@@ -1,8 +1,8 @@
 # 3.1 Partitioning And Bucketing
 
-Partitioning and bucketing are physical data organization techniques in Spark. Partitioning splits data into directories based on column values, enabling partition pruning for filters. Bucketing distributes data into a fixed number of files based on a hash of one or more columns, enabling shuffle-free joins and aggregations. Both are used to reduce I/O and shuffle cost, but they serve different purposes and have different trade-offs.
+<img width="1024" height="1536" alt="image" src="https://github.com/user-attachments/assets/4481025d-969c-4302-b3e4-e511f05fbfc0" />
 
----
+Partitioning and bucketing are physical data organization techniques in Spark. Partitioning splits data into directories based on column values, enabling partition pruning for filters. Bucketing distributes data into a fixed number of files based on a hash of one or more columns, enabling shuffle-free joins and aggregations. Both are used to reduce I/O and shuffle cost, but they serve different purposes and have different trade-offs.
 
 ### 3.1.1 What is the difference between `repartition()` and `coalesce()`?
 
@@ -47,8 +47,6 @@ df_coal = df.coalesce(2)                 # no shuffle, 2 partitions
 ```
 
 Explanation: `repartition` is a heavy operation that guarantees a new partition layout. `coalesce` is a lightweight operation that tries to avoid shuffle but may leave data uneven. Use `coalesce` when reducing partitions and shuffle is not needed. Use `repartition` when you need to increase partitions, balance data, or partition by specific columns.
-
----
 
 ### 3.1.2 When would you use `repartition()` over `coalesce()`, and vice versa?
 
@@ -116,8 +114,6 @@ Decision rule:
 - Need fewer partitions and want to avoid a shuffle: use `coalesce()`.
 - Need fewer partitions but also need even distribution: use `repartition(n)`, accepting the shuffle cost.
 - Need to increase partitions and are willing to shuffle: use `repartition(n)` or `coalesce(n, shuffle=True)`, but `repartition(n)` is clearer.
-
----
 
 ### 3.1.3 What is bucketing in Spark and how does it improve join performance?
 
@@ -205,8 +201,6 @@ Caveats and limitations:
 - If bucket counts differ between two tables, Spark may not be able to use the bucketed join optimization and may fall back to a shuffle join.
 
 In summary, bucketing pre-organizes data by hash into a fixed number of buckets. For joins, it allows Spark to co-locate matching keys without a shuffle, and with `sortBy` it can also avoid an extra sort. This makes joins faster and less resource-intensive when the join keys and bucket configurations align.
-
----
 
 ### 3.1.4 Explain the difference between `partitionBy` and `bucketBy`.
 
@@ -296,8 +290,6 @@ When to use which
 - Avoid `partitionBy` on high-cardinality columns because it creates too many small files.
 - Avoid `bucketBy` on columns that are not used in joins or aggregations, because it adds write overhead and metadata complexity.
 
----
-
 ### 3.1.5 What happens if you have too many small partitions (the 'small file problem')?
 
 **Answer:**
@@ -370,8 +362,6 @@ spark.sql("OPTIMIZE delta.`/path/to/table`")
 Important caveat: `coalesce(1)` on a large dataset can overload a single executor and cause out-of-memory errors. Use it only for small results.
 
 In summary, too many small partitions cause excessive task overhead, shuffle overhead, small files, poor read performance, and driver memory pressure. The fix is to coalesce, repartition, enable AQE, tune shuffle partitions, and avoid over-partitioning. Target partition sizes around 100 to 200 MB and output file sizes around 128 MB to 1 GB depending on storage.
-
----
 
 ### 3.1.6 How do you determine the optimal number of partitions for a dataset?
 
@@ -454,8 +444,6 @@ large_df.repartition(200).write.mode("overwrite").parquet("/path/output")
 
 In summary, determine the optimal number by balancing data size, cluster cores, and target partition size. Use the formula as a starting point, enable AQE, and tune based on Spark UI metrics. There is no fixed number. The best value is workload-specific and should be validated by monitoring performance.
 
----
-
 ### 3.1.7 What is the default number of shuffle partitions in Spark, and how do you change it?
 
 **Answer:**
@@ -526,7 +514,6 @@ AQE does not change the initial number of shuffle partitions. It reduces them af
 
 Choose the number based on data size and cluster cores. A common starting point is 2 to 4 tasks per CPU core, or target 100 MB to 200 MB per partition. For very small data, 200 may be too many and cause overhead. For very large data, 200 may be too few and cause spills or long tasks.
 
----
 
 **Notebook link:**  
 The notebooks (markdown files) for this section are available in the repository at:  
