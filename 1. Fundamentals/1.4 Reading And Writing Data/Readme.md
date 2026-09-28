@@ -1,4 +1,4 @@
-# 1. Fundamentals/1.4 Reading And Writing Data
+# 1.4 Reading And Writing Data
 
 Reading and writing data is a core operation in every Spark application. Spark provides a unified API to read from and write to many data sources, including files (CSV, JSON, Parquet, ORC, text), databases (JDBC), and data warehouses. Understanding the available formats, options, and best practices helps you build efficient and reliable pipelines.
 
