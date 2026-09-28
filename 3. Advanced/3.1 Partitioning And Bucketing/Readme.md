@@ -294,6 +294,8 @@ When to use which
 - Avoid `partitionBy` on high-cardinality columns because it creates too many small files.
 - Avoid `bucketBy` on columns that are not used in joins or aggregations, because it adds write overhead and metadata complexity.
 
+<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/b0d4c048-7688-4ed8-b544-80405cd7fff2" />
+
 ### 3.1.5 What happens if you have too many small partitions (the 'small file problem')?
 
 **Answer:**
