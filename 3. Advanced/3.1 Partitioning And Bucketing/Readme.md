@@ -117,6 +117,8 @@ Decision rule:
 - Need fewer partitions but also need even distribution: use `repartition(n)`, accepting the shuffle cost.
 - Need to increase partitions and are willing to shuffle: use `repartition(n)` or `coalesce(n, shuffle=True)`, but `repartition(n)` is clearer.
 
+<img width="800" height="800" alt="image" src="https://github.com/user-attachments/assets/fef4207c-666d-4a18-9ddb-e68f4331d016" />
+
 ### 3.1.3 What is bucketing in Spark and how does it improve join performance?
 
 **Answer:**
