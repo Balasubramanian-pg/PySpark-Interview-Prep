@@ -48,6 +48,8 @@ df_coal = df.coalesce(2)                 # no shuffle, 2 partitions
 
 Explanation: `repartition` is a heavy operation that guarantees a new partition layout. `coalesce` is a lightweight operation that tries to avoid shuffle but may leave data uneven. Use `coalesce` when reducing partitions and shuffle is not needed. Use `repartition` when you need to increase partitions, balance data, or partition by specific columns.
 
+<img width="668" height="459" alt="image" src="https://github.com/user-attachments/assets/d8d1e4ff-5914-4f8b-a5b3-5af73e6b3dd0" />
+
 ### 3.1.2 When would you use `repartition()` over `coalesce()`, and vice versa?
 
 **Answer:**
