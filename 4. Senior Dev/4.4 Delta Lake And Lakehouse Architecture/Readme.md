@@ -1,4 +1,4 @@
-### 4.4 Delta Lake And Lakehouse Architecture
+# 4.4 Delta Lake And Lakehouse Architecture
 
 **Delta Lake** is an open-source storage layer that brings ACID transactions, schema enforcement, time travel, and scalable metadata handling to data lakes built on Parquet files. A **Lakehouse** architecture combines the low-cost, open storage of a data lake with the reliability and performance guarantees of a data warehouse. Delta Lake is the storage foundation that makes the Lakehouse possible, and the **Medallion Architecture** (Bronze, Silver, Gold) is the most common pattern for organizing data within it. This section covers Delta Lake internals, core features, optimization techniques, and the architectural patterns that senior data engineers are expected to explain in interviews.
 
