@@ -1,4 +1,4 @@
-### 4.5 Cluster Sizing And Dynamic Allocation
+# 4.5 Cluster Sizing And Dynamic Allocation
 
 Cluster sizing and dynamic allocation determine how Spark distributes compute resources across a job. **Cluster sizing** is the deliberate choice of executor count, cores per executor, and memory per executor based on data volume, workload type, and SLA. **Dynamic allocation** is the runtime mechanism that adjusts the number of executors up or down as the workload changes, releasing idle executors and requesting new ones when tasks are backlogged. Together, they control cost, throughput, latency, and stability. Misconfigured sizing leads to out-of-memory errors, excessive garbage collection, idle resources, or long-running stages. In interviews, this topic tests whether you can reason from data characteristics to concrete configuration values and explain the operational trade-offs.
 
