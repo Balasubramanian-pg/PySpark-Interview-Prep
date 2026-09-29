@@ -1,4 +1,4 @@
-### 4. Senior Dev 4.3 Structured Streaming
+# 4.3 Structured Streaming
 
 **Structured Streaming** is Spark's scalable, fault-tolerant stream processing engine built on the Spark SQL engine. It models a stream as an **unbounded table** that receives new rows over time, and a streaming query as an incremental query over that table. This matters because it unifies batch and streaming APIs, supports event-time processing with **watermarks**, provides end-to-end exactly-once guarantees with checkpointing and replayable sources, and allows many Spark SQL operations to run in a streaming context. Interview questions usually focus on execution model, output modes, state management, watermarks, joins, fault tolerance, and performance tuning.
 
