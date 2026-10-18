@@ -185,9 +185,14 @@ defineExpose({
         <div class="popover-actions">
           <button v-if="currentStep > 0" class="btn-subtle" @click="prev">Back</button>
           <button class="btn-primary" @click="next">
-            {{ currentStep === steps.length - 1 ? 'Finish Tour' : 'Next →' }}
+            {{ currentStep === steps.length - 1 ? 'Finish Tour' : 'Next' }}
           </button>
-          <button class="btn-close" title="Close Tour" @click="dismiss">✕</button>
+          <button class="btn-close" title="Close Tour" @click="dismiss">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
         </div>
       </div>
     </div>
