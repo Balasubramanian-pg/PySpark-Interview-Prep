@@ -5,10 +5,56 @@
 
 @import url('https://fonts.cdnfonts.com/css/avenir-next-cyr');
 
+/* Embedded @font-face rules guarantee font availability without external CSS blocking */
+@font-face {
+  font-family: 'Avenir Next Cyr';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Avenir Next Cyr'), local('AvenirNextCyr-Regular'),
+       url('https://fonts.cdnfonts.com/s/14867/AvenirNextCyr-Regular.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Avenir Next Cyr';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Avenir Next Cyr'), local('AvenirNextCyr-Italic'),
+       url('https://fonts.cdnfonts.com/s/14867/AvenirNextCyr-Italic.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Avenir Next Cyr';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: local('Avenir Next Cyr Medium'), local('AvenirNextCyr-Medium'),
+       url('https://fonts.cdnfonts.com/s/14867/AvenirNextCyr-Medium.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Avenir Next Cyr';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Avenir Next Cyr Demi'), local('AvenirNextCyr-Demi'),
+       url('https://fonts.cdnfonts.com/s/14867/AvenirNextCyr-Demi.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Avenir Next Cyr';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Avenir Next Cyr Bold'), local('AvenirNextCyr-Bold'),
+       url('https://fonts.cdnfonts.com/s/14867/AvenirNextCyr-Bold.woff') format('woff');
+}
+
 :root {
-  /* Font Family Definitions */
-  --vp-font-family-base: "Avenir Next Cyr", "Avenir Next", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --vp-font-family-headings: "Avenir Next Cyr", "Avenir Next", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  /* Font Family Definitions: Avenir Next Cyr with modern geometric fallback, NEVER Calibri */
+  --vp-font-family-base: "Avenir Next Cyr", "Avenir Next", "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --vp-font-family-headings: "Avenir Next Cyr", "Avenir Next", "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --vp-font-family-mono: "JetBrains Mono", Consolas, Monaco, monospace;
 
   /* Surfaces & Canvas */
@@ -47,12 +93,27 @@
 
 /* Enforce Avenir Next Cyr across literally everything */
 *, *::before, *::after,
-html, body, p, li, a, span, button, input, textarea, blockquote, label, div,
-h1, h2, h3, h4, h5, h6,
+html, body, #app, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote,
+a, abbr, acronym, address, big, cite,
+del, dfn, em, ins, q, s,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video,
+input, button, select, textarea,
 .vp-doc, .vp-doc h1, .vp-doc h2, .vp-doc h3, .vp-doc h4, .vp-doc p, .vp-doc li,
 .VPDoc, .VPContent, .VPNavBar, .VPNav, .title, .text, .link, .brand-logo-text,
-.spotlight-title, .column-title, .widget-title, .module-title {
-  font-family: 'Avenir Next Cyr', 'Avenir Next', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+.spotlight-title, .column-title, .widget-title, .module-title,
+[class*="vp-"], [class*="dash-"], [class*="feat-"], [class*="card-"],
+[class*="module-"], [class*="filter-"], [class*="pomo-"], [class*="search-"],
+[class*="guide-"], [class*="quiz-"], [class*="question-"] {
+  font-family: 'Avenir Next Cyr', 'Avenir Next', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -60,7 +121,7 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: -0.02em;
 }
 
-code, kbd, samp, pre, .pomo-digits, .digits {
+code, kbd, samp, pre, .pomo-digits, .digits, .code-snippet {
   font-family: var(--vp-font-family-mono) !important;
 }
 
