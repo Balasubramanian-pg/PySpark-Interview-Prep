@@ -1,0 +1,119 @@
+/* ==========================================================================
+   Repo-Wiki Design System: Anti-Vibe-Coding Standards & Tokens
+   Typography: Avenir Next Cyr (Body) + Plus Jakarta Sans (Headings)
+   ========================================================================== */
+
+@font-face {
+  font-family: 'Avenir Next Cyr';
+  src: local('Avenir Next Cyr'), local('Avenir Next'), local('AvenirNext-Regular');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* Font Family Definitions */
+  --vp-font-family-base: "Avenir Next Cyr", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  --vp-font-family-headings: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --vp-font-family-mono: "JetBrains Mono", Consolas, Monaco, monospace;
+
+  /* Surfaces & Canvas */
+  --canvas-bg: #0D0E12;
+  --surface-panel: #12131A;
+  --card-bg: #15161E;
+  --card-light: #FFFFFF;
+  --capsule-container: #191B24;
+  --track-bg: #232532;
+
+  /* Borders */
+  --border-subtle: rgba(255, 255, 255, 0.07);
+  --border-medium: rgba(255, 255, 255, 0.12);
+  --border-active: rgba(144, 107, 255, 0.4);
+
+  /* Primary Brand Violet & Spark Orange Accents */
+  --primary-violet: #906BFF;
+  --primary-light: #C084FC;
+  --primary-glow: rgba(144, 107, 255, 0.3);
+  --accent-orange: #FF6B35;
+  --accent-orange-glow: rgba(255, 107, 53, 0.35);
+  --accent-mint: #34D399;
+  --accent-mint-bg: rgba(52, 211, 153, 0.15);
+  --accent-coral: #F87171;
+  --accent-blue-soft: #E0E7FF;
+  --accent-blue-card: #EEF2FF;
+
+  /* Text Colors */
+  --text-primary: #FFFFFF;
+  --text-secondary: #9CA3AF;
+  --text-muted: #6E7387;
+  --text-dark: #1E293B;
+
+  /* VitePress Overrides */
+  --vp-c-brand-1: #FF6B35;
+  --vp-c-brand-2: #906BFF;
+  --vp-c-brand-soft: rgba(255, 107, 53, 0.14);
+}
+
+/* Enforce font distinction across all elements */
+body, p, li, a, span, button, input, textarea, blockquote, label {
+  font-family: var(--vp-font-family-base) !important;
+}
+
+h1, h2, h3, h4, h5, h6, 
+.spotlight-title, .column-title, .widget-title, .module-title, .brand-logo-text {
+  font-family: var(--vp-font-family-headings) !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.02em;
+}
+
+code, kbd, samp, pre {
+  font-family: var(--vp-font-family-mono) !important;
+}
+
+/* Reader Mode Article Formatting & Anti-Clip Rules */
+.vp-doc {
+  overflow-wrap: break-word !important;
+  word-wrap: break-word !important;
+  word-break: break-word !important;
+  min-width: 0 !important;
+}
+
+.vp-doc pre {
+  overflow-x: auto !important;
+  max-width: 100% !important;
+  border-radius: 14px !important;
+  border: 1px solid var(--border-subtle) !important;
+}
+
+.vp-doc table {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  border-radius: 12px;
+}
+
+.vp-doc th, .vp-doc td {
+  padding: 10px 16px;
+  border: 1px solid var(--border-subtle);
+}
+
+/* Minimal Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
