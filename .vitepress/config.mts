@@ -17,9 +17,8 @@ export default defineConfig({
   base: '/PySpark-Interview-Prep/',
   
   head: [
-    ['link', { rel: 'preconnect', href: 'https://fonts.googleapis.com' }],
-    ['link', { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' }],
-    ['link', { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap' }],
+    ['link', { rel: 'preconnect', href: 'https://fonts.cdnfonts.com' }],
+    ['link', { rel: 'stylesheet', href: 'https://fonts.cdnfonts.com/css/avenir-next-cyr' }],
     ['meta', { name: 'theme-color', content: '#0D0E12' }],
     ['meta', { name: 'author', content: 'Balasubramanian PG' }],
     ['meta', { property: 'og:title', content: 'PySpark Interview Prep Wiki' }],
@@ -27,24 +26,15 @@ export default defineConfig({
   ],
 
   themeConfig: {
-    siteTitle: '⚡ PySpark Prep',
+    siteTitle: 'PySpark Prep',
     logo: {
       light: '/spark-logo.svg',
       dark: '/spark-logo.svg',
       alt: 'PySpark Prep'
     },
-    nav: [
-      { text: 'Dashboard', link: '/' },
-      { text: '1. Fundamentals', link: '/1. Fundamentals/1.1 Spark Architecture Basics/Readme' },
-      { text: '2. Intermediate', link: '/2. Intermediate/2.1 Joins And Join Types/Readme' },
-      { text: '3. Advanced', link: '/3. Advanced/3.1 Partitioning And Bucketing/Readme' },
-      { text: '4. Senior Dev', link: '/4. Senior Dev/4.1 Memory Management And OOM Errors/Readme' }
-    ],
+    nav: [],
     sidebar: sidebar,
-    socialLinks: [
-      { icon: 'github', link: 'https://github.com/Balasubramanian-pg/PySpark-Interview-Prep' },
-      { icon: 'linkedin', link: 'https://linkedin.com/in/balasubramanian-pg' }
-    ],
+    socialLinks: [],
     footer: {
       message: 'Zero-backend, client-first interactive learning portal for PySpark engineers.',
       copyright: 'Maintained by Balasubramanian PG'
