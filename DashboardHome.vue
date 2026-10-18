@@ -9,7 +9,12 @@ import {
   getActivityMap,
   getTimeframe,
   setTimeframe,
-  EVENT_PROGRESS_UPDATED
+  EVENT_PROGRESS_UPDATED,
+  resolveUrl,
+  normalizePath,
+  isLessonCompleted,
+  isFavorite,
+  toggleFavorite
 } from './.vitepress/theme/storage'
 import WalkthroughGuide from './.vitepress/theme/WalkthroughGuide.vue'
 import SearchModal from './.vitepress/theme/SearchModal.vue'
@@ -29,6 +34,84 @@ const pomodoroStats = ref<{ completedBlocks: number }>({ completedBlocks: 0 })
 const activityMap = ref<Record<string, string[]>>({})
 const selectedTimeframe = ref<'week' | 'month'>('week')
 const activeFilter = ref<'all' | '1. Fundamentals' | '2. Intermediate' | '3. Advanced' | '4. Senior Dev'>('all')
+
+// Interactive Question Feed State
+const feedSearchQuery = ref('')
+const selectedSubtopic = ref<string>('all')
+const currentPage = ref(1)
+const itemsPerPage = ref(12)
+
+function setFilter(filter: 'all' | '1. Fundamentals' | '2. Intermediate' | '3. Advanced' | '4. Senior Dev') {
+  activeFilter.value = filter
+  selectedSubtopic.value = 'all'
+  feedSearchQuery.value = ''
+  currentPage.value = 1
+}
+
+function setSubtopic(subtopic: string) {
+  selectedSubtopic.value = subtopic
+  currentPage.value = 1
+}
+
+const availableSubtopics = computed(() => {
+  let list = searchIndexData
+  if (activeFilter.value !== 'all') {
+    list = list.filter(item => item.module === activeFilter.value)
+  }
+  const subtopicMap: Record<string, number> = {}
+  list.forEach(item => {
+    subtopicMap[item.subtopic] = (subtopicMap[item.subtopic] || 0) + 1
+  })
+  return Object.entries(subtopicMap).map(([name, count]) => ({ name, count }))
+})
+
+const filteredQuestions = computed(() => {
+  return searchIndexData.filter(item => {
+    if (activeFilter.value !== 'all' && item.module !== activeFilter.value) {
+      return false
+    }
+    if (selectedSubtopic.value !== 'all' && item.subtopic !== selectedSubtopic.value) {
+      return false
+    }
+    if (feedSearchQuery.value.trim()) {
+      const q = feedSearchQuery.value.toLowerCase().trim()
+      const titleMatch = item.title.toLowerCase().includes(q)
+      const subtopicMatch = item.subtopic.toLowerCase().includes(q)
+      const summaryMatch = item.summary.toLowerCase().includes(q)
+      if (!titleMatch && !subtopicMatch && !summaryMatch) {
+        return false
+      }
+    }
+    return true
+  })
+})
+
+const totalPages = computed(() => {
+  return Math.ceil(filteredQuestions.value.length / itemsPerPage.value) || 1
+})
+
+const paginatedQuestions = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage.value
+  return filteredQuestions.value.slice(start, start + itemsPerPage.value)
+})
+
+function prevPage() {
+  if (currentPage.value > 1) {
+    currentPage.value--
+  }
+}
+
+function nextPage() {
+  if (currentPage.value < totalPages.value) {
+    currentPage.value++
+  }
+}
+
+function onToggleCardFavorite(item: any, e: Event) {
+  e.stopPropagation()
+  toggleFavorite(item.path)
+  favorites.value = getFavorites()
+}
 
 // Pomodoro state
 const POMO_KEY = 'portal_pomo_state'
@@ -209,15 +292,15 @@ const monthlyData = computed(() => {
 
 const favoriteQuestions = computed(() => {
   return searchIndexData.filter(item => {
-    const clean = item.path.replace(/\/$/, '')
-    return favorites.value.some(fav => fav.replace(/\/$/, '') === clean)
+    const clean = normalizePath(item.path)
+    return favorites.value.some(fav => normalizePath(fav) === clean)
   }).slice(0, 6)
 })
 
 const nextUncompletedLesson = computed(() => {
   const found = searchIndexData.find(item => {
-    const clean = item.path.replace(/\/$/, '')
-    return !completedLessons.value.some(c => c.replace(/\/$/, '') === clean)
+    const clean = normalizePath(item.path)
+    return !completedLessons.value.some(c => normalizePath(c) === clean)
   })
   return found || searchIndexData[0]
 })
@@ -261,8 +344,8 @@ function getModuleProgress(moduleId: string) {
   const moduleQuestions = searchIndexData.filter(i => i.module === moduleId)
   if (moduleQuestions.length === 0) return 0
   const completed = moduleQuestions.filter(i => {
-    const clean = i.path.replace(/\/$/, '')
-    return completedLessons.value.some(c => c.replace(/\/$/, '') === clean)
+    const clean = normalizePath(i.path)
+    return completedLessons.value.some(c => normalizePath(c) === clean)
   })
   return Math.round((completed.length / moduleQuestions.length) * 100)
 }
@@ -270,8 +353,8 @@ function getModuleProgress(moduleId: string) {
 function getModuleCompletedCount(moduleId: string) {
   const moduleQuestions = searchIndexData.filter(i => i.module === moduleId)
   return moduleQuestions.filter(i => {
-    const clean = i.path.replace(/\/$/, '')
-    return completedLessons.value.some(c => c.replace(/\/$/, '') === clean)
+    const clean = normalizePath(i.path)
+    return completedLessons.value.some(c => normalizePath(c) === clean)
   }).length
 }
 
@@ -284,7 +367,7 @@ function openTour() {
 }
 
 function navigateTo(path: string) {
-  router.go(path)
+  router.go(resolveUrl(path))
 }
 </script>
 
@@ -427,50 +510,50 @@ function navigateTo(path: string) {
 
       <!-- CENTER COLUMN: Feed & Cards & Curriculum & Bento -->
       <main class="dash-col-center">
-        <!-- Feed Header & Tabs -->
+        <!-- Feed Header & Filter Tabs -->
         <div class="feed-header">
           <h2 class="feed-title">Curriculum Feed</h2>
           <div class="feed-filter-chips">
             <button
               class="filter-pill"
               :class="{ active: activeFilter === 'all' }"
-              @click="activeFilter = 'all'"
+              @click="setFilter('all')"
             >
               All (265)
             </button>
             <button
               class="filter-pill"
               :class="{ active: activeFilter === '1. Fundamentals' }"
-              @click="activeFilter = '1. Fundamentals'"
+              @click="setFilter('1. Fundamentals')"
             >
               Fundamentals (70)
             </button>
             <button
               class="filter-pill"
               :class="{ active: activeFilter === '2. Intermediate' }"
-              @click="activeFilter = '2. Intermediate'"
+              @click="setFilter('2. Intermediate')"
             >
               Intermediate (77)
             </button>
             <button
               class="filter-pill"
               :class="{ active: activeFilter === '3. Advanced' }"
-              @click="activeFilter = '3. Advanced'"
+              @click="setFilter('3. Advanced')"
             >
               Advanced (68)
             </button>
             <button
               class="filter-pill"
               :class="{ active: activeFilter === '4. Senior Dev' }"
-              @click="activeFilter = '4. Senior Dev'"
+              @click="setFilter('4. Senior Dev')"
             >
               Senior Dev (50)
             </button>
           </div>
         </div>
 
-        <!-- FEATURED HERO CARDS matching screenshot 3-card layout -->
-        <div class="featured-cards-grid">
+        <!-- FEATURED HERO CARDS shown on 'All' view for quick spotlight -->
+        <div v-if="activeFilter === 'all'" class="featured-cards-grid">
           <!-- Card 1: Dark Navy Card -->
           <div class="feat-card feat-dark" @click="navigateTo('/1. Fundamentals/1.3 Lazy Evaluation And Lineage/1.3.6 How does Lineage help with fault tolerance')">
             <div class="feat-meta">
@@ -517,6 +600,169 @@ function navigateTo(path: string) {
               <span class="read-link" style="color: #2563EB;">Read architecture</span>
               <button class="feat-pill-dark">Master Sizing</button>
             </div>
+          </div>
+        </div>
+
+        <!-- ACTIVE CURRICULUM QUESTIONS STREAM (Interactive filtered question feed) -->
+        <div class="questions-stream-section">
+          <!-- Feed Sub-Header with In-Feed Search & Controls -->
+          <div class="feed-controls-bar">
+            <div class="feed-sub-info">
+              <span class="active-category-title">
+                {{ activeFilter === 'all' ? 'All PySpark Questions & Notes' : activeFilter }}
+              </span>
+              <span class="active-count-badge">
+                {{ filteredQuestions.length }} Notes
+              </span>
+            </div>
+
+            <!-- In-feed keyword filter -->
+            <div class="feed-search-box">
+              <svg class="search-mini-svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input
+                v-model="feedSearchQuery"
+                type="text"
+                placeholder="Filter active questions..."
+                class="feed-search-input"
+                @input="currentPage = 1"
+              />
+              <button v-if="feedSearchQuery" class="clear-search-btn" @click="feedSearchQuery = ''; currentPage = 1">
+                ✕
+              </button>
+            </div>
+          </div>
+
+          <!-- Dynamic Subtopic Filters -->
+          <div v-if="availableSubtopics.length > 1" class="subtopic-chips-row">
+            <button
+              class="subtopic-pill"
+              :class="{ active: selectedSubtopic === 'all' }"
+              @click="setSubtopic('all')"
+            >
+              All Topics
+            </button>
+            <button
+              v-for="sub in availableSubtopics"
+              :key="sub.name"
+              class="subtopic-pill"
+              :class="{ active: selectedSubtopic === sub.name }"
+              @click="setSubtopic(sub.name)"
+            >
+              {{ sub.name }} ({{ sub.count }})
+            </button>
+          </div>
+
+          <!-- Empty Results State -->
+          <div v-if="filteredQuestions.length === 0" class="empty-feed-state">
+            <svg class="empty-icon-svg" viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.8">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <div class="empty-title">No interview notes match your query</div>
+            <p class="empty-desc">Try clearing your search query or switching to another category.</p>
+            <button class="reset-feed-btn" @click="feedSearchQuery = ''; selectedSubtopic = 'all'; activeFilter = 'all'">
+              Show All Questions
+            </button>
+          </div>
+
+          <!-- Question Cards Stream Grid -->
+          <div v-else class="question-cards-stream">
+            <div
+              v-for="item in paginatedQuestions"
+              :key="item.path"
+              class="question-stream-card"
+              @click="navigateTo(item.path)"
+            >
+              <div class="q-card-header">
+                <div class="q-card-tags">
+                  <span class="q-module-badge">{{ item.module.replace(/^\d+\.\s*/, '') }}</span>
+                  <span class="q-subtopic-badge">{{ item.subtopic }}</span>
+                </div>
+                
+                <div class="q-card-actions">
+                  <!-- Completion status pill -->
+                  <span v-if="isLessonCompleted(item.path)" class="status-badge completed" title="Completed">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.8">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    <span>Done</span>
+                  </span>
+                  <span v-else class="status-badge ready">
+                    <span>Ready</span>
+                  </span>
+
+                  <!-- Bookmark button -->
+                  <button
+                    class="q-fav-toggle-btn"
+                    :class="{ active: isFavorite(item.path) }"
+                    :title="isFavorite(item.path) ? 'Saved in Favs' : 'Bookmark'"
+                    @click="onToggleCardFavorite(item, $event)"
+                  >
+                    <svg v-if="isFavorite(item.path)" viewBox="0 0 24 24" width="15" height="15" fill="#FBBF24">
+                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
+                    <svg v-else viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Question Title -->
+              <h4 class="q-card-title">
+                <a :href="resolveUrl(item.path)" class="q-card-link" @click.prevent="navigateTo(item.path)">
+                  {{ item.title }}
+                </a>
+              </h4>
+
+              <!-- Question Summary Preview -->
+              <p class="q-card-summary">
+                {{ item.summary }}
+              </p>
+
+              <!-- Question Footer -->
+              <div class="q-card-footer">
+                <span class="q-read-more">
+                  Read interview answer
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                  </svg>
+                </span>
+                <span class="q-action-chip">Study Note</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pagination Bar -->
+          <div v-if="totalPages > 1" class="feed-pagination-bar">
+            <button
+              class="pagination-btn"
+              :disabled="currentPage === 1"
+              @click="prevPage"
+            >
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="15 18 9 12 15 6"></polyline>
+              </svg>
+              <span>Previous</span>
+            </button>
+
+            <span class="pagination-page-indicator">
+              Page {{ currentPage }} of {{ totalPages }} ({{ filteredQuestions.length }} questions)
+            </span>
+
+            <button
+              class="pagination-btn"
+              :disabled="currentPage === totalPages"
+              @click="nextPage"
+            >
+              <span>Next</span>
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </button>
           </div>
         </div>
 
@@ -1711,6 +1957,387 @@ function navigateTo(path: string) {
 .mini-title-bold {
   font-size: 13.5px;
   font-weight: 700;
+}
+
+/* ==========================================================================
+   Interactive Curriculum Questions Stream
+   ========================================================================== */
+.questions-stream-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.feed-controls-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.feed-sub-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.active-category-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+.active-count-badge {
+  background: rgba(255, 107, 53, 0.15);
+  color: #FF6B35;
+  border: 1px solid rgba(255, 107, 53, 0.3);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 9999px;
+}
+
+.feed-search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #15161E;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 6px 14px;
+  border-radius: 9999px;
+  min-width: 260px;
+  transition: all 0.2s ease;
+}
+
+.feed-search-box:focus-within {
+  border-color: #FF6B35;
+  box-shadow: 0 0 0 2px rgba(255, 107, 53, 0.2);
+}
+
+.search-mini-svg {
+  color: #9CA3AF;
+  flex-shrink: 0;
+}
+
+.feed-search-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #FFFFFF;
+  font-size: 13px;
+  width: 100%;
+}
+
+.feed-search-input::placeholder {
+  color: #6E7387;
+}
+
+.clear-search-btn {
+  background: none;
+  border: none;
+  color: #9CA3AF;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 0 4px;
+}
+
+.clear-search-btn:hover {
+  color: #FFFFFF;
+}
+
+/* Subtopic filter chips row */
+.subtopic-chips-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  scrollbar-width: thin;
+}
+
+.subtopic-pill {
+  background: #15161E;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #9CA3AF;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.subtopic-pill:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #FFFFFF;
+}
+
+.subtopic-pill.active {
+  background: #FF6B35;
+  border-color: #FF6B35;
+  color: #FFFFFF;
+  font-weight: 600;
+}
+
+/* Question Cards Stream Grid */
+.question-cards-stream {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+
+.question-stream-card {
+  background: #15161E;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 18px;
+  padding: 18px 20px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.question-stream-card:hover {
+  border-color: rgba(255, 107, 53, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4);
+}
+
+.q-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.q-card-tags {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.q-module-badge {
+  background: rgba(255, 107, 53, 0.12);
+  color: #FF6B35;
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.q-subtopic-badge {
+  background: rgba(255, 255, 255, 0.06);
+  color: #9CA3AF;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.q-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 9999px;
+}
+
+.status-badge.completed {
+  background: rgba(52, 211, 153, 0.15);
+  color: #34D399;
+  border: 1px solid rgba(52, 211, 153, 0.3);
+}
+
+.status-badge.ready {
+  background: rgba(255, 255, 255, 0.05);
+  color: #9CA3AF;
+}
+
+.q-fav-toggle-btn {
+  background: none;
+  border: none;
+  color: #6E7387;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+}
+
+.q-fav-toggle-btn:hover {
+  color: #FBBF24;
+  background: rgba(251, 191, 36, 0.1);
+}
+
+.q-fav-toggle-btn.active {
+  color: #FBBF24;
+}
+
+.q-card-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.4;
+  color: #FFFFFF;
+}
+
+.q-card-link {
+  color: #FFFFFF;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.q-card-link:hover {
+  color: #FF6B35;
+}
+
+.q-card-summary {
+  margin: 0;
+  font-size: 13px;
+  color: #9CA3AF;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.q-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.q-read-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #FF6B35;
+}
+
+.q-action-chip {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #FFFFFF;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  transition: all 0.15s ease;
+}
+
+.question-stream-card:hover .q-action-chip {
+  background: #FF6B35;
+  border-color: #FF6B35;
+}
+
+/* Pagination Bar */
+.feed-pagination-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 20px;
+  background: #15161E;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 16px;
+  margin-top: 6px;
+}
+
+.pagination-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #FFFFFF;
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 7px 14px;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: #FF6B35;
+  border-color: #FF6B35;
+}
+
+.pagination-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.pagination-page-indicator {
+  font-size: 12.5px;
+  color: #9CA3AF;
+  font-weight: 500;
+}
+
+/* Empty state */
+.empty-feed-state {
+  text-align: center;
+  padding: 48px 24px;
+  background: #15161E;
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.empty-icon-svg {
+  color: #6E7387;
+}
+
+.empty-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+.empty-desc {
+  font-size: 13px;
+  color: #9CA3AF;
+  max-width: 360px;
+  margin: 0;
+}
+
+.reset-feed-btn {
+  background: #FF6B35;
+  border: none;
+  color: #FFFFFF;
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 7px 16px;
+  border-radius: 9999px;
+  cursor: pointer;
+  margin-top: 6px;
 }
 
 @media (max-width: 1200px) {
