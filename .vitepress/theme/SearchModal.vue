@@ -23,7 +23,6 @@ const conceptKeywords = [
 
 const filteredResults = computed(() => {
   if (!searchQuery.value.trim()) {
-    // Show top curated sample
     return searchIndexData.slice(0, 8)
   }
   const q = searchQuery.value.toLowerCase().trim()
@@ -95,7 +94,10 @@ defineExpose({ open, close })
   <div v-if="isVisible" class="search-backdrop" @click.self="close">
     <div class="search-dialog">
       <div class="search-input-header">
-        <span class="search-icon">🔍</span>
+        <svg class="search-svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
         <input
           ref="inputRef"
           v-model="searchQuery"
@@ -144,9 +146,9 @@ defineExpose({ open, close })
       </div>
 
       <div class="search-footer">
-        <span>↑↓ Navigate</span>
-        <span>↵ Select</span>
-        <span>ESC Close</span>
+        <span>Navigate: Arrow Up/Down</span>
+        <span>Select: Enter</span>
+        <span>Close: ESC</span>
       </div>
     </div>
   </div>
@@ -186,9 +188,9 @@ defineExpose({ open, close })
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.search-icon {
-  font-size: 18px;
-  opacity: 0.7;
+.search-svg {
+  color: #9CA3AF;
+  flex-shrink: 0;
 }
 
 .search-input {
