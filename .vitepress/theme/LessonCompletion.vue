@@ -2,7 +2,16 @@
 import { ref, watch, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vitepress'
 import confetti from 'canvas-confetti'
-import { isLessonCompleted, toggleLessonCompletion, isFavorite, toggleFavorite, resolveUrl, normalizePath } from './storage'
+import {
+  isLessonCompleted,
+  toggleLessonCompletion,
+  isFavorite,
+  toggleFavorite,
+  resolveUrl,
+  normalizePath,
+  scheduleSRSReview,
+  recordStudyActivity
+} from './storage'
 import searchIndexData from '../../search-index.json'
 
 const route = useRoute()
@@ -10,19 +19,23 @@ const router = useRouter()
 
 const completed = ref(false)
 const favorited = ref(false)
+const srsGraded = ref(false)
 
 function checkState() {
   const currentPath = route.path
   completed.value = isLessonCompleted(currentPath)
   favorited.value = isFavorite(currentPath)
+  srsGraded.value = false
 }
 
 onMounted(() => {
   checkState()
+  recordStudyActivity()
 })
 
 watch(() => route.path, () => {
   checkState()
+  recordStudyActivity()
 })
 
 function onToggleCompletion() {
@@ -30,7 +43,7 @@ function onToggleCompletion() {
   completed.value = nowCompleted
   if (nowCompleted) {
     confetti({
-      particleCount: 55,
+      particleCount: 50,
       spread: 60,
       origin: { y: 0.85 },
       colors: ['#FF6B35', '#906BFF', '#34D399', '#FBBF24']
@@ -42,7 +55,22 @@ function onToggleFavorite() {
   favorited.value = toggleFavorite(route.path)
 }
 
-// Find previous and next questions from search index
+function handleSRSGrade(confidence: 'hard' | 'good' | 'mastered') {
+  scheduleSRSReview(route.path, confidence)
+  srsGraded.value = true
+  if (!completed.value) {
+    onToggleCompletion()
+  } else {
+    confetti({
+      particleCount: 35,
+      spread: 50,
+      origin: { y: 0.85 },
+      colors: ['#FF6B35', '#10B981']
+    })
+  }
+}
+
+// Find previous and next questions
 const currentIndex = computed(() => {
   const cleanPath = normalizePath(route.path)
   return searchIndexData.findIndex(item => normalizePath(item.path) === cleanPath)
@@ -69,8 +97,34 @@ function navigateTo(path: string) {
 
 <template>
   <div class="completion-bar">
+    <!-- Active Recall & Spaced Repetition Bar -->
+    <div class="srs-retention-pill">
+      <div class="srs-pill-header">
+        <span class="pill-tag">ACTIVE RECALL CHECK</span>
+        <span class="pill-desc">How easily could you answer this in a real interview?</span>
+      </div>
+
+      <div v-if="!srsGraded" class="srs-pill-actions">
+        <button class="srs-btn hard" @click="handleSRSGrade('hard')">
+          <span>🧠 Hard</span>
+          <small>Review in 1d</small>
+        </button>
+        <button class="srs-btn good" @click="handleSRSGrade('good')">
+          <span>⚡ Good</span>
+          <small>Review in 3d</small>
+        </button>
+        <button class="srs-btn mastered" @click="handleSRSGrade('mastered')">
+          <span>🏆 Mastered</span>
+          <small>Review in 7d</small>
+        </button>
+      </div>
+      <div v-else class="srs-graded-confirmation">
+        <span>Scheduled into your Ebbinghaus Spaced Repetition queue!</span>
+      </div>
+    </div>
+
+    <!-- Navigation & Completion Controls -->
     <div class="completion-inner">
-      <!-- Navigation controls -->
       <div class="nav-links">
         <button
           v-if="prevQuestion"
@@ -81,10 +135,10 @@ function navigateTo(path: string) {
           <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
             <polyline points="15 18 9 12 15 6"></polyline>
           </svg>
-          <span>Previous Question</span>
+          <span>Previous</span>
         </button>
         <span v-else class="nav-btn disabled">
-          <span>Start of Curriculum</span>
+          <span>First Question</span>
         </span>
 
         <button
@@ -100,12 +154,11 @@ function navigateTo(path: string) {
         </button>
       </div>
 
-      <!-- Action buttons -->
       <div class="action-buttons">
         <button
           class="fav-btn"
           :class="{ active: favorited }"
-          :title="favorited ? 'Saved in Your Dashboard' : 'Bookmark this Question'"
+          :title="favorited ? 'Saved in Cheat Sheet' : 'Save to Cheat Sheet'"
           @click="onToggleFavorite"
         >
           <svg v-if="favorited" viewBox="0 0 24 24" width="15" height="15" fill="#FBBF24">
@@ -114,7 +167,7 @@ function navigateTo(path: string) {
           <svg v-else viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
           </svg>
-          <span>{{ favorited ? 'Saved in Dashboard' : 'Bookmark' }}</span>
+          <span>{{ favorited ? 'Saved in Cheat Sheet' : 'Bookmark' }}</span>
         </button>
 
         <button
@@ -128,7 +181,7 @@ function navigateTo(path: string) {
           <svg v-else viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="9"></circle>
           </svg>
-          <span>{{ completed ? 'Completed · Click to Reset' : 'Mark as Complete' }}</span>
+          <span>{{ completed ? 'Completed' : 'Mark as Complete' }}</span>
         </button>
       </div>
     </div>
@@ -142,8 +195,93 @@ function navigateTo(path: string) {
   margin-top: 48px;
   z-index: 40;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
   padding: 0 16px;
+}
+
+.srs-retention-pill {
+  width: 100%;
+  max-width: 860px;
+  background: #11121C;
+  border: 1px solid rgba(255, 107, 53, 0.3);
+  border-radius: 14px;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.srs-pill-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pill-tag {
+  font-size: 10px;
+  font-weight: 700;
+  color: #FF6B35;
+  letter-spacing: 0.06em;
+  background: rgba(255, 107, 53, 0.12);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.pill-desc {
+  font-size: 12px;
+  color: #8C93A8;
+}
+
+.srs-pill-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.srs-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #181926;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.srs-btn span {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+.srs-btn small {
+  font-size: 9px;
+  color: #8C93A8;
+}
+
+.srs-btn.hard:hover {
+  border-color: #EF4444;
+  background: rgba(239, 68, 68, 0.15);
+}
+
+.srs-btn.good:hover {
+  border-color: #F59E0B;
+  background: rgba(245, 158, 11, 0.15);
+}
+
+.srs-btn.mastered:hover {
+  border-color: #10B981;
+  background: rgba(16, 185, 129, 0.15);
+}
+
+.srs-graded-confirmation {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #10B981;
 }
 
 .completion-inner {
@@ -234,9 +372,9 @@ function navigateTo(path: string) {
   background: linear-gradient(135deg, #FF6B35 0%, #EA580C 100%);
   border: none;
   color: #FFFFFF;
-  font-size: 13.5px;
+  font-size: 13px;
   font-weight: 600;
-  padding: 9px 18px;
+  padding: 8px 16px;
   border-radius: 10px;
   cursor: pointer;
   box-shadow: 0 4px 14px rgba(255, 107, 53, 0.35);
@@ -254,6 +392,11 @@ function navigateTo(path: string) {
 }
 
 @media (max-width: 680px) {
+  .srs-retention-pill {
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+  }
   .completion-inner {
     flex-direction: column;
     gap: 12px;

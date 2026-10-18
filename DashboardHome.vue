@@ -9,6 +9,9 @@ import {
   getActivityMap,
   getTimeframe,
   setTimeframe,
+  getStudyStreak,
+  getDueSRSReviews,
+  getDiagnosticResult,
   EVENT_PROGRESS_UPDATED,
   resolveUrl,
   normalizePath,
@@ -19,6 +22,9 @@ import {
 import WalkthroughGuide from './.vitepress/theme/WalkthroughGuide.vue'
 import SearchModal from './.vitepress/theme/SearchModal.vue'
 import QuizModal from './.vitepress/theme/QuizModal.vue'
+import DiagnosticModal from './components/ui/DiagnosticModal.vue'
+import FlashcardModal from './components/ui/FlashcardModal.vue'
+import SyncModal from './components/ui/SyncModal.vue'
 import CircularCarousel from './components/ui/CircularCarousel.vue'
 import Gallery6Modules from './components/ui/Gallery6Modules.vue'
 import searchIndexData from './search-index.json'
@@ -28,6 +34,9 @@ const router = useRouter()
 const walkthroughRef = ref<InstanceType<typeof WalkthroughGuide> | null>(null)
 const searchModalRef = ref<InstanceType<typeof SearchModal> | null>(null)
 const showQuizModal = ref(false)
+const showDiagnosticModal = ref(false)
+const showFlashcardModal = ref(false)
+const showSyncModal = ref(false)
 
 // State
 const completedLessons = ref<string[]>([])
@@ -37,10 +46,15 @@ const activityMap = ref<Record<string, string[]>>({})
 const selectedTimeframe = ref<'week' | 'month'>('week')
 const activeFilter = ref<'all' | '1. Fundamentals' | '2. Intermediate' | '3. Advanced' | '4. Senior Dev'>('all')
 
+// Retention State
+const studyStreak = ref({ currentStreak: 0, longestStreak: 0, lastStudyDate: '' })
+const dueReviews = ref<any[]>([])
+const diagnosticResult = ref<any>(null)
+
 // Interactive Question Feed State
 const selectedSubtopic = ref<string>('all')
 const currentPage = ref(1)
-const itemsPerPage = ref(6) // Low cognitive load: 6 clean cards per page
+const itemsPerPage = ref(6)
 
 function setFilter(filter: 'all' | '1. Fundamentals' | '2. Intermediate' | '3. Advanced' | '4. Senior Dev') {
   activeFilter.value = filter
@@ -104,6 +118,16 @@ function onToggleCardFavorite(item: any, e: Event) {
   favorites.value = getFavorites()
 }
 
+// Company War Stories Tagging (high engagement hook)
+const companyTags = ['Netflix', 'Databricks', 'Uber', 'Apple', 'Meta', 'Amazon', 'Stripe']
+function getCompanyTag(title: string): string {
+  let hash = 0
+  for (let i = 0; i < title.length; i++) {
+    hash = (hash << 5) - hash + title.charCodeAt(i)
+  }
+  return companyTags[Math.abs(hash) % companyTags.length]
+}
+
 // Pomodoro state
 const POMO_KEY = 'portal_pomo_state'
 const pomoRemaining = ref(25 * 60)
@@ -118,6 +142,9 @@ function loadAllState() {
   pomodoroStats.value = getPomodoroStats()
   activityMap.value = getActivityMap()
   selectedTimeframe.value = getTimeframe()
+  studyStreak.value = getStudyStreak()
+  dueReviews.value = getDueSRSReviews()
+  diagnosticResult.value = getDiagnosticResult()
   syncPomo()
 }
 
@@ -235,7 +262,7 @@ const formattedPomoTime = computed(() => {
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
 })
 
-// Dynamic Performance Spline Wave (Contained 220x70)
+// Dynamic Performance Spline Wave
 const waveData = computed(() => {
   const score = readinessScore.value
   const normalizedScore = Math.max(8, score)
@@ -282,7 +309,7 @@ const monthlyData = computed(() => {
   })
 })
 
-// ─── 4 Core Curriculum Modules with Gallery6 ──────────────────────────
+// Core Modules
 const modulesList = computed(() => [
   {
     id: '1. Fundamentals',
@@ -346,11 +373,10 @@ function navigateTo(path: string) {
   router.go(resolveUrl(path))
 }
 
-// ─── ADHD-Friendly Random Daily Topics (3D Orbit Carousel) ────────────
+// ─── ADHD-Friendly 3D Orbit Carousel ──────────────────────────────────
 const randomSeed = ref(Date.now())
 
 const randomDailyTopics = computed(() => {
-  // Pick 6 distinct high-value topics from across the 4 modules
   const candidateTopics = [
     {
       id: 'topic-1',
@@ -396,7 +422,6 @@ const randomDailyTopics = computed(() => {
     }
   ]
 
-  // Shuffle pseudo-randomly when seed changes
   const list = [...candidateTopics]
   const seed = randomSeed.value
   for (let i = list.length - 1; i > 0; i--) {
@@ -413,14 +438,19 @@ function shuffleTopics() {
 
 <template>
   <div class="dash-viewport">
-    <!-- Streamlined Minimal Header (Clean, Single Search Bar, No Duplicate Clutter) -->
+    <!-- Streamlined Minimal Header (Clean, High Signal) -->
     <header class="dash-top-bar">
       <div class="brand-wrap" @click="navigateTo('/')">
         <svg class="brand-spark-svg" viewBox="0 0 24 24" width="24" height="24" fill="#FF6B35">
           <path d="M10.812 0c-.425.013-.845.215-1.196.605a3.593 3.593 0 00-.493.722c-.355.667-.425 1.415-.556 2.143a551.9 551.9 0 00-.726 4.087c-.027.16-.096.227-.244.273C5.83 8.386 4.06 8.94 2.3 9.514c-.387.125-.773.289-1.114.506-1.042.665-1.196 1.753-.415 2.71.346.422.79.715 1.284.936 1.1.49 2.202.976 3.3 1.47.019.01.036.013.053.019h-.004l1.306.535c0 .023.002.045 0 .073-.2 2.03-.39 4.063-.58 6.095-.04.419-.012.831.134 1.23.317.87 1.065 1.148 1.881.701.372-.204.666-.497.937-.818 1.372-1.623 2.746-3.244 4.113-4.872.111-.133.205-.15.363-.098.349.117.697.231 1.045.347h.001c.02.012.045.02.073.03l.142.042c1.248.416 2.68.775 3.929 1.19.4.132.622.164 1.045.098.311-.048.592-.062.828-.236.602-.33.995-.957.988-1.682-.005-.427-.154-.813-.35-1.186-.82-1.556-1.637-3.113-2.461-4.666-.078-.148-.076-.243.037-.375 1.381-1.615 2.756-3.236 4.133-4.855.272-.32.513-.658.653-1.058.308-.878-.09-1.57-1-1.741a2.783 2.783 0 00-1.235.069c-1.974.521-3.947 1.041-5.918 1.57-.175.047-.26.015-.355-.144a353.08 353.08 0 00-2.421-4.018 4.61 4.61 0 00-.652-.849c-.371-.37-.802-.549-1.227-.536z"/>
         </svg>
         <span class="brand-logo-text">PySpark Wiki</span>
-        <span class="brand-badge">Enterprise Hub</span>
+        
+        <!-- Daily Streak Pill (Habit formation hook) -->
+        <span class="streak-pill" :title="`Current Streak: ${studyStreak.currentStreak} days`">
+          <span class="flame-icon">&#128293;</span>
+          <span class="streak-text">{{ studyStreak.currentStreak > 0 ? `${studyStreak.currentStreak}-Day Streak` : 'Start Streak' }}</span>
+        </span>
       </div>
 
       <!-- Single Global Search Pill (Ctrl+K) -->
@@ -433,14 +463,21 @@ function shuffleTopics() {
         <span class="search-kbd">Ctrl K</span>
       </div>
 
-      <!-- Header Quick Actions -->
+      <!-- Retention Command Bar -->
       <div class="dash-header-actions">
-        <button class="header-action-pill" @click="openTour">
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"></circle>
-            <polygon points="10 8 16 12 10 16 10 8"></polygon>
-          </svg>
-          <span>Guided Tour</span>
+        <!-- 5-Min Diagnostic Test Button -->
+        <button class="retention-trigger-btn diagnostic" @click="showDiagnosticModal = true">
+          <span>&#127919; 5-Min Diagnostic</span>
+        </button>
+
+        <!-- Flashcards Active Recall Button -->
+        <button class="retention-trigger-btn flashcards" @click="showFlashcardModal = true">
+          <span>&#9889; Flashcards</span>
+        </button>
+
+        <!-- Sync & Export Modal Button -->
+        <button class="retention-trigger-btn sync" @click="showSyncModal = true">
+          <span>&#9729; Sync &amp; Export</span>
         </button>
 
         <a
@@ -460,8 +497,23 @@ function shuffleTopics() {
     <!-- Main Container -->
     <main class="dash-main-flow">
       <!-- ═════════════════════════════════════════════════════════════
+           RETENTION ALERT: Ebbinghaus Spaced Repetition Due Today
+           ═════════════════════════════════════════════════════════════ -->
+      <div v-if="dueReviews.length > 0" class="srs-due-banner">
+        <div class="srs-due-left">
+          <span class="srs-due-icon">&#9200;</span>
+          <div>
+            <div class="srs-due-title">{{ dueReviews.length }} Topic{{ dueReviews.length > 1 ? 's' : '' }} Due for Review Today (Spaced Repetition)</div>
+            <div class="srs-due-sub">Memory decay indicates these topics need recall practice before your interview.</div>
+          </div>
+        </div>
+        <button class="srs-due-btn" @click="showFlashcardModal = true">
+          Review Due Deck &rarr;
+        </button>
+      </div>
+
+      <!-- ═════════════════════════════════════════════════════════════
            HERO SECTION: ADHD-Friendly 3D Circular Orbit Carousel
-           "Random Topic to Study" — Solves analysis paralysis in <3s
            ═════════════════════════════════════════════════════════════ -->
       <section class="hero-orbit-section">
         <div class="orbit-header">
@@ -473,16 +525,21 @@ function shuffleTopics() {
           <p class="orbit-main-sub">
             Rotating 3D study orbit designed for high-focus deep work. Click the centered topic or hit shuffle to get a fresh prompt.
           </p>
-          <button class="shuffle-btn" @click="shuffleTopics">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="16 3 21 3 21 8"></polyline>
-              <line x1="4" y1="20" x2="21" y2="3"></line>
-              <polyline points="21 16 21 21 16 21"></polyline>
-              <line x1="15" y1="15" x2="21" y2="21"></line>
-              <line x1="4" y1="4" x2="9" y2="9"></line>
-            </svg>
-            <span>Shuffle Topics</span>
-          </button>
+          <div class="orbit-action-row">
+            <button class="shuffle-btn" @click="shuffleTopics">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="16 3 21 3 21 8"></polyline>
+                <line x1="4" y1="20" x2="21" y2="3"></line>
+                <polyline points="21 16 21 21 16 21"></polyline>
+                <line x1="15" y1="15" x2="21" y2="21"></line>
+                <line x1="4" y1="4" x2="9" y2="9"></line>
+              </svg>
+              <span>Shuffle Topics</span>
+            </button>
+            <button class="commute-mode-btn" @click="showFlashcardModal = true">
+              <span>&#9889; Mobile / Commute Flashcards</span>
+            </button>
+          </div>
         </div>
 
         <!-- 3D Circular Orbit Component -->
@@ -611,7 +668,7 @@ function shuffleTopics() {
             </div>
           </div>
 
-          <!-- Widget 4: Quick Action Cards (Built below the side section as requested) -->
+          <!-- Widget 4: Quick Action Cards -->
           <div class="bento-widget action-cards-widget">
             <div class="widget-header">
               <span class="widget-tag">TACTICAL PLAYBOOKS</span>
@@ -645,8 +702,7 @@ function shuffleTopics() {
       </section>
 
       <!-- ═════════════════════════════════════════════════════════════
-           CURRICULUM FEED: Progressive Disclosure, 6 Items per Page
-           Working Filters, Zero 404s, Clean Typography
+           CURRICULUM FEED: Progressive Disclosure + Company War Stories
            ═════════════════════════════════════════════════════════════ -->
       <section class="curriculum-feed-section">
         <div class="feed-header-wrap">
@@ -685,7 +741,7 @@ function shuffleTopics() {
           </div>
         </div>
 
-        <!-- Subtopics Row (if module selected) -->
+        <!-- Subtopics Row -->
         <div v-if="availableSubtopics.length > 1" class="subtopics-chip-row">
           <button
             class="subtopic-badge"
@@ -701,7 +757,7 @@ function shuffleTopics() {
           >{{ sub.name }} ({{ sub.count }})</button>
         </div>
 
-        <!-- Clean 6-Card Grid (No Badge Soup, Low Cognitive Load) -->
+        <!-- Clean Cards with Company War Stories Badge -->
         <div class="feed-clean-grid">
           <div
             v-for="item in paginatedQuestions"
@@ -710,7 +766,10 @@ function shuffleTopics() {
             @click="navigateTo(item.path)"
           >
             <div class="card-top-meta">
-              <span class="clean-category-chip">{{ item.module.replace(/^\d+\.\s*/, '') }}</span>
+              <div class="meta-tag-row">
+                <span class="clean-category-chip">{{ item.module.replace(/^\d+\.\s*/, '') }}</span>
+                <span class="company-target-chip">Asked at {{ getCompanyTag(item.title) }}</span>
+              </div>
               <button
                 class="clean-fav-btn"
                 :class="{ active: isFavorite(item.path) }"
@@ -737,7 +796,7 @@ function shuffleTopics() {
             <div class="clean-card-bottom">
               <span class="clean-subtopic-text">{{ item.subtopic }}</span>
               <span class="clean-read-trigger">
-                Read Notes &rarr;
+                Read Answer &rarr;
               </span>
             </div>
           </div>
@@ -770,6 +829,9 @@ function shuffleTopics() {
     <WalkthroughGuide ref="walkthroughRef" />
     <SearchModal ref="searchModalRef" />
     <QuizModal v-if="showQuizModal" @close="showQuizModal = false" />
+    <DiagnosticModal v-if="showDiagnosticModal" @close="showDiagnosticModal = false" />
+    <FlashcardModal v-if="showFlashcardModal" @close="showFlashcardModal = false" />
+    <SyncModal v-if="showSyncModal" @close="showSyncModal = false" />
   </div>
 </template>
 
@@ -810,20 +872,26 @@ function shuffleTopics() {
   color: #FFFFFF;
 }
 
-.brand-badge {
-  font-size: 10px;
+.streak-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
   font-weight: 700;
   color: #FF6B35;
-  background: rgba(255, 107, 53, 0.12);
-  border: 1px solid rgba(255, 107, 53, 0.25);
-  padding: 2px 7px;
+  background: rgba(255, 107, 53, 0.15);
+  border: 1px solid rgba(255, 107, 53, 0.35);
+  padding: 2px 8px;
   border-radius: 9999px;
-  letter-spacing: 0.04em;
+}
+
+.flame-icon {
+  font-size: 12px;
 }
 
 .dash-search-pill {
   flex: 1;
-  max-width: 580px;
+  max-width: 480px;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -863,39 +931,50 @@ function shuffleTopics() {
 .dash-header-actions {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
-.header-action-pill {
-  display: flex;
+.retention-trigger-btn {
+  display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   color: #D1D5DB;
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 600;
-  padding: 6px 14px;
-  border-radius: 9999px;
+  padding: 6px 12px;
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
-.header-action-pill:hover {
+.retention-trigger-btn:hover {
   background: rgba(255, 107, 53, 0.15);
   border-color: rgba(255, 107, 53, 0.4);
   color: #FF6B35;
+}
+
+.retention-trigger-btn.diagnostic {
+  border-color: rgba(16, 185, 129, 0.35);
+  color: #10B981;
+}
+
+.retention-trigger-btn.diagnostic:hover {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: #10B981;
 }
 
 .header-icon-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
+  border-radius: 8px;
   color: #9CA3AF;
   text-decoration: none;
   transition: all 0.2s;
@@ -907,7 +986,52 @@ function shuffleTopics() {
   border-color: rgba(255, 107, 53, 0.4);
 }
 
-/* ── Main Flow Layout (Single Column, High Breathability) ──────────── */
+/* ── SRS Due Today Banner ──────────────────────────────────────────── */
+.srs-due-banner {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(255, 107, 53, 0.15) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: 16px;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.srs-due-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.srs-due-icon {
+  font-size: 24px;
+}
+
+.srs-due-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #F59E0B;
+}
+
+.srs-due-sub {
+  font-size: 12px;
+  color: #D1D5DB;
+}
+
+.srs-due-btn {
+  background: #F59E0B;
+  border: none;
+  color: #000000;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* ── Main Flow Layout ──────────────────────────────────────────────── */
 .dash-main-flow {
   max-width: 1200px;
   margin: 0 auto;
@@ -977,6 +1101,13 @@ function shuffleTopics() {
   margin: 0;
 }
 
+.orbit-action-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+
 .shuffle-btn {
   display: inline-flex;
   align-items: center;
@@ -989,7 +1120,6 @@ function shuffleTopics() {
   padding: 6px 14px;
   border-radius: 9999px;
   cursor: pointer;
-  margin-top: 4px;
   transition: all 0.2s ease;
 }
 
@@ -997,6 +1127,24 @@ function shuffleTopics() {
   background: rgba(255, 107, 53, 0.15);
   border-color: rgba(255, 107, 53, 0.4);
   color: #FF6B35;
+}
+
+.commute-mode-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #10B981;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  cursor: pointer;
+}
+
+.commute-mode-btn:hover {
+  background: rgba(16, 185, 129, 0.2);
 }
 
 /* ── Bento Section ─────────────────────────────────────────────────── */
@@ -1451,6 +1599,13 @@ function shuffleTopics() {
   justify-content: space-between;
 }
 
+.meta-tag-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
 .clean-category-chip {
   font-size: 10.5px;
   font-weight: 700;
@@ -1459,6 +1614,16 @@ function shuffleTopics() {
   padding: 2px 8px;
   border-radius: 6px;
   letter-spacing: 0.04em;
+}
+
+.company-target-chip {
+  font-size: 10px;
+  font-weight: 600;
+  color: #94A3B8;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 2px 7px;
+  border-radius: 6px;
 }
 
 .clean-fav-btn {
@@ -1589,6 +1754,10 @@ function shuffleTopics() {
   }
   .orbit-main-title {
     font-size: 21px;
+  }
+  .srs-due-banner {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
 </style>
