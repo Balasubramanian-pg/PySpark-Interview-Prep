@@ -448,7 +448,9 @@ function shuffleTopics() {
         
         <!-- Daily Streak Pill (Habit formation hook) -->
         <span class="streak-pill" :title="`Current Streak: ${studyStreak.currentStreak} days`">
-          <span class="flame-icon">&#128293;</span>
+          <svg class="flame-svg" viewBox="0 0 24 24" width="13" height="13" fill="currentColor">
+            <path d="M12 0c-.28 0-.5.22-.5.5 0 2.24-1.32 3.63-2.6 4.98C7.54 6.89 6 8.52 6 11.5c0 3.59 2.91 6.5 6.5 6.5s6.5-2.91 6.5-6.5c0-4.08-3.08-6.19-5.58-8.75C12.74 2.05 12.08 1.13 12 0zm0 15c-1.93 0-3.5-1.57-3.5-3.5 0-1.3.7-2.31 1.6-3.3.8-1 1.9-2.12 1.9-4.2 1.34 1.5 3.5 3.32 3.5 6 0 2.76-1.57 5-3.5 5z"/>
+          </svg>
           <span class="streak-text">{{ studyStreak.currentStreak > 0 ? `${studyStreak.currentStreak}-Day Streak` : 'Start Streak' }}</span>
         </span>
       </div>
@@ -467,17 +469,28 @@ function shuffleTopics() {
       <div class="dash-header-actions">
         <!-- 5-Min Diagnostic Test Button -->
         <button class="retention-trigger-btn diagnostic" @click="showDiagnosticModal = true">
-          <span>&#127919; 5-Min Diagnostic</span>
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <circle cx="12" cy="12" r="6"></circle>
+            <circle cx="12" cy="12" r="2"></circle>
+          </svg>
+          <span>5-Min Diagnostic</span>
         </button>
 
         <!-- Flashcards Active Recall Button -->
         <button class="retention-trigger-btn flashcards" @click="showFlashcardModal = true">
-          <span>&#9889; Flashcards</span>
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+          </svg>
+          <span>Flashcards</span>
         </button>
 
         <!-- Sync & Export Modal Button -->
         <button class="retention-trigger-btn sync" @click="showSyncModal = true">
-          <span>&#9729; Sync &amp; Export</span>
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
+          </svg>
+          <span>Sync &amp; Export</span>
         </button>
 
         <a
@@ -501,7 +514,12 @@ function shuffleTopics() {
            ═════════════════════════════════════════════════════════════ -->
       <div v-if="dueReviews.length > 0" class="srs-due-banner">
         <div class="srs-due-left">
-          <span class="srs-due-icon">&#9200;</span>
+          <span class="srs-due-icon">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+          </span>
           <div>
             <div class="srs-due-title">{{ dueReviews.length }} Topic{{ dueReviews.length > 1 ? 's' : '' }} Due for Review Today (Spaced Repetition)</div>
             <div class="srs-due-sub">Memory decay indicates these topics need recall practice before your interview.</div>
@@ -537,7 +555,10 @@ function shuffleTopics() {
               <span>Shuffle Topics</span>
             </button>
             <button class="commute-mode-btn" @click="showFlashcardModal = true">
-              <span>&#9889; Mobile / Commute Flashcards</span>
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+              </svg>
+              <span>Mobile / Commute Flashcards</span>
             </button>
           </div>
         </div>

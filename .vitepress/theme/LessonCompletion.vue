@@ -106,15 +106,24 @@ function navigateTo(path: string) {
 
       <div v-if="!srsGraded" class="srs-pill-actions">
         <button class="srs-btn hard" @click="handleSRSGrade('hard')">
-          <span>🧠 Hard</span>
+          <span class="srs-btn-label">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 4.44-2.04z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-4.44-2.04z"/></svg>
+            Hard
+          </span>
           <small>Review in 1d</small>
         </button>
         <button class="srs-btn good" @click="handleSRSGrade('good')">
-          <span>⚡ Good</span>
+          <span class="srs-btn-label">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            Good
+          </span>
           <small>Review in 3d</small>
         </button>
         <button class="srs-btn mastered" @click="handleSRSGrade('mastered')">
-          <span>🏆 Mastered</span>
+          <span class="srs-btn-label">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.45 1-1 1H8c-.55 0-1 .45-1 1v1h10v-1c0-.55-.45-1-1-1h-1c-.55 0-1-.45-1-1v-2.34"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg>
+            Mastered
+          </span>
           <small>Review in 7d</small>
         </button>
       </div>
@@ -256,6 +265,12 @@ function navigateTo(path: string) {
   font-size: 11.5px;
   font-weight: 700;
   color: #FFFFFF;
+}
+
+.srs-btn-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
 }
 
 .srs-btn small {

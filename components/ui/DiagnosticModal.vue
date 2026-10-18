@@ -225,7 +225,10 @@ function goToTopic(path: string) {
           <h4 class="roadmap-heading">Your Tailored High-Yield Study Roadmap</h4>
           
           <div v-if="weakAreas.length === 0" class="mastery-note">
-            🏆 Perfect score! You have strong grasp of core Spark mechanics. Deep dive directly into Senior Dev & Cost FinOps topics!
+            <svg class="mastery-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#10B981" stroke-width="2">
+              <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.45 1-1 1H8c-.55 0-1 .45-1 1v1h10v-1c0-.55-.45-1-1-1h-1c-.55 0-1-.45-1-1v-2.34"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/>
+            </svg>
+            <span>Perfect score! You have strong grasp of core Spark mechanics. Deep dive directly into Senior Dev &amp; Cost FinOps topics!</span>
           </div>
 
           <div v-else class="weak-topics-list">
@@ -549,5 +552,23 @@ function goToTopic(path: string) {
   padding: 10px;
   border-radius: 12px;
   cursor: pointer;
+}
+
+.mastery-note {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 12px 16px;
+  border-radius: 10px;
+  color: #10B981;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.mastery-icon {
+  flex-shrink: 0;
 }
 </style>
