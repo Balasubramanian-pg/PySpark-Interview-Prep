@@ -3,6 +3,8 @@
  * Zero-Backend Client Persistence Primitives
  */
 
+import { withBase } from 'vitepress'
+
 export const STORAGE_KEYS = {
   COMPLETED: 'pyspark_completed_lessons',
   ACTIVITY: 'pyspark_lesson_activity',
@@ -16,6 +18,37 @@ export const STORAGE_KEYS = {
 } as const
 
 export const EVENT_PROGRESS_UPDATED = 'pyspark-progress-updated'
+
+/**
+ * Strips base URL, .html, and trailing slashes so paths always match
+ */
+export function normalizePath(path: string): string {
+  if (!path) return ''
+  let p = path.trim()
+  p = p.replace(/^\/PySpark-Interview-Prep\//, '/')
+  p = p.replace(/\.html$/, '')
+  p = p.replace(/\/$/, '')
+  return p
+}
+
+/**
+ * Resolves any route or question path into an exact URL with base and .html extension
+ * for GitHub Pages zero-404 navigation.
+ */
+export function resolveUrl(path: string): string {
+  if (!path || path === '/') {
+    return withBase('/')
+  }
+  let target = path.trim()
+  // Keep hashes or queries intact if present
+  if (!target.endsWith('.html') && !target.includes('#')) {
+    target = target + '.html'
+  }
+  if (target.startsWith('/PySpark-Interview-Prep/')) {
+    return target
+  }
+  return withBase(target)
+}
 
 function isClient(): boolean {
   return typeof window !== 'undefined' && typeof localStorage !== 'undefined'
@@ -33,19 +66,19 @@ export function getCompletedLessons(): string[] {
 
 export function isLessonCompleted(path: string): boolean {
   const list = getCompletedLessons()
-  const clean = path.replace(/\/$/, '')
-  return list.some(p => p.replace(/\/$/, '') === clean)
+  const clean = normalizePath(path)
+  return list.some(p => normalizePath(p) === clean)
 }
 
 export function toggleLessonCompletion(path: string): boolean {
   if (!isClient()) return false
   const list = getCompletedLessons()
-  const clean = path.replace(/\/$/, '')
-  const exists = list.some(p => p.replace(/\/$/, '') === clean)
+  const clean = normalizePath(path)
+  const exists = list.some(p => normalizePath(p) === clean)
   
   let updated: string[] = []
   if (exists) {
-    updated = list.filter(p => p.replace(/\/$/, '') !== clean)
+    updated = list.filter(p => normalizePath(p) !== clean)
   } else {
     updated = [...list, clean]
   }
@@ -88,17 +121,17 @@ export function getFavorites(): string[] {
 
 export function isFavorite(path: string): boolean {
   const favs = getFavorites()
-  const clean = path.replace(/\/$/, '')
-  return favs.some(p => p.replace(/\/$/, '') === clean)
+  const clean = normalizePath(path)
+  return favs.some(p => normalizePath(p) === clean)
 }
 
 export function toggleFavorite(path: string): boolean {
   if (!isClient()) return false
   const favs = getFavorites()
-  const clean = path.replace(/\/$/, '')
-  const exists = favs.some(p => p.replace(/\/$/, '') === clean)
+  const clean = normalizePath(path)
+  const exists = favs.some(p => normalizePath(p) === clean)
   
-  const updated = exists ? favs.filter(p => p.replace(/\/$/, '') !== clean) : [...favs, clean]
+  const updated = exists ? favs.filter(p => normalizePath(p) !== clean) : [...favs, clean]
   try {
     localStorage.setItem(STORAGE_KEYS.FAVORITES, JSON.stringify(updated))
   } catch (e) {
