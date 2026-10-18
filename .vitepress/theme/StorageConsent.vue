@@ -22,7 +22,10 @@ function onAccept() {
   <div v-if="visible" class="storage-consent-banner">
     <div class="consent-inner">
       <div class="consent-info">
-        <span class="consent-icon">🔒</span>
+        <svg class="consent-lock-svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#FF6B35" stroke-width="2">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
         <div class="consent-text">
           <span class="consent-title">Zero Server Tracking & 100% Local-First Storage</span>
           <span class="consent-desc">Your PySpark question completions, focus timers, and bookmark stats are saved strictly in your browser's localStorage. No cookies, no accounts, and zero server telemetry.</span>
@@ -82,8 +85,8 @@ function onAccept() {
   gap: 14px;
 }
 
-.consent-icon {
-  font-size: 24px;
+.consent-lock-svg {
+  flex-shrink: 0;
 }
 
 .consent-text {
