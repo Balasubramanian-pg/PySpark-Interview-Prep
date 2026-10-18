@@ -1,20 +1,14 @@
 /* ==========================================================================
    Repo-Wiki Design System: Anti-Vibe-Coding Standards & Tokens
-   Typography: Avenir Next Cyr (Body) + Plus Jakarta Sans (Headings)
+   Strict Typography: Avenir Next Cyr for literally everything
    ========================================================================== */
 
-@font-face {
-  font-family: 'Avenir Next Cyr';
-  src: local('Avenir Next Cyr'), local('Avenir Next'), local('AvenirNext-Regular');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
+@import url('https://fonts.cdnfonts.com/css/avenir-next-cyr');
 
 :root {
   /* Font Family Definitions */
-  --vp-font-family-base: "Avenir Next Cyr", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  --vp-font-family-headings: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --vp-font-family-base: "Avenir Next Cyr", "Avenir Next", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --vp-font-family-headings: "Avenir Next Cyr", "Avenir Next", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --vp-font-family-mono: "JetBrains Mono", Consolas, Monaco, monospace;
 
   /* Surfaces & Canvas */
@@ -28,12 +22,9 @@
   /* Borders */
   --border-subtle: rgba(255, 255, 255, 0.07);
   --border-medium: rgba(255, 255, 255, 0.12);
-  --border-active: rgba(144, 107, 255, 0.4);
+  --border-active: rgba(255, 107, 53, 0.4);
 
-  /* Primary Brand Violet & Spark Orange Accents */
-  --primary-violet: #906BFF;
-  --primary-light: #C084FC;
-  --primary-glow: rgba(144, 107, 255, 0.3);
+  /* Primary Brand & Spark Orange Accents */
   --accent-orange: #FF6B35;
   --accent-orange-glow: rgba(255, 107, 53, 0.35);
   --accent-mint: #34D399;
@@ -50,24 +41,32 @@
 
   /* VitePress Overrides */
   --vp-c-brand-1: #FF6B35;
-  --vp-c-brand-2: #906BFF;
+  --vp-c-brand-2: #FF6B35;
   --vp-c-brand-soft: rgba(255, 107, 53, 0.14);
 }
 
-/* Enforce font distinction across all elements */
-body, p, li, a, span, button, input, textarea, blockquote, label {
-  font-family: var(--vp-font-family-base) !important;
+/* Enforce Avenir Next Cyr across literally everything */
+*, *::before, *::after,
+html, body, p, li, a, span, button, input, textarea, blockquote, label, div,
+h1, h2, h3, h4, h5, h6,
+.vp-doc, .vp-doc h1, .vp-doc h2, .vp-doc h3, .vp-doc h4, .vp-doc p, .vp-doc li,
+.VPDoc, .VPContent, .VPNavBar, .VPNav, .title, .text, .link, .brand-logo-text,
+.spotlight-title, .column-title, .widget-title, .module-title {
+  font-family: 'Avenir Next Cyr', 'Avenir Next', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
 }
 
-h1, h2, h3, h4, h5, h6, 
-.spotlight-title, .column-title, .widget-title, .module-title, .brand-logo-text {
-  font-family: var(--vp-font-family-headings) !important;
+h1, h2, h3, h4, h5, h6 {
   font-weight: 700 !important;
   letter-spacing: -0.02em;
 }
 
-code, kbd, samp, pre {
+code, kbd, samp, pre, .pomo-digits, .digits {
   font-family: var(--vp-font-family-mono) !important;
+}
+
+/* Hide default VitePress redundant top navigation on home page */
+.home-page .VPNav {
+  display: none !important;
 }
 
 /* Reader Mode Article Formatting & Anti-Clip Rules */
