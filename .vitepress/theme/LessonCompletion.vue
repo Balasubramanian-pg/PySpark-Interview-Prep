@@ -29,7 +29,6 @@ function onToggleCompletion() {
   const nowCompleted = toggleLessonCompletion(route.path)
   completed.value = nowCompleted
   if (nowCompleted) {
-    // Confetti celebration
     confetti({
       particleCount: 55,
       spread: 60,
@@ -79,9 +78,14 @@ function navigateTo(path: string) {
           :title="prevQuestion.title"
           @click="navigateTo(prevQuestion.path)"
         >
-          ← Previous Question
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+          <span>Previous Question</span>
         </button>
-        <span v-else class="nav-btn disabled">← Start of Curriculum</span>
+        <span v-else class="nav-btn disabled">
+          <span>Start of Curriculum</span>
+        </span>
 
         <button
           v-if="nextQuestion"
@@ -89,7 +93,10 @@ function navigateTo(path: string) {
           :title="nextQuestion.title"
           @click="navigateTo(nextQuestion.path)"
         >
-          Next Question →
+          <span>Next Question</span>
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
         </button>
       </div>
 
@@ -101,7 +108,12 @@ function navigateTo(path: string) {
           :title="favorited ? 'Saved in Your Dashboard' : 'Bookmark this Question'"
           @click="onToggleFavorite"
         >
-          <span class="fav-icon">{{ favorited ? '★' : '☆' }}</span>
+          <svg v-if="favorited" viewBox="0 0 24 24" width="15" height="15" fill="#FBBF24">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+          </svg>
+          <svg v-else viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+          </svg>
           <span>{{ favorited ? 'Saved in Dashboard' : 'Bookmark' }}</span>
         </button>
 
@@ -110,7 +122,12 @@ function navigateTo(path: string) {
           :class="{ completed: completed }"
           @click="onToggleCompletion"
         >
-          <span class="check-icon">{{ completed ? '✓' : '○' }}</span>
+          <svg v-if="completed" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <svg v-else viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="9"></circle>
+          </svg>
           <span>{{ completed ? 'Completed · Click to Reset' : 'Mark as Complete' }}</span>
         </button>
       </div>
@@ -152,6 +169,9 @@ function navigateTo(path: string) {
 }
 
 .nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.12);
   color: #9CA3AF;
@@ -184,7 +204,7 @@ function navigateTo(path: string) {
 .fav-btn {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.12);
   color: #D1D5DB;
@@ -231,11 +251,6 @@ function navigateTo(path: string) {
 .complete-btn.completed {
   background: linear-gradient(135deg, #059669 0%, #047857 100%);
   box-shadow: 0 4px 14px rgba(5, 150, 105, 0.35);
-}
-
-.check-icon {
-  font-size: 15px;
-  font-weight: bold;
 }
 
 @media (max-width: 680px) {
