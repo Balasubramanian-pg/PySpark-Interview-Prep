@@ -131,7 +131,12 @@ function close() {
           <span class="quiz-badge">SCENARIO SIMULATOR</span>
           <h3 class="quiz-title">Staff / Senior PySpark Interview Challenge</h3>
         </div>
-        <button class="close-btn" @click="close">✕</button>
+        <button class="close-btn" @click="close">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
       </div>
 
       <!-- Quiz Body -->
@@ -165,7 +170,14 @@ function close() {
         <!-- Explanation Feedback -->
         <div v-if="isAnswerSubmitted" class="explanation-box" :class="{ 'is-correct': selectedOption === questions[currentIndex].answer }">
           <div class="explanation-title">
-            {{ selectedOption === questions[currentIndex].answer ? '✓ Correct Architectural Decision' : '✗ Review Architecture Principle' }}
+            <svg v-if="selectedOption === questions[currentIndex].answer" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#10B981" stroke-width="2.5" style="display:inline-block; vertical-align:middle; margin-right:4px;">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <svg v-else viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#EF4444" stroke-width="2.5" style="display:inline-block; vertical-align:middle; margin-right:4px;">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+            <span>{{ selectedOption === questions[currentIndex].answer ? 'Correct Architectural Decision' : 'Review Architecture Principle' }}</span>
           </div>
           <div class="explanation-text">{{ questions[currentIndex].explanation }}</div>
         </div>
@@ -184,15 +196,19 @@ function close() {
             class="btn-next"
             @click="nextQuestion"
           >
-            {{ currentIndex === questions.length - 1 ? 'View Final Results →' : 'Next Scenario →' }}
+            <span>{{ currentIndex === questions.length - 1 ? 'View Final Results' : 'Next Scenario' }}</span>
           </button>
         </div>
       </div>
 
       <!-- Results Screen -->
       <div v-else class="quiz-results">
-        <div class="trophy-icon">🏆</div>
-        <h2 class="result-title">Scenario Challenge Complete!</h2>
+        <svg class="trophy-svg" viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="#FF6B35" stroke-width="1.8">
+          <path d="M6 9H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3m12 6h3a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-3M6 3h12v7a6 6 0 0 1-12 0V3z"></path>
+          <path d="M9 21h6"></path>
+          <path d="M12 17v4"></path>
+        </svg>
+        <h2 class="result-title">Scenario Challenge Complete</h2>
         <p class="result-score">
           You scored <span class="highlight">{{ score }}</span> out of <span class="highlight">{{ questions.length }}</span> ({{ Math.round((score / questions.length) * 100) }}%)
         </p>
@@ -265,9 +281,11 @@ function close() {
   background: transparent;
   border: none;
   color: #6E7387;
-  font-size: 16px;
   cursor: pointer;
   padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .close-btn:hover {
@@ -371,6 +389,8 @@ function close() {
 }
 
 .explanation-title {
+  display: flex;
+  align-items: center;
   font-size: 13.5px;
   font-weight: 700;
   color: #FFFFFF;
@@ -410,11 +430,13 @@ function close() {
 .quiz-results {
   padding: 40px 24px;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.trophy-icon {
-  font-size: 48px;
-  margin-bottom: 12px;
+.trophy-svg {
+  margin-bottom: 14px;
 }
 
 .result-title {
