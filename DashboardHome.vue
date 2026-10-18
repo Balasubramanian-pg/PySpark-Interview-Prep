@@ -244,13 +244,14 @@ const formattedPomoTime = computed(() => {
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
 })
 
-// Dynamic Performance Spline Wave
+// Dynamic Performance Spline Wave — fully contained in a 220×80 box
 const waveData = computed(() => {
-  const s = Math.max(8, readinessScore.value)
-  const peakX = 30 + (s * 1.8)
-  const peakY = 75 - (s * 0.55)
-  const curve = `M 0,75 C 40,75 ${peakX - 30},${peakY} ${peakX},${peakY} S 200,65 240,70`
-  const area = `${curve} L 240,90 L 0,90 Z`
+  const s = Math.max(5, readinessScore.value)
+  // Map 0–100 readiness to a peak that stays within [20,180] x and [10,65] y
+  const peakX = 20 + (s / 100) * 140         // 20 → 160
+  const peakY = 65 - (s / 100) * 45          // 65 → 20
+  const curve = `M 0,70 C 50,70 ${Math.max(10, peakX - 40)},${peakY} ${peakX},${peakY} S 210,62 220,65`
+  const area  = `${curve} L 220,80 L 0,80 Z`
   return { peakX, peakY, curve, area }
 })
 
@@ -369,14 +370,68 @@ function openTour() {
 function navigateTo(path: string) {
   router.go(resolveUrl(path))
 }
+
+// ─── Random Daily Topic Carousel ─────────────────────────────────────────────
+// Picks a fresh set of topics seeded by today's date (changes each day)
+function getDailyTopics(count = 8) {
+  const today = new Date().toISOString().slice(0, 10)
+  const seed = today.split('-').reduce((a, b) => a + parseInt(b), 0)
+  const allSubtopics = Array.from(new Set(searchIndexData.map(i => i.subtopic)))
+  // Seeded shuffle — deterministic per day
+  const shuffled = [...allSubtopics]
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = (seed * (i + 1)) % (i + 1)
+    ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+  }
+  return shuffled.slice(0, count).map(subtopic => {
+    const items = searchIndexData.filter(i => i.subtopic === subtopic)
+    const readme = items.find(i => i.path.toLowerCase().includes('readme')) || items[0]
+    const firstQuestion = items.find(i => !i.path.toLowerCase().includes('readme')) || items[0]
+    return {
+      subtopic,
+      path: readme?.path || firstQuestion?.path || '',
+      firstQ: firstQuestion,
+      count: items.length,
+      module: items[0]?.module || ''
+    }
+  })
+}
+
+const dailyTopics = computed(() => getDailyTopics(8))
+
+// Carousel scroll
+const carouselEl = ref<HTMLElement | null>(null)
+const carouselCanPrev = ref(false)
+const carouselCanNext = ref(true)
+
+function scrollCarousel(dir: 'prev' | 'next') {
+  const el = carouselEl.value
+  if (!el) return
+  const scrollAmount = 340
+  el.scrollBy({ left: dir === 'next' ? scrollAmount : -scrollAmount, behavior: 'smooth' })
+  setTimeout(updateCarouselArrows, 350)
+}
+
+function updateCarouselArrows() {
+  const el = carouselEl.value
+  if (!el) return
+  carouselCanPrev.value = el.scrollLeft > 8
+  carouselCanNext.value = el.scrollLeft < el.scrollWidth - el.clientWidth - 8
+}
+
+const moduleTagColors: Record<string, string> = {
+  '1. Fundamentals': '#3B82F6',
+  '2. Intermediate': '#8B5CF6',
+  '3. Advanced': '#F59E0B',
+  '4. Senior Dev': '#EF4444'
+}
 </script>
 
 <template>
   <div class="dash-viewport">
-    <!-- Streamlined Minimal Header: Brand + Search Bar + 1 GitHub + 1 LinkedIn ONLY -->
+    <!-- Streamlined Minimal Header -->
     <header class="dash-top-bar">
       <div class="brand-wrap" @click="navigateTo('/')">
-        <!-- Simple Icons: Apache Spark -->
         <svg class="brand-spark-svg" viewBox="0 0 24 24" width="24" height="24" fill="#FF6B35">
           <path d="M10.812 0c-.425.013-.845.215-1.196.605a3.593 3.593 0 00-.493.722c-.355.667-.425 1.415-.556 2.143a551.9 551.9 0 00-.726 4.087c-.027.16-.096.227-.244.273C5.83 8.386 4.06 8.94 2.3 9.514c-.387.125-.773.289-1.114.506-1.042.665-1.196 1.753-.415 2.71.346.422.79.715 1.284.936 1.1.49 2.202.976 3.3 1.47.019.01.036.013.053.019h-.004l1.306.535c0 .023.002.045 0 .073-.2 2.03-.39 4.063-.58 6.095-.04.419-.012.831.134 1.23.317.87 1.065 1.148 1.881.701.372-.204.666-.497.937-.818 1.372-1.623 2.746-3.244 4.113-4.872.111-.133.205-.15.363-.098.349.117.697.231 1.045.347h.001c.02.012.045.02.073.03l.142.042c1.248.416 2.68.775 3.929 1.19.4.132.622.164 1.045.098.311-.048.592-.062.828-.236.602-.33.995-.957.988-1.682-.005-.427-.154-.813-.35-1.186-.82-1.556-1.637-3.113-2.461-4.666-.078-.148-.076-.243.037-.375 1.381-1.615 2.756-3.236 4.133-4.855.272-.32.513-.658.653-1.058.308-.878-.09-1.57-1-1.741a2.783 2.783 0 00-1.235.069c-1.974.521-3.947 1.041-5.918 1.57-.175.047-.26.015-.355-.144a353.08 353.08 0 00-2.421-4.018 4.61 4.61 0 00-.652-.849c-.371-.37-.802-.549-1.227-.536zm.172 3.703a.592.592 0 01.189.211c.87 1.446 1.742 2.89 2.609 4.338.07.118.135.16.277.121 1.525-.41 3.052-.813 4.579-1.217.367-.098.735-.193 1.103-.289a.399.399 0 01-.1.2c-1.259 1.48-2.516 2.962-3.779 4.438-.11.13-.12.22-.04.37.937 1.803 1.768 3.309 2.498 4.76l-3.696-1.019c-.538-.18-1.077-.358-1.615-.539-.163-.055-.25-.03-.36.1-1.248 1.488-2.504 2.97-3.759 4.454a.398.398 0 01-.18.132c.035-.378.068-.757.104-1.136.149-1.572.297-3.144.451-4.716-.03-.318.117-.405-.322-.545-1.493-.593-3.346-1.321-4.816-1.905a.595.595 0 01.24-.134c1.797-.57 3.595-1.14 5.394-1.705.127-.04.199-.092.211-.233.013-.148.05-.294.076-.441.241-1.363.483-2.726.726-4.088.068-.386.14-.771.21-1.157z"/>
         </svg>
@@ -393,29 +448,14 @@ function navigateTo(path: string) {
         <span class="search-kbd">Ctrl K</span>
       </div>
 
-      <!-- Right Header Actions: Exactly ONE LinkedIn and ONE GitHub icon ONLY -->
+      <!-- Right: GitHub + LinkedIn -->
       <div class="dash-header-actions">
-        <!-- Simple Icons: GitHub -->
-        <a
-          href="https://github.com/Balasubramanian-pg/PySpark-Interview-Prep"
-          target="_blank"
-          rel="noopener"
-          class="header-icon-btn"
-          title="GitHub Repository"
-        >
+        <a href="https://github.com/Balasubramanian-pg/PySpark-Interview-Prep" target="_blank" rel="noopener" class="header-icon-btn" title="GitHub Repository">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
             <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
           </svg>
         </a>
-
-        <!-- Simple Icons: LinkedIn -->
-        <a
-          href="https://linkedin.com/in/balasubramanian-pg"
-          target="_blank"
-          rel="noopener"
-          class="header-icon-btn"
-          title="LinkedIn Profile"
-        >
+        <a href="https://linkedin.com/in/balasubramanian-pg" target="_blank" rel="noopener" class="header-icon-btn" title="LinkedIn Profile">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
             <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
           </svg>
@@ -423,52 +463,46 @@ function navigateTo(path: string) {
       </div>
     </header>
 
-    <!-- Main 3-Column Bowwow Layout Container -->
+    <!-- 2-Column Layout: Left sidebar + Main content -->
     <div class="dash-grid-layout">
-      <!-- LEFT COLUMN: Favs with Simple Icons & Saved Bookmarks -->
+      <!-- LEFT COLUMN: Favs & Saved Bookmarks -->
       <aside class="dash-col-left">
         <div class="sidebar-block">
           <div class="sidebar-section-title">Favs</div>
           <ul class="fav-list">
             <li class="fav-item" @click="navigateTo('/1. Fundamentals/1.1 Spark Architecture Basics/Readme')">
-              <!-- Simple Icons: Apache Spark -->
               <svg viewBox="0 0 24 24" class="fav-icon-svg" fill="currentColor">
-                <path d="M10.812 0c-.425.013-.845.215-1.196.605a3.593 3.593 0 00-.493.722c-.355.667-.425 1.415-.556 2.143a551.9 551.9 0 00-.726 4.087c-.027.16-.096.227-.244.273C5.83 8.386 4.06 8.94 2.3 9.514c-.387.125-.773.289-1.114.506-1.042.665-1.196 1.753-.415 2.71.346.422.79.715 1.284.936 1.1.49 2.202.976 3.3 1.47.019.01.036.013.053.019h-.004l1.306.535c0 .023.002.045 0 .073-.2 2.03-.39 4.063-.58 6.095-.04.419-.012.831.134 1.23.317.87 1.065 1.148 1.881.701.372-.204.666-.497.937-.818 1.372-1.623 2.746-3.244 4.113-4.872.111-.133.205-.15.363-.098.349.117.697.231 1.045.347h.001c.02.012.045.02.073.03l.142.042c1.248.416 2.68.775 3.929 1.19.4.132.622.164 1.045.098.311-.048.592-.062.828-.236.602-.33.995-.957.988-1.682-.005-.427-.154-.813-.35-1.186-.82-1.556-1.637-3.113-2.461-4.666-.078-.148-.076-.243.037-.375 1.381-1.615 2.756-3.236 4.133-4.855.272-.32.513-.658.653-1.058.308-.878-.09-1.57-1-1.741a2.783 2.783 0 00-1.235.069c-1.974.521-3.947 1.041-5.918 1.57-.175.047-.26.015-.355-.144a353.08 353.08 0 00-2.421-4.018 4.61 4.61 0 00-.652-.849c-.371-.37-.802-.549-1.227-.536zm.172 3.703a.592.592 0 01.189.211c.87 1.446 1.742 2.89 2.609 4.338.07.118.135.16.277.121 1.525-.41 3.052-.813 4.579-1.217.367-.098.735-.193 1.103-.289a.399.399 0 01-.1.2c-1.259 1.48-2.516 2.962-3.779 4.438-.11.13-.12.22-.04.37.937 1.803 1.768 3.309 2.498 4.76l-3.696-1.019c-.538-.18-1.077-.358-1.615-.539-.163-.055-.25-.03-.36.1-1.248 1.488-2.504 2.97-3.759 4.454a.398.398 0 01-.18.132c.035-.378.068-.757.104-1.136.149-1.572.297-3.144.451-4.716-.03-.318.117-.405-.322-.545-1.493-.593-3.346-1.321-4.816-1.905a.595.595 0 01.24-.134c1.797-.57 3.595-1.14 5.394-1.705.127-.04.199-.092.211-.233.013-.148.05-.294.076-.441.241-1.363.483-2.726.726-4.088.068-.386.14-.771.21-1.157z"/>
+                <path d="M10.812 0c-.425.013-.845.215-1.196.605a3.593 3.593 0 00-.493.722c-.355.667-.425 1.415-.556 2.143a551.9 551.9 0 00-.726 4.087c-.027.16-.096.227-.244.273C5.83 8.386 4.06 8.94 2.3 9.514c-.387.125-.773.289-1.114.506-1.042.665-1.196 1.753-.415 2.71.346.422.79.715 1.284.936 1.1.49 2.202.976 3.3 1.47.019.01.036.013.053.019h-.004l1.306.535c0 .023.002.045 0 .073-.2 2.03-.39 4.063-.58 6.095-.04.419-.012.831.134 1.23.317.87 1.065 1.148 1.881.701.372-.204.666-.497.937-.818 1.372-1.623 2.746-3.244 4.113-4.872.111-.133.205-.15.363-.098.349.117.697.231 1.045.347h.001c.02.012.045.02.073.03l.142.042c1.248.416 2.68.775 3.929 1.19.4.132.622.164 1.045.098.311-.048.592-.062.828-.236.602-.33.995-.957.988-1.682-.005-.427-.154-.813-.35-1.186-.82-1.556-1.637-3.113-2.461-4.666-.078-.148-.076-.243.037-.375 1.381-1.615 2.756-3.236 4.133-4.855.272-.32.513-.658.653-1.058.308-.878-.09-1.57-1-1.741a2.783 2.783 0 00-1.235.069c-1.974.521-3.947 1.041-5.918 1.57-.175.047-.26.015-.355-.144a353.08 353.08 0 00-2.421-4.018 4.61 4.61 0 00-.652-.849c-.371-.37-.802-.549-1.227-.536z"/>
               </svg>
               <span class="fav-text">Spark Architecture</span>
             </li>
             <li class="fav-item" @click="navigateTo('/3. Advanced/3.6 Spark SQL Engine/Readme')">
-              <!-- Simple Icons: Databricks -->
               <svg viewBox="0 0 24 24" class="fav-icon-svg" fill="currentColor">
                 <path d="M.95 14.184L12 20.403l9.919-5.55v2.21L12 22.662l-11.05-6.23zm0-4.398L12 16.005l9.919-5.55v2.21L12 18.264l-11.05-6.23zm0-4.398L12 11.608l9.919-5.55v2.21L12 13.866l-11.05-6.23zm11.05-5.388l11.05 6.23-2.21 1.24-8.84-4.96-8.84 4.96-2.21-1.24z"/>
               </svg>
               <span class="fav-text">Catalyst Optimizer</span>
             </li>
             <li class="fav-item" @click="navigateTo('/3. Advanced/3.3 Join Strategies/Readme')">
-              <!-- Simple Icons: PostgreSQL -->
-              <svg viewBox="0 0 24 24" class="fav-icon-svg" fill="currentColor">
-                <path d="M23.5594 14.7228a.5269.5269 0 0 0-.0563-.1191c-.13-.1824-.6278-.6098-1.5794-1.0776a8.8795 8.8795 0 0 0-3.3283-.7507c-.432 0-.8255.0381-1.1895.1054a3.8153 3.8153 0 0 0-1.2783-.9904 3.7538 3.7538 0 0 0-1.8028-.437c-.366 0-.712.0624-1.037.1857-.325-.1233-.671-.1857-1.037-.1857a3.7538 3.7538 0 0 0-1.8028.437 3.8153 3.8153 0 0 0-1.2783.9904c-.364-.0673-.7575-.1054-1.1895-.1054a8.8795 8.8795 0 0 0-3.3283.7507c-.9516.4678-1.4494.8952-1.5794 1.0776a.5269.5269 0 0 0-.0563.1191C.0134 14.9575 0 15.228 0 15.5332c0 2.456 1.9427 4.4534 4.3468 4.4534.6214 0 1.2098-.135 1.741-.3773.5312.2423 1.1196.3773 1.741.3773 1.769 0 3.2847-1.0792 3.9432-2.6186.228.0587.467.0898.711.0898.244 0 .483-.0311.711-.0898.6585 1.5394 2.1742 2.6186 3.9432 2.6186.6214 0 1.2098-.135 1.741-.3773.5312.2423 1.1196.3773 1.741.3773 2.4041 0 4.3468-1.9974 4.3468-4.4534 0-.3052-.0134-.5757-.027-.8104z"/>
+              <svg viewBox="0 0 24 24" class="fav-icon-svg" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>
               </svg>
               <span class="fav-text">Join Strategies</span>
             </li>
             <li class="fav-item" @click="navigateTo('/4. Senior Dev/4.1 Memory Management And OOM Errors/Readme')">
-              <!-- Simple Icons: Linux -->
-              <svg viewBox="0 0 24 24" class="fav-icon-svg" fill="currentColor">
-                <path d="M12.504 0c-.155 0-.315.008-.48.021-4.226.333-3.105 4.807-3.17 6.298-.076 1.092-.3 1.953-1.05 3.02-.885 1.051-2.127 2.75-2.716 4.521-.278.832-.41 1.684-.287 2.489a.424.424 0 00-.11.135c-.26.268-.45.6-.663.839-.199.199-.485.267-.797.4-.313.136-.658.269-.864.68-.09.189-.136.394-.132.602 0 .199.027.4.055.536.058.399.116.728.04.97-.249.68-.28 1.145-.106 1.484.174.334.535.47.94.601.81.2 1.91.135 2.774.6.926.466 1.866.67 2.616.47.526-.116.97-.464 1.208-.946.587-.003 1.23-.269 2.26-.334.699-.058 1.574.267 2.577.2.025.134.063.198.114.333l.003.003c.391.778 1.113 1.132 1.884 1.071.771-.06 1.592-.536 2.257-1.306.631-.765 1.683-1.084 2.378-1.503.348-.199.629-.469.649-.853.023-.4-.2-.811-.714-1.376v-.097l-.003-.003c-.17-.2-.25-.535-.338-.926-.085-.401-.182-.786-.492-1.046h-.003c-.059-.054-.123-.067-.188-.135a.357.357 0 00-.19-.064c.431-1.278.264-2.55-.173-3.694-.533-1.41-1.465-2.638-2.175-3.483-.796-1.005-1.576-1.957-1.56-3.368.026-2.152.236-6.133-3.544-6.139z"/>
+              <svg viewBox="0 0 24 24" class="fav-icon-svg" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>
               </svg>
               <span class="fav-text">Memory & OOMs</span>
             </li>
             <li class="fav-item" @click="navigateTo('/4. Senior Dev/4.3 Structured Streaming/Readme')">
-              <!-- Simple Icons: Apache Kafka -->
-              <svg viewBox="0 0 24 24" class="fav-icon-svg" fill="currentColor">
-                <path d="M9.71 2.136a1.43 1.43 0 0 0-2.047 0h-.007a1.48 1.48 0 0 0 0 2.08l.007.007 7.07 7.184-7.07 7.185a1.48 1.48 0 0 0 0 2.08l.007.006a1.43 1.43 0 0 0 2.047 0l8.1-8.228a1.48 1.48 0 0 0 0-2.08z"/>
+              <svg viewBox="0 0 24 24" class="fav-icon-svg" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
               </svg>
               <span class="fav-text">Streaming & Watermarks</span>
             </li>
             <li class="fav-item" @click="navigateTo('/4. Senior Dev/4.4 Delta Lake And Lakehouse Architecture/Readme')">
-              <!-- Simple Icons: Apache Parquet -->
-              <svg viewBox="0 0 24 24" class="fav-icon-svg" fill="currentColor">
-                <path d="M10.953 20.391c-.95-1.013-.978-1.057-.807-1.248.27-.3.729-.283 1.272.048.43.262.778.365 1.096.326.319-.039.69-.25 1.057-.597 1.109-1.052 1.942-2.827 2.503-5.328l.228-1.018-.748.276c-1.396.516-2.585.698-3.565.545-1.127-.176-1.891-.689-2.3-1.545-.37-.775-.326-1.745.132-2.89.475-1.189 1.343-2.399 2.518-3.513 1.503-1.424 3.097-2.316 4.606-2.58 1.074-.188 1.966-.028 2.6.467.625.488.947 1.297.947 2.378 0 1.943-.787 4.417-2.223 6.993-1.365 2.447-3.159 4.444-5.068 5.642-.988.621-1.89.923-2.593.923a2.12 2.12 0 0 1-.648-.09z"/>
+              <svg viewBox="0 0 24 24" class="fav-icon-svg" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>
               </svg>
               <span class="fav-text">Delta Lake & ACID</span>
             </li>
@@ -498,17 +532,17 @@ function navigateTo(path: string) {
           </div>
         </div>
 
-        <!-- Quick Jump Continue Hero Button -->
+        <!-- Quick Resume Button -->
         <div id="walkthrough-continue-btn" class="quick-resume-card">
           <div class="resume-label">RESUME ACTIVE TOPIC</div>
-          <div class="resume-title">{{ nextUncompletedLesson.title }}</div>
-          <button class="resume-action-btn" @click="navigateTo(nextUncompletedLesson.path)">
+          <div class="resume-title">{{ nextUncompletedLesson?.title }}</div>
+          <button class="resume-action-btn" @click="navigateTo(nextUncompletedLesson?.path || '/')">
             Continue Reading
           </button>
         </div>
       </aside>
 
-      <!-- CENTER COLUMN: Feed & Cards & Curriculum & Bento -->
+      <!-- MAIN COLUMN: Feed + Bento + Modules + Carousel -->
       <main class="dash-col-center">
         <!-- Feed Header & Filter Tabs -->
         <div class="feed-header">
@@ -518,43 +552,32 @@ function navigateTo(path: string) {
               class="filter-pill"
               :class="{ active: activeFilter === 'all' }"
               @click="setFilter('all')"
-            >
-              All (265)
-            </button>
+            >All (265)</button>
             <button
               class="filter-pill"
               :class="{ active: activeFilter === '1. Fundamentals' }"
               @click="setFilter('1. Fundamentals')"
-            >
-              Fundamentals (70)
-            </button>
+            >Fundamentals (70)</button>
             <button
               class="filter-pill"
               :class="{ active: activeFilter === '2. Intermediate' }"
               @click="setFilter('2. Intermediate')"
-            >
-              Intermediate (77)
-            </button>
+            >Intermediate (77)</button>
             <button
               class="filter-pill"
               :class="{ active: activeFilter === '3. Advanced' }"
               @click="setFilter('3. Advanced')"
-            >
-              Advanced (68)
-            </button>
+            >Advanced (68)</button>
             <button
               class="filter-pill"
               :class="{ active: activeFilter === '4. Senior Dev' }"
               @click="setFilter('4. Senior Dev')"
-            >
-              Senior Dev (50)
-            </button>
+            >Senior Dev (50)</button>
           </div>
         </div>
 
-        <!-- FEATURED HERO CARDS shown on 'All' view for quick spotlight -->
+        <!-- FEATURED HERO CARDS shown on 'All' view -->
         <div v-if="activeFilter === 'all'" class="featured-cards-grid">
-          <!-- Card 1: Dark Navy Card -->
           <div class="feat-card feat-dark" @click="navigateTo('/1. Fundamentals/1.3 Lazy Evaluation And Lineage/1.3.6 How does Lineage help with fault tolerance')">
             <div class="feat-meta">
               <span class="feat-time">TODAY · 8 MIN READ</span>
@@ -570,10 +593,9 @@ function navigateTo(path: string) {
             </div>
           </div>
 
-          <!-- Card 2: Crisp White Card with Orange Accent -->
           <div class="feat-card feat-white" @click="navigateTo('/3. Advanced/3.3 Join Strategies/3.3.1 What are the different join strategies in PySpark')">
             <div class="feat-meta">
-              <span class="feat-time">OPTIMIZATION · 12 MIN</span>
+              <span class="feat-time" style="color: #64748B;">OPTIMIZATION · 12 MIN</span>
               <span class="feat-badge-orange">Join Mechanics</span>
             </div>
             <h3 class="feat-title" style="color: #0F172A;">What kind of Join Strategy?</h3>
@@ -586,10 +608,9 @@ function navigateTo(path: string) {
             </div>
           </div>
 
-          <!-- Card 3: Wide Soft Blue/Lavender Card below -->
           <div class="feat-card feat-wide-blue" @click="navigateTo('/4. Senior Dev/4.1 Memory Management And OOM Errors/4.1.1 Describe the Spark Executor Memory architecture.')">
             <div class="feat-meta">
-              <span class="feat-time">STAFF LEVEL · 15 MIN</span>
+              <span class="feat-time" style="color: #475569;">STAFF LEVEL · 15 MIN</span>
               <span class="feat-badge-blue">Memory Management</span>
             </div>
             <h3 class="feat-title" style="color: #1E293B;">Unified Memory Manager & Zero OOMs</h3>
@@ -603,9 +624,9 @@ function navigateTo(path: string) {
           </div>
         </div>
 
-        <!-- ACTIVE CURRICULUM QUESTIONS STREAM (Interactive filtered question feed) -->
+        <!-- ACTIVE CURRICULUM QUESTIONS STREAM -->
         <div class="questions-stream-section">
-          <!-- Feed Sub-Header with In-Feed Search & Controls -->
+          <!-- Feed Sub-Header -->
           <div class="feed-controls-bar">
             <div class="feed-sub-info">
               <span class="active-category-title">
@@ -629,9 +650,7 @@ function navigateTo(path: string) {
                 class="feed-search-input"
                 @input="currentPage = 1"
               />
-              <button v-if="feedSearchQuery" class="clear-search-btn" @click="feedSearchQuery = ''; currentPage = 1">
-                ✕
-              </button>
+              <button v-if="feedSearchQuery" class="clear-search-btn" @click="feedSearchQuery = ''; currentPage = 1">✕</button>
             </div>
           </div>
 
@@ -641,18 +660,14 @@ function navigateTo(path: string) {
               class="subtopic-pill"
               :class="{ active: selectedSubtopic === 'all' }"
               @click="setSubtopic('all')"
-            >
-              All Topics
-            </button>
+            >All Topics</button>
             <button
               v-for="sub in availableSubtopics"
               :key="sub.name"
               class="subtopic-pill"
               :class="{ active: selectedSubtopic === sub.name }"
               @click="setSubtopic(sub.name)"
-            >
-              {{ sub.name }} ({{ sub.count }})
-            </button>
+            >{{ sub.name }} ({{ sub.count }})</button>
           </div>
 
           <!-- Empty Results State -->
@@ -681,20 +696,16 @@ function navigateTo(path: string) {
                   <span class="q-module-badge">{{ item.module.replace(/^\d+\.\s*/, '') }}</span>
                   <span class="q-subtopic-badge">{{ item.subtopic }}</span>
                 </div>
-                
+
                 <div class="q-card-actions">
-                  <!-- Completion status pill -->
                   <span v-if="isLessonCompleted(item.path)" class="status-badge completed" title="Completed">
                     <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.8">
                       <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
                     <span>Done</span>
                   </span>
-                  <span v-else class="status-badge ready">
-                    <span>Ready</span>
-                  </span>
+                  <span v-else class="status-badge ready"><span>Ready</span></span>
 
-                  <!-- Bookmark button -->
                   <button
                     class="q-fav-toggle-btn"
                     :class="{ active: isFavorite(item.path) }"
@@ -711,19 +722,15 @@ function navigateTo(path: string) {
                 </div>
               </div>
 
-              <!-- Question Title -->
+              <!-- Question Title — uses resolveUrl for correct href -->
               <h4 class="q-card-title">
                 <a :href="resolveUrl(item.path)" class="q-card-link" @click.prevent="navigateTo(item.path)">
                   {{ item.title }}
                 </a>
               </h4>
 
-              <!-- Question Summary Preview -->
-              <p class="q-card-summary">
-                {{ item.summary }}
-              </p>
+              <p class="q-card-summary">{{ item.summary }}</p>
 
-              <!-- Question Footer -->
               <div class="q-card-footer">
                 <span class="q-read-more">
                   Read interview answer
@@ -738,26 +745,14 @@ function navigateTo(path: string) {
 
           <!-- Pagination Bar -->
           <div v-if="totalPages > 1" class="feed-pagination-bar">
-            <button
-              class="pagination-btn"
-              :disabled="currentPage === 1"
-              @click="prevPage"
-            >
+            <button class="pagination-btn" :disabled="currentPage === 1" @click="prevPage">
               <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="15 18 9 12 15 6"></polyline>
               </svg>
               <span>Previous</span>
             </button>
-
-            <span class="pagination-page-indicator">
-              Page {{ currentPage }} of {{ totalPages }} ({{ filteredQuestions.length }} questions)
-            </span>
-
-            <button
-              class="pagination-btn"
-              :disabled="currentPage === totalPages"
-              @click="nextPage"
-            >
+            <span class="pagination-page-indicator">Page {{ currentPage }} of {{ totalPages }} ({{ filteredQuestions.length }} questions)</span>
+            <button class="pagination-btn" :disabled="currentPage === totalPages" @click="nextPage">
               <span>Next</span>
               <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="9 18 15 12 9 6"></polyline>
@@ -769,7 +764,7 @@ function navigateTo(path: string) {
         <!-- 4-WIDGET ANALYTICS BENTO SECTION -->
         <div class="bento-section-title">Learning Intelligence Bento</div>
         <div class="analytics-bento-grid">
-          <!-- Widget 1: Resilient Pomodoro Focus Clock -->
+          <!-- Widget 1: Pomodoro Focus Clock -->
           <div id="walkthrough-pomodoro" class="bento-widget pomo-widget">
             <div class="widget-header">
               <span class="widget-tag">FOCUS ENGINE</span>
@@ -813,16 +808,12 @@ function navigateTo(path: string) {
                   class="toggle-btn"
                   :class="{ active: selectedTimeframe === 'week' }"
                   @click="setTimeframe('week'); selectedTimeframe = 'week'"
-                >
-                  Week
-                </button>
+                >Week</button>
                 <button
                   class="toggle-btn"
                   :class="{ active: selectedTimeframe === 'month' }"
                   @click="setTimeframe('month'); selectedTimeframe = 'month'"
-                >
-                  Month
-                </button>
+                >Month</button>
               </div>
             </div>
 
@@ -846,7 +837,7 @@ function navigateTo(path: string) {
             </div>
           </div>
 
-          <!-- Widget 3: Dynamic Performance & Exam Readiness Spline Wave -->
+          <!-- Widget 3: Performance Spline Wave — fixed overflow -->
           <div class="bento-widget spline-widget">
             <div class="widget-header">
               <span class="widget-tag">TRAJECTORY SPLINE</span>
@@ -854,25 +845,35 @@ function navigateTo(path: string) {
             </div>
 
             <div class="spline-visual-wrap">
-              <svg width="240" height="90" viewBox="0 0 240 90" class="spline-svg">
+              <svg width="220" height="80" viewBox="0 0 220 80" class="spline-svg" style="overflow:visible">
                 <defs>
                   <linearGradient id="waveGrad" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stop-color="#FF6B35" stop-opacity="0.4" />
                     <stop offset="100%" stop-color="#FF6B35" stop-opacity="0" />
                   </linearGradient>
+                  <clipPath id="splineClip">
+                    <rect x="0" y="0" width="220" height="80" />
+                  </clipPath>
                 </defs>
-                <path :d="waveData.area" fill="url(#waveGrad)" />
-                <path :d="waveData.curve" fill="none" stroke="#FF6B35" stroke-width="3" stroke-linecap="round" />
-                <circle :cx="waveData.peakX" :cy="waveData.peakY" r="5" fill="#FFFFFF" stroke="#FF6B35" stroke-width="3" />
+                <g clip-path="url(#splineClip)">
+                  <path :d="waveData.area" fill="url(#waveGrad)" />
+                  <path :d="waveData.curve" fill="none" stroke="#FF6B35" stroke-width="2.5" stroke-linecap="round" />
+                </g>
+                <!-- Score dot & label rendered outside clip so it's always visible -->
+                <circle :cx="waveData.peakX" :cy="waveData.peakY" r="5" fill="#FFFFFF" stroke="#FF6B35" stroke-width="2.5" />
+                <rect
+                  :x="Math.min(Math.max(waveData.peakX - 18, 0), 176)"
+                  :y="Math.max(waveData.peakY - 24, 0)"
+                  width="44" height="18" rx="9"
+                  fill="#FF6B35"
+                />
+                <text
+                  :x="Math.min(Math.max(waveData.peakX, 22), 198)"
+                  :y="Math.max(waveData.peakY - 11, 13)"
+                  text-anchor="middle"
+                  font-size="10" font-weight="700" fill="white"
+                >{{ readinessScore }}%</text>
               </svg>
-
-              <!-- Floating Score Pill -->
-              <div
-                class="floating-score-badge"
-                :style="{ left: `${waveData.peakX - 22}px`, top: `${Math.max(4, waveData.peakY - 26)}px` }"
-              >
-                {{ readinessScore }}%
-              </div>
             </div>
 
             <div class="spline-caption">
@@ -913,76 +914,85 @@ function navigateTo(path: string) {
             </div>
           </div>
         </div>
+
+        <!-- ═══════════════════════════════════════════════════════
+             RANDOM DAILY TOPIC — ADHD-Friendly Study Carousel
+             Changes every day, links to real markdown files
+             ═══════════════════════════════════════════════════════ -->
+        <div class="daily-topic-section">
+          <div class="daily-topic-header">
+            <div class="daily-topic-left">
+              <div class="daily-topic-eyebrow">
+                <span class="daily-dot"></span>
+                DAILY FOCUS · {{ new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' }) }}
+              </div>
+              <h3 class="daily-topic-title">Random Topic to Study</h3>
+              <p class="daily-topic-sub">Fresh topics every day — click any card to dive into the full notes</p>
+            </div>
+            <div class="carousel-controls">
+              <button
+                class="carousel-arrow-btn"
+                :disabled="!carouselCanPrev"
+                @click="scrollCarousel('prev')"
+                aria-label="Previous topics"
+              >
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+              </button>
+              <button
+                class="carousel-arrow-btn"
+                :disabled="!carouselCanNext"
+                @click="scrollCarousel('next')"
+                aria-label="Next topics"
+              >
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Horizontal scroll carousel -->
+          <div
+            ref="carouselEl"
+            class="daily-carousel-track"
+            @scroll="updateCarouselArrows"
+          >
+            <div
+              v-for="(topic, idx) in dailyTopics"
+              :key="topic.subtopic"
+              class="daily-topic-card"
+              :class="{ 'topic-card-featured': idx === 0 }"
+              @click="navigateTo(topic.path)"
+            >
+              <div class="topic-card-top">
+                <span
+                  class="topic-module-chip"
+                  :style="{ background: (moduleTagColors[topic.module] || '#FF6B35') + '22', color: moduleTagColors[topic.module] || '#FF6B35' }"
+                >{{ topic.module.replace(/^\d+\.\s*/, '') }}</span>
+                <span class="topic-card-count">{{ topic.count }} questions</span>
+              </div>
+
+              <div class="topic-card-body">
+                <h4 class="topic-card-name">{{ topic.subtopic }}</h4>
+                <p v-if="topic.firstQ" class="topic-card-preview">{{ topic.firstQ.title }}</p>
+              </div>
+
+              <div class="topic-card-footer">
+                <span class="topic-read-btn">
+                  Open Notes
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                  </svg>
+                </span>
+                <div class="topic-pill-indicator" :class="{ 'pill-featured': idx === 0 }"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </main>
-
-      <!-- RIGHT COLUMN: Profile, Stats & Action Cards matching screenshot -->
-      <aside class="dash-col-right">
-        <!-- Profile Card -->
-        <div class="profile-card">
-          <div class="profile-avatar-wrap">
-            <div class="profile-avatar">BP</div>
-          </div>
-          <div class="profile-name">Balasubramanian PG</div>
-          <div class="profile-role">Senior Data Engineer · PySpark</div>
-          <button class="profile-edit-btn" @click="openTour">Guided Tour</button>
-
-          <!-- Bio Speech Bubble matching screenshot -->
-          <div class="speech-bubble">
-            Targeting Staff & Senior Big Data Engineering roles. 260+ comprehensive questions with 100% zero-backend persistence.
-          </div>
-
-          <!-- 3 Stats metrics matching screenshot -->
-          <div class="profile-stats-row">
-            <div class="stat-col">
-              <div class="stat-num">265</div>
-              <div class="stat-lbl">Questions</div>
-            </div>
-            <div class="stat-col">
-              <div class="stat-num">{{ completedCount }}</div>
-              <div class="stat-lbl">Completed</div>
-            </div>
-            <div class="stat-col">
-              <div class="stat-num">{{ pomodoroStats.completedBlocks }}</div>
-              <div class="stat-lbl">Focus Pomo</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Mini Grid of Action Cards matching screenshot bottom right -->
-        <div class="action-cards-grid">
-          <div class="mini-card add-card" @click="showQuizModal = true">
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#FF6B35" stroke-width="2.5">
-              <line x1="12" y1="5" x2="12" y2="19"></line>
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-            </svg>
-            <span class="mini-title">Scenario Quiz</span>
-          </div>
-
-          <div class="mini-card outline-card" @click="navigateTo('/3. Advanced/3.2 Shuffling And Data Exchange/Readme')">
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#9CA3AF" stroke-width="2">
-              <path d="M2 12c3-4 6-4 10 0s7 4 10 0"></path>
-            </svg>
-            <span class="mini-title">Be patient with shuffles</span>
-          </div>
-
-          <div class="mini-card outline-card" @click="navigateTo('/4. Senior Dev/4.1 Memory Management And OOM Errors/Readme')">
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#9CA3AF" stroke-width="2">
-              <line x1="8" y1="6" x2="21" y2="6"></line>
-              <line x1="8" y1="12" x2="21" y2="12"></line>
-              <line x1="8" y1="18" x2="21" y2="18"></line>
-              <line x1="3" y1="6" x2="3.01" y2="6"></line>
-              <line x1="3" y1="12" x2="3.01" y2="12"></line>
-              <line x1="3" y1="18" x2="3.01" y2="18"></line>
-            </svg>
-            <span class="mini-title">12 Steps to Debug OOMs</span>
-          </div>
-
-          <!-- Solid Orange Card matching screenshot "Zero Budget" -->
-          <div class="mini-card solid-orange-card" @click="navigateTo('/3. Advanced/3.5 Handling Data Skewness/Readme')">
-            <span class="mini-title-bold">Zero Data Skew</span>
-          </div>
-        </div>
-      </aside>
     </div>
 
     <!-- Modals & Overlays -->
@@ -1000,7 +1010,7 @@ function navigateTo(path: string) {
   padding: 24px 32px 64px 32px;
 }
 
-/* Streamlined Header matching user specification */
+/* ── Header ─────────────────────────────────────────────────────── */
 .dash-top-bar {
   display: flex;
   align-items: center;
@@ -1018,9 +1028,6 @@ function navigateTo(path: string) {
   align-items: center;
   gap: 10px;
   cursor: pointer;
-}
-
-.brand-spark-svg {
   flex-shrink: 0;
 }
 
@@ -1050,10 +1057,7 @@ function navigateTo(path: string) {
   border-color: rgba(255, 107, 53, 0.4);
 }
 
-.search-svg-icon {
-  color: #9CA3AF;
-  flex-shrink: 0;
-}
+.search-svg-icon { color: #9CA3AF; flex-shrink: 0; }
 
 .search-placeholder {
   flex: 1;
@@ -1077,6 +1081,7 @@ function navigateTo(path: string) {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-shrink: 0;
 }
 
 .header-icon-btn {
@@ -1099,14 +1104,14 @@ function navigateTo(path: string) {
   border-color: rgba(255, 107, 53, 0.4);
 }
 
-/* 3-Column Grid */
+/* ── 2-Column Grid ─────────────────────────────────────────────── */
 .dash-grid-layout {
   display: grid;
-  grid-template-columns: 240px 1fr 280px;
+  grid-template-columns: 240px 1fr;
   gap: 24px;
 }
 
-/* Left Column */
+/* ── Left Column ────────────────────────────────────────────────── */
 .dash-col-left {
   display: flex;
   flex-direction: column;
@@ -1162,28 +1167,11 @@ function navigateTo(path: string) {
   color: #FF6B35;
 }
 
-.empty-favs {
-  padding: 14px 6px;
-  text-align: center;
-}
+.empty-favs { padding: 14px 6px; text-align: center; }
+.empty-bookmark-svg { color: #6E7387; margin-bottom: 6px; }
+.empty-text { font-size: 11.5px; color: #6E7387; margin: 6px 0 0 0; line-height: 1.4; }
 
-.empty-bookmark-svg {
-  color: #6E7387;
-  margin-bottom: 6px;
-}
-
-.empty-text {
-  font-size: 11.5px;
-  color: #6E7387;
-  margin: 6px 0 0 0;
-  line-height: 1.4;
-}
-
-.saved-cards-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
+.saved-cards-list { display: flex; flex-direction: column; gap: 10px; }
 
 .saved-mini-card {
   padding: 12px;
@@ -1191,56 +1179,20 @@ function navigateTo(path: string) {
   cursor: pointer;
   transition: transform 0.2s;
 }
-
-.saved-mini-card:hover {
-  transform: translateY(-2px);
-}
-
-.saved-mini-card.card-dark {
-  background: #1E293B;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.saved-mini-card.card-orange {
-  background: linear-gradient(135deg, #FF6B35 0%, #EA580C 100%);
-}
-
-.saved-card-tag {
-  font-size: 10px;
-  font-weight: 700;
-  opacity: 0.8;
-  margin-bottom: 4px;
-}
-
-.saved-card-title {
-  font-size: 12.5px;
-  font-weight: 600;
-  line-height: 1.35;
-}
+.saved-mini-card:hover { transform: translateY(-2px); }
+.saved-mini-card.card-dark { background: #1E293B; border: 1px solid rgba(255,255,255,0.08); }
+.saved-mini-card.card-orange { background: linear-gradient(135deg, #FF6B35 0%, #EA580C 100%); }
+.saved-card-tag { font-size: 10px; font-weight: 700; opacity: 0.8; margin-bottom: 4px; }
+.saved-card-title { font-size: 12.5px; font-weight: 600; line-height: 1.35; }
 
 .quick-resume-card {
-  background: linear-gradient(135deg, rgba(255, 107, 53, 0.15) 0%, rgba(144, 107, 255, 0.15) 100%);
-  border: 1px solid rgba(255, 107, 53, 0.3);
+  background: linear-gradient(135deg, rgba(255,107,53,0.15) 0%, rgba(144,107,255,0.15) 100%);
+  border: 1px solid rgba(255,107,53,0.3);
   border-radius: 20px;
   padding: 18px;
 }
-
-.resume-label {
-  font-size: 10.5px;
-  font-weight: 700;
-  color: #FF6B35;
-  letter-spacing: 0.05em;
-  margin-bottom: 6px;
-}
-
-.resume-title {
-  font-size: 13.5px;
-  font-weight: 600;
-  color: #FFFFFF;
-  margin-bottom: 12px;
-  line-height: 1.4;
-}
-
+.resume-label { font-size: 10.5px; font-weight: 700; color: #FF6B35; letter-spacing: 0.05em; margin-bottom: 6px; }
+.resume-title { font-size: 13.5px; font-weight: 600; color: #FFFFFF; margin-bottom: 12px; line-height: 1.4; }
 .resume-action-btn {
   width: 100%;
   background: linear-gradient(135deg, #FF6B35 0%, #EA580C 100%);
@@ -1253,12 +1205,9 @@ function navigateTo(path: string) {
   cursor: pointer;
   transition: all 0.2s;
 }
+.resume-action-btn:hover { box-shadow: 0 4px 14px rgba(255,107,53,0.4); }
 
-.resume-action-btn:hover {
-  box-shadow: 0 4px 14px rgba(255, 107, 53, 0.4);
-}
-
-/* Center Column */
+/* ── Center Column ──────────────────────────────────────────────── */
 .dash-col-center {
   display: flex;
   flex-direction: column;
@@ -1274,17 +1223,13 @@ function navigateTo(path: string) {
   gap: 12px;
 }
 
-.feed-title {
-  font-size: 20px;
-  font-weight: 700;
-  margin: 0;
-}
+.feed-title { font-size: 20px; font-weight: 700; margin: 0; }
 
 .feed-filter-chips {
   display: flex;
   align-items: center;
   gap: 8px;
-  overflow-x: auto;
+  flex-wrap: wrap;
 }
 
 .filter-pill {
@@ -1300,13 +1245,14 @@ function navigateTo(path: string) {
   transition: all 0.2s;
 }
 
-.filter-pill:hover, .filter-pill.active {
+.filter-pill:hover,
+.filter-pill.active {
   background: rgba(255, 107, 53, 0.18);
   border-color: rgba(255, 107, 53, 0.45);
   color: #FF6B35;
 }
 
-/* Featured Hero Cards Grid */
+/* ── Featured Hero Cards ─────────────────────────────────────────── */
 .featured-cards-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1321,154 +1267,60 @@ function navigateTo(path: string) {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  min-height: 200px;
 }
 
-.feat-card:hover {
-  transform: translateY(-3px);
-}
+.feat-card:hover { transform: translateY(-3px); }
 
 .feat-dark {
   background: #15161E;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
 }
-
 .feat-white {
   background: #FFFFFF;
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0,0,0,0.06);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
 }
-
 .feat-wide-blue {
   grid-column: 1 / -1;
   background: linear-gradient(135deg, #E0E7FF 0%, #EDE9FE 100%);
-  border: 1px solid rgba(99, 102, 241, 0.15);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(99,102,241,0.15);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
 }
 
-.feat-meta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 12px;
-}
+.feat-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.feat-time { font-size: 11px; font-weight: 700; opacity: 0.7; }
+.feat-badge-dark { font-size: 11px; font-weight: 700; color: #A78BFA; background: rgba(167,139,250,0.15); padding: 3px 8px; border-radius: 6px; }
+.feat-badge-orange { font-size: 11px; font-weight: 700; color: #EA580C; background: rgba(234,88,12,0.12); padding: 3px 8px; border-radius: 6px; }
+.feat-badge-blue { font-size: 11px; font-weight: 700; color: #2563EB; background: rgba(37,99,235,0.12); padding: 3px 8px; border-radius: 6px; }
+.feat-title { font-size: 18px; font-weight: 700; margin: 0 0 10px 0; line-height: 1.35; }
+.feat-desc { font-size: 13.5px; line-height: 1.5; margin: 0 0 20px 0; opacity: 0.85; flex: 1; }
+.feat-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 12px; }
+.read-link { font-size: 13px; font-weight: 600; color: #9CA3AF; }
+.feat-pill-btn { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); color: #FFFFFF; font-size: 12.5px; font-weight: 600; padding: 7px 16px; border-radius: 9999px; cursor: pointer; }
+.feat-pill-orange { background: #FF6B35; border: none; color: #FFFFFF; font-size: 12.5px; font-weight: 600; padding: 7px 16px; border-radius: 9999px; cursor: pointer; box-shadow: 0 4px 12px rgba(255,107,53,0.35); }
+.feat-pill-dark { background: #0F172A; border: none; color: #FFFFFF; font-size: 12.5px; font-weight: 600; padding: 7px 16px; border-radius: 9999px; cursor: pointer; }
 
-.feat-time {
-  font-size: 11px;
-  font-weight: 700;
-  opacity: 0.7;
-}
-
-.feat-badge-dark {
-  font-size: 11px;
-  font-weight: 700;
-  color: #A78BFA;
-  background: rgba(167, 139, 250, 0.15);
-  padding: 3px 8px;
-  border-radius: 6px;
-}
-
-.feat-badge-orange {
-  font-size: 11px;
-  font-weight: 700;
-  color: #EA580C;
-  background: rgba(234, 88, 12, 0.12);
-  padding: 3px 8px;
-  border-radius: 6px;
-}
-
-.feat-badge-blue {
-  font-size: 11px;
-  font-weight: 700;
-  color: #2563EB;
-  background: rgba(37, 99, 235, 0.12);
-  padding: 3px 8px;
-  border-radius: 6px;
-}
-
-.feat-title {
-  font-size: 18px;
-  font-weight: 700;
-  margin: 0 0 10px 0;
-  line-height: 1.35;
-}
-
-.feat-desc {
-  font-size: 13.5px;
-  line-height: 1.5;
-  margin: 0 0 20px 0;
-  opacity: 0.85;
-}
-
-.feat-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-top: 12px;
-}
-
-.read-link {
-  font-size: 13px;
-  font-weight: 600;
-  color: #9CA3AF;
-}
-
-.feat-pill-btn {
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #FFFFFF;
-  font-size: 12.5px;
-  font-weight: 600;
-  padding: 7px 16px;
-  border-radius: 9999px;
-  cursor: pointer;
-}
-
-.feat-pill-orange {
-  background: #FF6B35;
-  border: none;
-  color: #FFFFFF;
-  font-size: 12.5px;
-  font-weight: 600;
-  padding: 7px 16px;
-  border-radius: 9999px;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.35);
-}
-
-.feat-pill-dark {
-  background: #0F172A;
-  border: none;
-  color: #FFFFFF;
-  font-size: 12.5px;
-  font-weight: 600;
-  padding: 7px 16px;
-  border-radius: 9999px;
-  cursor: pointer;
-}
-
-/* Analytics Bento */
-.bento-section-title {
-  font-size: 15px;
-  font-weight: 700;
-  color: #FFFFFF;
-  letter-spacing: -0.01em;
-}
+/* ── Analytics Bento ─────────────────────────────────────────────── */
+.bento-section-title { font-size: 15px; font-weight: 700; color: #FFFFFF; letter-spacing: -0.01em; }
 
 .analytics-bento-grid {
   display: grid;
-  grid-template-columns: 240px 1fr 240px;
+  grid-template-columns: 200px 1fr 220px;
   gap: 18px;
+  align-items: start;
 }
 
 .bento-widget {
   background: #12131A;
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255,255,255,0.07);
   border-radius: 20px;
   padding: 20px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  overflow: hidden; /* prevent any child from leaking */
 }
 
 .widget-header {
@@ -1478,25 +1330,10 @@ function navigateTo(path: string) {
   margin-bottom: 14px;
 }
 
-.widget-tag {
-  font-size: 10.5px;
-  font-weight: 700;
-  color: #FF6B35;
-  letter-spacing: 0.05em;
-}
+.widget-tag { font-size: 10.5px; font-weight: 700; color: #FF6B35; letter-spacing: 0.05em; }
 
-.widget-status {
-  font-size: 11px;
-  color: #6E7387;
-  padding: 2px 8px;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.widget-status.running {
-  color: #34D399;
-  background: rgba(52, 211, 153, 0.15);
-}
+.widget-status { font-size: 11px; color: #6E7387; padding: 2px 8px; border-radius: 6px; background: rgba(255,255,255,0.05); }
+.widget-status.running { color: #34D399; background: rgba(52,211,153,0.15); }
 
 .pomo-clock-wrap {
   position: relative;
@@ -1508,195 +1345,75 @@ function navigateTo(path: string) {
   justify-content: center;
 }
 
-.pomo-svg {
-  transform: rotate(-90deg);
-}
+.pomo-svg { transform: rotate(-90deg); }
+.pomo-track { fill: none; stroke: rgba(255,255,255,0.08); stroke-width: 6; }
+.pomo-progress { fill: none; stroke: #FF6B35; stroke-width: 6; stroke-linecap: round; stroke-dasharray: 301.59; transition: stroke-dashoffset 0.5s ease; }
+.pomo-progress.active { stroke: #FF6B35; filter: drop-shadow(0 0 6px rgba(255,107,53,0.5)); }
 
-.pomo-track {
-  fill: none;
-  stroke: rgba(255, 255, 255, 0.08);
-  stroke-width: 6;
-}
+.pomo-center-digits { position: absolute; display: flex; flex-direction: column; align-items: center; }
+.digits { font-size: 20px; font-weight: 700; font-family: var(--vp-font-family-mono); }
+.mode-label { font-size: 10px; color: #9CA3AF; text-transform: uppercase; }
 
-.pomo-progress {
-  fill: none;
-  stroke: #FF6B35;
-  stroke-width: 6;
-  stroke-linecap: round;
-  stroke-dasharray: 301.59;
-  transition: stroke-dashoffset 0.5s ease;
-}
+.pomo-actions { display: flex; gap: 8px; }
+.pomo-btn { flex: 1; padding: 7px 10px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.pomo-btn.main { background: linear-gradient(135deg, #FF6B35 0%, #EA580C 100%); border: none; color: #FFFFFF; }
+.pomo-btn.alt { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: #D1D5DB; }
 
-.pomo-progress.active {
-  stroke: #FF6B35;
-  filter: drop-shadow(0 0 6px rgba(255, 107, 53, 0.5));
-}
-
-.pomo-center-digits {
-  position: absolute;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.digits {
-  font-size: 20px;
-  font-weight: 700;
-  font-family: var(--vp-font-family-mono);
-}
-
-.mode-label {
-  font-size: 10px;
-  color: #9CA3AF;
-  text-transform: uppercase;
-}
-
-.pomo-actions {
-  display: flex;
-  gap: 8px;
-}
-
-.pomo-btn {
-  flex: 1;
-  padding: 7px 10px;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.pomo-btn.main {
-  background: linear-gradient(135deg, #FF6B35 0%, #EA580C 100%);
-  border: none;
-  color: #FFFFFF;
-}
-
-.pomo-btn.alt {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #D1D5DB;
-}
-
-/* Capsule Chart */
-.chart-toggle {
-  display: flex;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
-  padding: 2px;
-}
-
-.toggle-btn {
-  background: transparent;
-  border: none;
-  color: #9CA3AF;
-  font-size: 11px;
-  padding: 3px 8px;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.toggle-btn.active {
-  background: #FF6B35;
-  color: #FFFFFF;
-  font-weight: 600;
-}
+/* Chart widget */
+.chart-toggle { display: flex; background: rgba(255,255,255,0.05); border-radius: 8px; padding: 2px; }
+.toggle-btn { background: transparent; border: none; color: #9CA3AF; font-size: 11px; padding: 3px 8px; border-radius: 6px; cursor: pointer; }
+.toggle-btn.active { background: #FF6B35; color: #FFFFFF; font-weight: 600; }
 
 .capsule-chart-container {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 8px;
-  height: 100px;
-  margin-bottom: 12px;
-  padding: 0 4px;
-}
-
-.capsule-col {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   gap: 6px;
+  height: 90px;
+  margin-bottom: 12px;
+  padding: 0 2px;
 }
 
-.col-day {
-  font-size: 11px;
-  color: #6E7387;
-  font-weight: 600;
-}
-
-.col-pill-track {
-  width: 14px;
-  height: 64px;
-  background: #191B24;
-  border-radius: 9999px;
-  position: relative;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.col-pill-fill {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: linear-gradient(180deg, #FF6B35 0%, #EA580C 100%);
-  border-radius: 9999px;
-  transition: height 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.col-count {
-  font-size: 10px;
-  color: #9CA3AF;
-}
+.capsule-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+.col-day { font-size: 10px; color: #6E7387; font-weight: 600; }
+.col-pill-track { width: 12px; height: 56px; background: #191B24; border-radius: 9999px; position: relative; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); }
+.col-pill-fill { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(180deg, #FF6B35 0%, #EA580C 100%); border-radius: 9999px; transition: height 0.6s cubic-bezier(0.16,1,0.3,1); }
+.col-count { font-size: 10px; color: #9CA3AF; }
 
 .chart-summary {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 11.5px;
+  font-size: 11px;
   color: #9CA3AF;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 1px solid rgba(255,255,255,0.06);
   padding-top: 10px;
 }
+.summary-pill { color: #FF6B35; font-weight: 700; }
 
-.summary-pill {
-  color: #FF6B35;
-  font-weight: 700;
-}
+/* Spline widget — fully contained */
+.spline-widget { min-height: auto; }
 
-/* Spline Wave */
 .spline-visual-wrap {
   position: relative;
-  margin: 0 auto;
+  width: 220px;
+  height: 80px;
+  margin: 8px 0 12px 0;
+  overflow: hidden;
 }
 
-.floating-score-badge {
-  position: absolute;
-  background: #FF6B35;
-  color: #FFFFFF;
-  font-size: 11px;
-  font-weight: 700;
-  padding: 2px 7px;
-  border-radius: 9999px;
-  box-shadow: 0 0 10px rgba(255, 107, 53, 0.6);
-  transition: all 0.3s ease;
+.spline-svg {
+  display: block;
+  width: 220px;
+  height: 80px;
 }
 
-.spline-caption {
-  font-size: 11px;
-  color: #9CA3AF;
-  line-height: 1.4;
-  margin-top: 10px;
-}
+.readiness-indicator { font-size: 11px; font-weight: 700; color: #FF6B35; }
 
-/* Curriculum Modules Grid */
-.curriculum-section {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
+.spline-caption { font-size: 11px; color: #9CA3AF; line-height: 1.4; margin-top: 6px; }
+
+/* ── Curriculum Modules ──────────────────────────────────────────── */
+.curriculum-section { display: flex; flex-direction: column; gap: 16px; }
 
 .curriculum-header {
   display: flex;
@@ -1704,16 +1421,8 @@ function navigateTo(path: string) {
   justify-content: space-between;
 }
 
-.section-title {
-  font-size: 18px;
-  font-weight: 700;
-  margin: 0;
-}
-
-.section-sub {
-  font-size: 12.5px;
-  color: #9CA3AF;
-}
+.section-title { font-size: 18px; font-weight: 700; margin: 0; }
+.section-sub { font-size: 12.5px; color: #9CA3AF; }
 
 .modules-grid {
   display: grid;
@@ -1723,11 +1432,11 @@ function navigateTo(path: string) {
 
 .module-card {
   background: #12131A;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255,255,255,0.08);
   border-radius: 18px;
   padding: 20px;
   cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.25s cubic-bezier(0.16,1,0.3,1);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -1735,239 +1444,235 @@ function navigateTo(path: string) {
 
 .module-card:hover {
   transform: translateY(-3px);
-  border-color: rgba(255, 107, 53, 0.4);
+  border-color: rgba(255,107,53,0.4);
   background: #151620;
 }
 
-.module-card-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 8px;
-}
+.module-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.module-tag { font-size: 11px; font-weight: 700; color: #FF6B35; background: rgba(255,107,53,0.12); padding: 3px 8px; border-radius: 6px; }
+.module-percent { font-size: 12px; font-weight: 700; color: #FFFFFF; }
+.module-card-title { font-size: 15.5px; font-weight: 700; color: #FFFFFF; margin: 0 0 6px 0; }
+.module-card-desc { font-size: 12.5px; color: #9CA3AF; line-height: 1.45; margin: 0 0 16px 0; }
 
-.module-tag {
-  font-size: 11px;
-  font-weight: 700;
-  color: #FF6B35;
-  background: rgba(255, 107, 53, 0.12);
-  padding: 3px 8px;
-  border-radius: 6px;
-}
+.module-progress-bar { height: 6px; background: #191B24; border-radius: 9999px; overflow: hidden; margin-bottom: 12px; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, #FF6B35 0%, #EA580C 100%); border-radius: 9999px; transition: width 0.6s ease; }
 
-.module-percent {
-  font-size: 12px;
-  font-weight: 700;
-  color: #FFFFFF;
-}
+.module-card-footer { display: flex; align-items: center; justify-content: space-between; font-size: 11.5px; color: #6E7387; }
+.card-arrow { color: #FF6B35; font-weight: 600; }
 
-.module-card-title {
-  font-size: 15.5px;
-  font-weight: 700;
-  color: #FFFFFF;
-  margin: 0 0 6px 0;
-}
-
-.module-card-desc {
-  font-size: 12.5px;
-  color: #9CA3AF;
-  line-height: 1.45;
-  margin: 0 0 16px 0;
-}
-
-.module-progress-bar {
-  height: 6px;
-  background: #191B24;
-  border-radius: 9999px;
-  overflow: hidden;
-  margin-bottom: 12px;
-}
-
-.progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #FF6B35 0%, #EA580C 100%);
-  border-radius: 9999px;
-  transition: width 0.6s ease;
-}
-
-.module-card-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 11.5px;
-  color: #6E7387;
-}
-
-.card-arrow {
-  color: #FF6B35;
-  font-weight: 600;
-}
-
-/* Right Column */
-.dash-col-right {
+/* ═══════════════════════════════════════════════════════════════════
+   DAILY RANDOM TOPIC CAROUSEL
+   ═══════════════════════════════════════════════════════════════════ */
+.daily-topic-section {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-.profile-card {
-  background: #12131A;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 20px;
-  padding: 24px 20px;
-  text-align: center;
+.daily-topic-header {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.profile-avatar-wrap {
-  margin-bottom: 12px;
-}
-
-.profile-avatar {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #FF6B35 0%, #EA580C 100%);
-  color: #FFFFFF;
-  font-size: 18px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 16px rgba(255, 107, 53, 0.35);
-}
-
-.profile-name {
-  font-size: 16px;
-  font-weight: 700;
-  color: #FFFFFF;
-  margin-bottom: 2px;
-}
-
-.profile-role {
-  font-size: 12px;
-  color: #9CA3AF;
-  margin-bottom: 12px;
-}
-
-.profile-edit-btn {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #D1D5DB;
-  font-size: 11.5px;
-  padding: 4px 12px;
-  border-radius: 9999px;
-  cursor: pointer;
-  margin-bottom: 16px;
-}
-
-.speech-bubble {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 14px;
-  padding: 12px 14px;
-  font-size: 12px;
-  color: #D1D5DB;
-  line-height: 1.4;
-  margin-bottom: 18px;
-  text-align: left;
-}
-
-.profile-stats-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  width: 100%;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-  padding-top: 14px;
-}
-
-.stat-col {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.stat-num {
-  font-size: 18px;
-  font-weight: 700;
-  color: #FFFFFF;
-}
-
-.stat-lbl {
-  font-size: 10.5px;
-  color: #6E7387;
-  text-transform: uppercase;
-}
-
-/* Action Cards Mini Grid */
-.action-cards-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-.mini-card {
-  height: 100px;
-  border-radius: 16px;
-  padding: 14px;
-  display: flex;
-  flex-direction: column;
+  align-items: flex-end;
   justify-content: space-between;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.mini-card:hover {
-  transform: translateY(-2px);
-}
-
-.add-card {
-  background: #1E293B;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  align-items: center;
-  justify-content: center;
+.daily-topic-left {
+  display: flex;
+  flex-direction: column;
   gap: 6px;
 }
 
-.outline-card {
-  background: #12131A;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+.daily-topic-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #FF6B35;
+  letter-spacing: 0.06em;
 }
 
-.mini-title {
-  font-size: 12px;
-  font-weight: 600;
-  color: #FFFFFF;
-  line-height: 1.3;
+.daily-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #FF6B35;
+  box-shadow: 0 0 8px rgba(255, 107, 53, 0.7);
+  animation: blink 2s ease-in-out infinite;
 }
 
-.solid-orange-card {
-  background: linear-gradient(135deg, #FF6B35 0%, #EA580C 100%);
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+.daily-topic-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
   color: #FFFFFF;
+}
+
+.daily-topic-sub {
+  font-size: 13px;
+  color: #9CA3AF;
+  margin: 0;
+}
+
+.carousel-controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.carousel-arrow-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  text-align: center;
-  box-shadow: 0 6px 18px rgba(255, 107, 53, 0.35);
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #9CA3AF;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-.mini-title-bold {
-  font-size: 13.5px;
-  font-weight: 700;
+.carousel-arrow-btn:hover:not(:disabled) {
+  background: rgba(255, 107, 53, 0.18);
+  border-color: rgba(255, 107, 53, 0.45);
+  color: #FF6B35;
 }
 
-/* ==========================================================================
-   Interactive Curriculum Questions Stream
-   ========================================================================== */
-.questions-stream-section {
+.carousel-arrow-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Horizontal scroll track — no scrollbar */
+.daily-carousel-track {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding-bottom: 8px;
+  scrollbar-width: none;
+}
+
+.daily-carousel-track::-webkit-scrollbar {
+  display: none;
+}
+
+/* Topic Cards */
+.daily-topic-card {
+  flex: 0 0 280px;
+  background: #12131A;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  margin-top: 24px;
+  justify-content: space-between;
+  min-height: 160px;
 }
+
+.daily-topic-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255, 107, 53, 0.4);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+  background: #151620;
+}
+
+/* First card gets an accent gradient border */
+.daily-topic-card.topic-card-featured {
+  background: linear-gradient(145deg, #1A1B25, #141520);
+  border-color: rgba(255, 107, 53, 0.35);
+  box-shadow: 0 0 0 1px rgba(255, 107, 53, 0.15), 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.topic-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.topic-module-chip {
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  letter-spacing: 0.04em;
+}
+
+.topic-card-count {
+  font-size: 11px;
+  color: #6E7387;
+  font-weight: 500;
+}
+
+.topic-card-body {
+  flex: 1;
+  margin-bottom: 14px;
+}
+
+.topic-card-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin: 0 0 8px 0;
+  line-height: 1.3;
+}
+
+.topic-card-preview {
+  font-size: 12px;
+  color: #6E7387;
+  margin: 0;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.topic-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.topic-read-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #FF6B35;
+  transition: gap 0.2s;
+}
+
+.daily-topic-card:hover .topic-read-btn {
+  gap: 10px;
+}
+
+.topic-pill-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.topic-pill-indicator.pill-featured {
+  background: #FF6B35;
+  box-shadow: 0 0 6px rgba(255, 107, 53, 0.6);
+}
+
+/* ── Questions Stream ─────────────────────────────────────────────── */
+.questions-stream-section { display: flex; flex-direction: column; gap: 16px; margin-top: 4px; }
 
 .feed-controls-bar {
   display: flex;
@@ -1977,77 +1682,29 @@ function navigateTo(path: string) {
   flex-wrap: wrap;
 }
 
-.feed-sub-info {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.active-category-title {
-  font-size: 16px;
-  font-weight: 700;
-  color: #FFFFFF;
-}
-
-.active-count-badge {
-  background: rgba(255, 107, 53, 0.15);
-  color: #FF6B35;
-  border: 1px solid rgba(255, 107, 53, 0.3);
-  font-size: 11px;
-  font-weight: 700;
-  padding: 3px 9px;
-  border-radius: 9999px;
-}
+.feed-sub-info { display: flex; align-items: center; gap: 10px; }
+.active-category-title { font-size: 16px; font-weight: 700; color: #FFFFFF; }
+.active-count-badge { background: rgba(255,107,53,0.15); color: #FF6B35; border: 1px solid rgba(255,107,53,0.3); font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 9999px; }
 
 .feed-search-box {
   display: flex;
   align-items: center;
   gap: 8px;
   background: #15161E;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255,255,255,0.1);
   padding: 6px 14px;
   border-radius: 9999px;
   min-width: 260px;
   transition: all 0.2s ease;
 }
 
-.feed-search-box:focus-within {
-  border-color: #FF6B35;
-  box-shadow: 0 0 0 2px rgba(255, 107, 53, 0.2);
-}
+.feed-search-box:focus-within { border-color: #FF6B35; box-shadow: 0 0 0 2px rgba(255,107,53,0.2); }
+.search-mini-svg { color: #9CA3AF; flex-shrink: 0; }
+.feed-search-input { background: transparent; border: none; outline: none; color: #FFFFFF; font-size: 13px; width: 100%; }
+.feed-search-input::placeholder { color: #6E7387; }
+.clear-search-btn { background: none; border: none; color: #9CA3AF; cursor: pointer; font-size: 12px; padding: 0 4px; }
+.clear-search-btn:hover { color: #FFFFFF; }
 
-.search-mini-svg {
-  color: #9CA3AF;
-  flex-shrink: 0;
-}
-
-.feed-search-input {
-  background: transparent;
-  border: none;
-  outline: none;
-  color: #FFFFFF;
-  font-size: 13px;
-  width: 100%;
-}
-
-.feed-search-input::placeholder {
-  color: #6E7387;
-}
-
-.clear-search-btn {
-  background: none;
-  border: none;
-  color: #9CA3AF;
-  cursor: pointer;
-  font-size: 12px;
-  padding: 0 4px;
-}
-
-.clear-search-btn:hover {
-  color: #FFFFFF;
-}
-
-/* Subtopic filter chips row */
 .subtopic-chips-row {
   display: flex;
   align-items: center;
@@ -2059,7 +1716,7 @@ function navigateTo(path: string) {
 
 .subtopic-pill {
   background: #15161E;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255,255,255,0.08);
   color: #9CA3AF;
   font-size: 12px;
   font-weight: 500;
@@ -2070,191 +1727,55 @@ function navigateTo(path: string) {
   transition: all 0.18s ease;
 }
 
-.subtopic-pill:hover {
-  border-color: rgba(255, 255, 255, 0.2);
-  color: #FFFFFF;
-}
+.subtopic-pill:hover { border-color: rgba(255,255,255,0.2); color: #FFFFFF; }
+.subtopic-pill.active { background: #FF6B35; border-color: #FF6B35; color: #FFFFFF; font-weight: 600; }
 
-.subtopic-pill.active {
-  background: #FF6B35;
-  border-color: #FF6B35;
-  color: #FFFFFF;
-  font-weight: 600;
-}
-
-/* Question Cards Stream Grid */
-.question-cards-stream {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 14px;
-}
+.question-cards-stream { display: grid; grid-template-columns: 1fr; gap: 14px; }
 
 .question-stream-card {
   background: #15161E;
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255,255,255,0.07);
   border-radius: 18px;
   padding: 18px 20px;
   cursor: pointer;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.22s cubic-bezier(0.16,1,0.3,1);
   position: relative;
 }
 
 .question-stream-card:hover {
-  border-color: rgba(255, 107, 53, 0.4);
+  border-color: rgba(255,107,53,0.4);
   transform: translateY(-2px);
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 10px 28px rgba(0,0,0,0.4);
 }
 
-.q-card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
+.q-card-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.q-card-tags { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.q-module-badge { background: rgba(255,107,53,0.12); color: #FF6B35; font-size: 10.5px; font-weight: 700; padding: 2px 8px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.04em; }
+.q-subtopic-badge { background: rgba(255,255,255,0.06); color: #9CA3AF; font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 6px; }
+.q-card-actions { display: flex; align-items: center; gap: 8px; }
 
-.q-card-tags {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
+.status-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 9999px; }
+.status-badge.completed { background: rgba(52,211,153,0.15); color: #34D399; border: 1px solid rgba(52,211,153,0.3); }
+.status-badge.ready { background: rgba(255,255,255,0.05); color: #9CA3AF; }
 
-.q-module-badge {
-  background: rgba(255, 107, 53, 0.12);
-  color: #FF6B35;
-  font-size: 10.5px;
-  font-weight: 700;
-  padding: 2px 8px;
-  border-radius: 6px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
+.q-fav-toggle-btn { background: none; border: none; color: #6E7387; cursor: pointer; padding: 4px; display: flex; align-items: center; justify-content: center; border-radius: 6px; transition: all 0.15s ease; }
+.q-fav-toggle-btn:hover { color: #FBBF24; background: rgba(251,191,36,0.1); }
+.q-fav-toggle-btn.active { color: #FBBF24; }
 
-.q-subtopic-badge {
-  background: rgba(255, 255, 255, 0.06);
-  color: #9CA3AF;
-  font-size: 11px;
-  font-weight: 500;
-  padding: 2px 8px;
-  border-radius: 6px;
-}
+.q-card-title { margin: 0; font-size: 15px; font-weight: 700; line-height: 1.4; color: #FFFFFF; }
+.q-card-link { color: #FFFFFF; text-decoration: none; transition: color 0.15s ease; }
+.q-card-link:hover { color: #FF6B35; }
+.q-card-summary { margin: 0; font-size: 13px; color: #9CA3AF; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
-.q-card-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
+.q-card-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 4px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.04); }
+.q-read-more { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; color: #FF6B35; }
+.q-action-chip { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); color: #FFFFFF; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 9999px; transition: all 0.15s ease; }
+.question-stream-card:hover .q-action-chip { background: #FF6B35; border-color: #FF6B35; }
 
-.status-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 11px;
-  font-weight: 600;
-  padding: 3px 8px;
-  border-radius: 9999px;
-}
-
-.status-badge.completed {
-  background: rgba(52, 211, 153, 0.15);
-  color: #34D399;
-  border: 1px solid rgba(52, 211, 153, 0.3);
-}
-
-.status-badge.ready {
-  background: rgba(255, 255, 255, 0.05);
-  color: #9CA3AF;
-}
-
-.q-fav-toggle-btn {
-  background: none;
-  border: none;
-  color: #6E7387;
-  cursor: pointer;
-  padding: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 6px;
-  transition: all 0.15s ease;
-}
-
-.q-fav-toggle-btn:hover {
-  color: #FBBF24;
-  background: rgba(251, 191, 36, 0.1);
-}
-
-.q-fav-toggle-btn.active {
-  color: #FBBF24;
-}
-
-.q-card-title {
-  margin: 0;
-  font-size: 15px;
-  font-weight: 700;
-  line-height: 1.4;
-  color: #FFFFFF;
-}
-
-.q-card-link {
-  color: #FFFFFF;
-  text-decoration: none;
-  transition: color 0.15s ease;
-}
-
-.q-card-link:hover {
-  color: #FF6B35;
-}
-
-.q-card-summary {
-  margin: 0;
-  font-size: 13px;
-  color: #9CA3AF;
-  line-height: 1.5;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.q-card-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 4px;
-  padding-top: 10px;
-  border-top: 1px solid rgba(255, 255, 255, 0.04);
-}
-
-.q-read-more {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 12px;
-  font-weight: 600;
-  color: #FF6B35;
-}
-
-.q-action-chip {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: #FFFFFF;
-  font-size: 11px;
-  font-weight: 600;
-  padding: 4px 10px;
-  border-radius: 9999px;
-  transition: all 0.15s ease;
-}
-
-.question-stream-card:hover .q-action-chip {
-  background: #FF6B35;
-  border-color: #FF6B35;
-}
-
-/* Pagination Bar */
+/* Pagination */
 .feed-pagination-bar {
   display: flex;
   align-items: center;
@@ -2262,7 +1783,7 @@ function navigateTo(path: string) {
   gap: 16px;
   padding: 14px 20px;
   background: #15161E;
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255,255,255,0.07);
   border-radius: 16px;
   margin-top: 6px;
 }
@@ -2271,8 +1792,8 @@ function navigateTo(path: string) {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
   color: #FFFFFF;
   font-size: 12.5px;
   font-weight: 600;
@@ -2282,70 +1803,36 @@ function navigateTo(path: string) {
   transition: all 0.18s ease;
 }
 
-.pagination-btn:hover:not(:disabled) {
-  background: #FF6B35;
-  border-color: #FF6B35;
-}
-
-.pagination-btn:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-}
-
-.pagination-page-indicator {
-  font-size: 12.5px;
-  color: #9CA3AF;
-  font-weight: 500;
-}
+.pagination-btn:hover:not(:disabled) { background: #FF6B35; border-color: #FF6B35; }
+.pagination-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.pagination-page-indicator { font-size: 12.5px; color: #9CA3AF; font-weight: 500; }
 
 /* Empty state */
-.empty-feed-state {
-  text-align: center;
-  padding: 48px 24px;
-  background: #15161E;
-  border: 1px dashed rgba(255, 255, 255, 0.12);
-  border-radius: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-}
+.empty-feed-state { text-align: center; padding: 48px 24px; background: #15161E; border: 1px dashed rgba(255,255,255,0.12); border-radius: 20px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.empty-icon-svg { color: #6E7387; }
+.empty-title { font-size: 16px; font-weight: 700; color: #FFFFFF; }
+.empty-desc { font-size: 13px; color: #9CA3AF; max-width: 360px; margin: 0; }
+.reset-feed-btn { background: #FF6B35; border: none; color: #FFFFFF; font-size: 12.5px; font-weight: 600; padding: 7px 16px; border-radius: 9999px; cursor: pointer; margin-top: 6px; }
 
-.empty-icon-svg {
-  color: #6E7387;
-}
-
-.empty-title {
-  font-size: 16px;
-  font-weight: 700;
-  color: #FFFFFF;
-}
-
-.empty-desc {
-  font-size: 13px;
-  color: #9CA3AF;
-  max-width: 360px;
-  margin: 0;
-}
-
-.reset-feed-btn {
-  background: #FF6B35;
-  border: none;
-  color: #FFFFFF;
-  font-size: 12.5px;
-  font-weight: 600;
-  padding: 7px 16px;
-  border-radius: 9999px;
-  cursor: pointer;
-  margin-top: 6px;
-}
-
-@media (max-width: 1200px) {
+/* ── Responsive ─────────────────────────────────────────────────── */
+@media (max-width: 1100px) {
   .dash-grid-layout {
     grid-template-columns: 1fr;
   }
   .analytics-bento-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .modules-grid {
     grid-template-columns: 1fr;
   }
+}
+
+@media (max-width: 768px) {
+  .dash-viewport { padding: 16px 16px 48px 16px; }
+  .analytics-bento-grid { grid-template-columns: 1fr; }
+  .featured-cards-grid { grid-template-columns: 1fr; }
+  .feat-wide-blue { grid-column: 1; }
+  .feed-controls-bar { flex-direction: column; align-items: flex-start; }
+  .feed-search-box { min-width: 100%; }
 }
 </style>

@@ -30,6 +30,7 @@
     "vue": "^3.5.44"
   },
   "dependencies": {
+    "embla-carousel-vue": "^8.6.0",
     "simple-icons": "^16.35.0"
   }
 }
