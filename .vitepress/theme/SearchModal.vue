@@ -2,6 +2,7 @@
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRouter } from 'vitepress'
 import searchIndexData from '../../search-index.json'
+import { resolveUrl } from './storage'
 
 const router = useRouter()
 const isVisible = ref(false)
@@ -50,7 +51,7 @@ function close() {
 }
 
 function selectItem(item: any) {
-  router.go(item.path)
+  router.go(resolveUrl(item.path))
   close()
 }
 
