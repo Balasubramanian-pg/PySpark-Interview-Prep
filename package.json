@@ -1,0 +1,32 @@
+{
+  "name": "pyspark-interview-prep",
+  "version": "1.0.0",
+  "description": "Enterprise-Grade PySpark Interview Preparation Wiki & Certification Learning Hub",
+  "type": "module",
+  "scripts": {
+    "docs:dev": "vitepress dev",
+    "docs:build": "vitepress build",
+    "docs:preview": "vitepress preview"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Balasubramanian-pg/PySpark-Interview-Prep.git"
+  },
+  "keywords": [
+    "pyspark",
+    "apache-spark",
+    "data-engineering",
+    "interview-prep",
+    "vitepress",
+    "vue3"
+  ],
+  "author": "Balasubramanian PG",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/canvas-confetti": "^1.9.0",
+    "canvas-confetti": "^1.9.4",
+    "lucide-vue-next": "^1.0.0",
+    "vitepress": "^1.6.4",
+    "vue": "^3.5.44"
+  }
+}
