@@ -2,7 +2,7 @@
 import { ref, watch, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vitepress'
 import confetti from 'canvas-confetti'
-import { isLessonCompleted, toggleLessonCompletion, isFavorite, toggleFavorite } from './storage'
+import { isLessonCompleted, toggleLessonCompletion, isFavorite, toggleFavorite, resolveUrl, normalizePath } from './storage'
 import searchIndexData from '../../search-index.json'
 
 const route = useRoute()
@@ -44,8 +44,8 @@ function onToggleFavorite() {
 
 // Find previous and next questions from search index
 const currentIndex = computed(() => {
-  const cleanPath = route.path.replace(/\/$/, '')
-  return searchIndexData.findIndex(item => item.path.replace(/\/$/, '') === cleanPath)
+  const cleanPath = normalizePath(route.path)
+  return searchIndexData.findIndex(item => normalizePath(item.path) === cleanPath)
 })
 
 const prevQuestion = computed(() => {
@@ -63,7 +63,7 @@ const nextQuestion = computed(() => {
 })
 
 function navigateTo(path: string) {
-  router.go(path)
+  router.go(resolveUrl(path))
 }
 </script>
 
