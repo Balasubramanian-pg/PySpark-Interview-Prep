@@ -1,0 +1,1857 @@
+[
+  {
+    "title": "1.1.1 What is the role of the Spark Driver?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.1 Spark Architecture Basics",
+    "path": "/1. Fundamentals/1.1 Spark Architecture Basics/1.1.1 What is the role of the Spark Driver",
+    "summary": "The Spark Driver is the process that runs your application\u2019s `main()` function and coordinates the whole Spark job. It is the \u201cbrain\u201d of the application: it plans the work, schedules it, and collects "
+  },
+  {
+    "title": "1.1.2 Explain the purpose of the Cluster Manager.",
+    "module": "1. Fundamentals",
+    "subtopic": "1.1 Spark Architecture Basics",
+    "path": "/1. Fundamentals/1.1 Spark Architecture Basics/1.1.2 Explain the purpose of the Cluster Manager.",
+    "summary": "The Cluster Manager is the resource manager for the cluster. Its main purpose is to allocate machines and resources to Spark applications and to start the processes Spark needs. It does not process da"
+  },
+  {
+    "title": "1.1.3 What are Executors and how do they execute tasks?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.1 Spark Architecture Basics",
+    "path": "/1. Fundamentals/1.1 Spark Architecture Basics/1.1.3 What are Executors and how do they execute tasks",
+    "summary": "Executors are worker processes that run on cluster worker nodes. The Cluster Manager launches them for a Spark application when the Driver requests resources. Executors do the actual data processing: "
+  },
+  {
+    "title": "1.1.4 What is a DAG (Directed Acyclic Graph) in Spark?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.1 Spark Architecture Basics",
+    "path": "/1. Fundamentals/1.1 Spark Architecture Basics/1.1.4 What is a DAG (Directed Acyclic Graph) in Spark",
+    "summary": "A DAG is Spark\u2019s logical execution plan. It is a graph of the transformations you apply to data, where each node is a dataset or operation and each edge shows how data flows from one operation to the "
+  },
+  {
+    "title": "1.1.5 Explain the difference between a Job, a Stage, and a Task.",
+    "module": "1. Fundamentals",
+    "subtopic": "1.1 Spark Architecture Basics",
+    "path": "/1. Fundamentals/1.1 Spark Architecture Basics/1.1.5 Explain the difference between a Job, a Stage, and a Task.",
+    "summary": "A **Job** is the largest unit. It is created when an action such as `collect()` or `count()` is called. One action normally creates one job. A job contains one or more stages."
+  },
+  {
+    "title": "1.1.6 How does Spark handle node failures during execution?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.1 Spark Architecture Basics",
+    "path": "/1. Fundamentals/1.1 Spark Architecture Basics/1.1.6 How does Spark handle node failures during execution",
+    "summary": "Spark treats worker-node and executor failures as normal events. The Driver detects the loss, the DAGScheduler uses the lineage DAG to recompute only missing data, and the TaskScheduler reschedules fa"
+  },
+  {
+    "title": "1.1.7 What is the difference between client mode and cluster mode?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.1 Spark Architecture Basics",
+    "path": "/1. Fundamentals/1.1 Spark Architecture Basics/1.1.7 What is the difference between client mode and cluster mode",
+    "summary": "The core difference is **where the Spark Driver process runs**. In client mode, the Driver runs on the machine that submits the application (the client or edge node). In cluster mode, the Driver runs "
+  },
+  {
+    "title": "1.1.8 How does the Driver communicate with the Executors?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.1 Spark Architecture Basics",
+    "path": "/1. Fundamentals/1.1 Spark Architecture Basics/1.1.8 How does the Driver communicate with the Executors",
+    "summary": "The Driver and Executors communicate directly through a **remote procedure call (RPC) framework built on Netty**. After an Executor starts and registers itself with the Driver, all coordination betwee"
+  },
+  {
+    "title": "1.1.9 What is the role of the SparkContext?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.1 Spark Architecture Basics",
+    "path": "/1. Fundamentals/1.1 Spark Architecture Basics/1.1.9 What is the role of the SparkContext",
+    "summary": "The `SparkContext` is the main entry point to Spark\u2019s low-level API and the Driver-side object that represents a connection to the Spark cluster. It is created once by the Driver, usually through `Spa"
+  },
+  {
+    "title": "1. Fundamentals/1.1 Spark Architecture Basics",
+    "module": "1. Fundamentals",
+    "subtopic": "1.1 Spark Architecture Basics",
+    "path": "/1. Fundamentals/1.1 Spark Architecture Basics/Readme",
+    "summary": "Apache Spark is a distributed computing engine designed for fast, general-purpose data processing. Its architecture is built around a driver program, a cluster manager, and a set of executors running "
+  },
+  {
+    "title": "1.2.1 What is an RDD and what are its key features?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.2 RDD Vs DataFrame Vs Dataset",
+    "path": "/1. Fundamentals/1.2 RDD Vs DataFrame Vs Dataset/1.2.1 What is an RDD and what are its key features",
+    "summary": "An RDD (Resilient Distributed Dataset) is Spark\u2019s fundamental distributed data abstraction. It is an immutable, partitioned collection of records that can be processed in parallel across executors. RD"
+  },
+  {
+    "title": "1.2.2 Why is DataFrame preferred over RDDs in PySpark?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.2 RDD Vs DataFrame Vs Dataset",
+    "path": "/1. Fundamentals/1.2 RDD Vs DataFrame Vs Dataset/1.2.2 Why is DataFrame preferred over RDDs in PySpark",
+    "summary": "A DataFrame is a structured, table-like abstraction with named columns and a schema. It runs on top of RDDs but adds an optimizer and a faster execution engine. In PySpark, DataFrames are usually pref"
+  },
+  {
+    "title": "1.2.3 Explain the concept of Immutability in Spark data structures.",
+    "module": "1. Fundamentals",
+    "subtopic": "1.2 RDD Vs DataFrame Vs Dataset",
+    "path": "/1. Fundamentals/1.2 RDD Vs DataFrame Vs Dataset/1.2.3 Explain the concept of Immutability in Spark data structures.",
+    "summary": "Immutability means that once an RDD, DataFrame, or Dataset is created, its data cannot be changed in place. Any transformation such as `map()`, `filter()`, or `withColumn()` returns a new data structu"
+  },
+  {
+    "title": "1.2.4 What is the Catalyst Optimizer and how does it benefit DataFrames?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.2 RDD Vs DataFrame Vs Dataset",
+    "path": "/1. Fundamentals/1.2 RDD Vs DataFrame Vs Dataset/1.2.4 What is the Catalyst Optimizer and how does it benefit DataFrames",
+    "summary": "The Catalyst Optimizer is Spark SQL\u2019s query optimization framework. It takes a DataFrame operation or SQL query, builds a tree-structured logical plan, rewrites that plan using a library of rules, and"
+  },
+  {
+    "title": "1.2.5 What is the difference between DataFrames and Datasets?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.2 RDD Vs DataFrame Vs Dataset",
+    "path": "/1. Fundamentals/1.2 RDD Vs DataFrame Vs Dataset/1.2.5 What is the difference between DataFrames and Datasets",
+    "summary": "A DataFrame is a distributed table with named columns and a schema. It is untyped from the API perspective: columns are accessed by name or expression, and type errors often appear at runtime. A Datas"
+  },
+  {
+    "title": "1.2.6 Why doesn't PySpark support the Dataset API in the same way Scala does?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.2 RDD Vs DataFrame Vs Dataset",
+    "path": "/1. Fundamentals/1.2 RDD Vs DataFrame Vs Dataset/1.2.6 Why doesn't PySpark support the Dataset API in the same way Scala does",
+    "summary": "PySpark does not support the typed Dataset API because the Dataset API is built on language features that exist only in statically typed JVM languages like Scala and Java. Python is dynamically typed "
+  },
+  {
+    "title": "1.2.7 In what scenario would you still use an RDD over a DataFrame?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.2 RDD Vs DataFrame Vs Dataset",
+    "path": "/1. Fundamentals/1.2 RDD Vs DataFrame Vs Dataset/1.2.7 In what scenario would you still use an RDD over a DataFrame",
+    "summary": "Use an RDD when your data or logic does not fit the structured table model, or when you need low-level control over partitions, serialization, or physical execution. DataFrames are usually better for "
+  },
+  {
+    "title": "1.2.8 How does Tungsten memory management improve DataFrame performance?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.2 RDD Vs DataFrame Vs Dataset",
+    "path": "/1. Fundamentals/1.2 RDD Vs DataFrame Vs Dataset/1.2.8 How does Tungsten memory management improve DataFrame performance",
+    "summary": "Tungsten improves DataFrame performance by moving away from the JVM object model. Instead of storing each row as a Java object on the heap, Tungsten stores data in a **compact binary format in off-hea"
+  },
+  {
+    "title": "1.2 RDD Vs DataFrame Vs Dataset",
+    "module": "1. Fundamentals",
+    "subtopic": "1.2 RDD Vs DataFrame Vs Dataset",
+    "path": "/1. Fundamentals/1.2 RDD Vs DataFrame Vs Dataset/Readme",
+    "summary": "Spark provides three main data abstractions: RDD, DataFrame, and Dataset. Each has different levels of type safety, optimization, and performance. Understanding their differences is essential for choo"
+  },
+  {
+    "title": "1.3.1 What is Lazy Evaluation in PySpark?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.3 Lazy Evaluation And Lineage",
+    "path": "/1. Fundamentals/1.3 Lazy Evaluation And Lineage/1.3.1 What is Lazy Evaluation in PySpark",
+    "summary": "Lazy evaluation means PySpark does not process data when you write transformations. It records them in a plan or lineage DAG and waits until an action is called. Only then does the Driver create a job"
+  },
+  {
+    "title": "1.3.2 Why does Spark use Lazy Evaluation? How does it optimize performance?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.3 Lazy Evaluation And Lineage",
+    "path": "/1. Fundamentals/1.3 Lazy Evaluation And Lineage/1.3.2 Why does Spark use Lazy Evaluation How does it optimize performance",
+    "summary": "Spark uses lazy evaluation because it lets the Driver see the complete chain of transformations before running anything. With the full plan in hand, Spark can combine steps, push work closer to the da"
+  },
+  {
+    "title": "1.3.3 What is the difference between a Transformation and an Action?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.3 Lazy Evaluation And Lineage",
+    "path": "/1. Fundamentals/1.3 Lazy Evaluation And Lineage/1.3.3 What is the difference between a Transformation and an Action",
+    "summary": "A **transformation** describes a new dataset derived from an existing one. It is lazy: it records the operation in the lineage DAG but does not process data. An **action** requests a result or writes "
+  },
+  {
+    "title": "1.3.4 Give 3 examples of Transformations and 3 examples of Actions.",
+    "module": "1. Fundamentals",
+    "subtopic": "1.3 Lazy Evaluation And Lineage",
+    "path": "/1. Fundamentals/1.3 Lazy Evaluation And Lineage/1.3.4 Give 3 examples of Transformations and 3 examples of Actions.",
+    "summary": "Transformations are lazy and return a new dataset. Actions are eager and trigger computation to return a result or write data."
+  },
+  {
+    "title": "1.3.5 What is an RDD Lineage Graph?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.3 Lazy Evaluation And Lineage",
+    "path": "/1. Fundamentals/1.3 Lazy Evaluation And Lineage/1.3.5 What is an RDD Lineage Graph",
+    "summary": "An RDD Lineage Graph is the record of how an RDD was built from its parent RDDs through transformations. Each node is an RDD, and each edge is a transformation that produced the child from the parent."
+  },
+  {
+    "title": "1.3.6 How does Lineage help with fault tolerance?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.3 Lazy Evaluation And Lineage",
+    "path": "/1. Fundamentals/1.3 Lazy Evaluation And Lineage/1.3.6 How does Lineage help with fault tolerance",
+    "summary": "Lineage is the record of transformations that produced each RDD. When a partition is lost because an executor or node fails, Spark walks the lineage backward to the nearest available parent data and r"
+  },
+  {
+    "title": "1.3.7 What happens under the hood when you call `df.show()` or `df.count()`?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.3 Lazy Evaluation And Lineage",
+    "path": "/1. Fundamentals/1.3 Lazy Evaluation And Lineage/1.3.7 What happens under the hood when you call `df.show()` or `df.count()`",
+    "summary": "Both `df.show()` and `df.count()` are actions. They trigger the full Spark execution pipeline: Catalyst optimization, physical planning, stage and task creation by the DAGScheduler, task scheduling by"
+  },
+  {
+    "title": "1.3 Lazy Evaluation And Lineage",
+    "module": "1. Fundamentals",
+    "subtopic": "1.3 Lazy Evaluation And Lineage",
+    "path": "/1. Fundamentals/1.3 Lazy Evaluation And Lineage/Readme",
+    "summary": "Lazy evaluation and lineage are two fundamental concepts in Spark that enable efficient execution and fault tolerance. Lazy evaluation means transformations are not executed immediately; instead, Spar"
+  },
+  {
+    "title": "1.4.1 How do you read a CSV file into a DataFrame with headers and inferred schema?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.4 Reading And Writing Data",
+    "path": "/1. Fundamentals/1.4 Reading And Writing Data/1.4.1 How do you read a CSV file into a DataFrame with headers and inferred schema",
+    "summary": "Use `spark.read.csv()` with `header=True` and `inferSchema=True`. `header=True` treats the first row as column names. `inferSchema=True` makes Spark scan the data and infer column types such as intege"
+  },
+  {
+    "title": "1.4.2 What are the performance implications of inferSchema=True?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.4 Reading And Writing Data",
+    "path": "/1. Fundamentals/1.4 Reading And Writing Data/1.4.2 What are the performance implications of inferSchema=True",
+    "summary": "`inferSchema=True` makes Spark read the file twice: once to sample and infer column types, and once to actually load the data. This extra pass adds I/O, CPU, and job startup cost. For small files the "
+  },
+  {
+    "title": "Reload later",
+    "module": "1. Fundamentals",
+    "subtopic": "1.4 Reading And Writing Data",
+    "path": "/1. Fundamentals/1.4 Reading And Writing Data/1.4.3 How do you enforce a custom schema when reading a file",
+    "summary": "Define an explicit `StructType` with `StructField` entries for each column, then pass it to `spark.read` using the `schema=` parameter. Spark uses your declared names and types directly and skips infe"
+  },
+  {
+    "title": "1.4.4 What are the different save modes when writing data (e.g., overwrite, append)?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.4 Reading And Writing Data",
+    "path": "/1. Fundamentals/1.4 Reading And Writing Data/1.4.4 What are the different save modes when writing data (e.g., overwrite, append)",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "1.4.5 How do you write a DataFrame out as partitioned Parquet files?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.4 Reading And Writing Data",
+    "path": "/1. Fundamentals/1.4 Reading And Writing Data/1.4.5 How do you write a DataFrame out as partitioned Parquet files",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "1.4.6 How does Spark handle corrupt records when reading JSON or CSV?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.4 Reading And Writing Data",
+    "path": "/1. Fundamentals/1.4 Reading And Writing Data/1.4.6 How does Spark handle corrupt records when reading JSON or CSV",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "1.4.7 How do you read data from a relational database using JDBC?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.4 Reading And Writing Data",
+    "path": "/1. Fundamentals/1.4 Reading And Writing Data/1.4.7 How do you read data from a relational database using JDBC",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "1.4 Reading And Writing Data",
+    "module": "1. Fundamentals",
+    "subtopic": "1.4 Reading And Writing Data",
+    "path": "/1. Fundamentals/1.4 Reading And Writing Data/Readme",
+    "summary": "Reading and writing data is a core operation in every Spark application. Spark provides a unified API to read from and write to many data sources, including files (CSV, JSON, Parquet, ORC, text), data"
+  },
+  {
+    "title": "1.5.1 What is the difference between select() and withColumn()?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.5 Basic Select And Filter",
+    "path": "/1. Fundamentals/1.5 Basic Select And Filter/1.5.1 What is the difference between select() and withColumn()",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "1.5.2 How do you filter a DataFrame based on multiple conditions?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.5 Basic Select And Filter",
+    "path": "/1. Fundamentals/1.5 Basic Select And Filter/1.5.2 How do you filter a DataFrame based on multiple conditions",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "1.5.3 Is there a performance difference between filter() and where()?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.5 Basic Select And Filter",
+    "path": "/1. Fundamentals/1.5 Basic Select And Filter/1.5.3 Is there a performance difference between filter() and where()",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "1.5.4 How do you rename a column in a PySpark DataFrame?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.5 Basic Select And Filter",
+    "path": "/1. Fundamentals/1.5 Basic Select And Filter/1.5.4 How do you rename a column in a PySpark DataFrame",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "1.5.5 How do you drop one or multiple columns from a DataFrame?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.5 Basic Select And Filter",
+    "path": "/1. Fundamentals/1.5 Basic Select And Filter/1.5.5 How do you drop one or multiple columns from a DataFrame",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "1.5.6 How do you check if a column exists in a DataFrame before selecting it?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.5 Basic Select And Filter",
+    "path": "/1. Fundamentals/1.5 Basic Select And Filter/1.5.6 How do you check if a column exists in a DataFrame before selecting it",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "1.5.7 What is the difference between col('name') and df['name']?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.5 Basic Select And Filter",
+    "path": "/1. Fundamentals/1.5 Basic Select And Filter/1.5.7 What is the difference between col('name') and df['name']",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "1.5.8 How do you conditionally create a new column using when() and otherwise()?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.5 Basic Select And Filter",
+    "path": "/1. Fundamentals/1.5 Basic Select And Filter/1.5.8 How do you conditionally create a new column using when() and otherwise()",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "1.5 Basic Select And Filter",
+    "module": "1. Fundamentals",
+    "subtopic": "1.5 Basic Select And Filter",
+    "path": "/1. Fundamentals/1.5 Basic Select And Filter/Readme",
+    "summary": "Select and filter are the two most fundamental operations in PySpark DataFrames. `select` chooses columns, and `filter` (or `where`) chooses rows. They are lazy transformations that build a plan witho"
+  },
+  {
+    "title": "1.6.1 How do you drop rows that contain any null values?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.6 Handling Nulls And Missing Data",
+    "path": "/1. Fundamentals/1.6 Handling Nulls And Missing Data/1.6.1 How do you drop rows that contain any null values",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "1.6.2 How do you drop rows only if ALL values in the row are null?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.6 Handling Nulls And Missing Data",
+    "path": "/1. Fundamentals/1.6 Handling Nulls And Missing Data/1.6.2 How do you drop rows only if ALL values in the row are null",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "1.6.3 How do you fill null values in numeric columns with a specific number?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.6 Handling Nulls And Missing Data",
+    "path": "/1. Fundamentals/1.6 Handling Nulls And Missing Data/1.6.3 How do you fill null values in numeric columns with a specific number",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "1.6.4 How do you drop nulls considering only a specific subset of columns?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.6 Handling Nulls And Missing Data",
+    "path": "/1. Fundamentals/1.6 Handling Nulls And Missing Data/1.6.4 How do you drop nulls considering only a specific subset of columns",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "1.6.5 What is the difference between coalesce() the SQL function and fillna()?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.6 Handling Nulls And Missing Data",
+    "path": "/1. Fundamentals/1.6 Handling Nulls And Missing Data/1.6.5 What is the difference between coalesce() the SQL function and fillna()",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "1.6.6 How do you replace specific string values like Unknown with Null?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.6 Handling Nulls And Missing Data",
+    "path": "/1. Fundamentals/1.6 Handling Nulls And Missing Data/1.6.6 How do you replace specific string values like Unknown with Null",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "1.6.7 Write a snippet to count the number of null values in every column of a DataFrame.",
+    "module": "1. Fundamentals",
+    "subtopic": "1.6 Handling Nulls And Missing Data",
+    "path": "/1. Fundamentals/1.6 Handling Nulls And Missing Data/1.6.7 Write a snippet to count the number of null values in every column of a DataFrame.",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "Combine two columns",
+    "module": "1. Fundamentals",
+    "subtopic": "1.6 Handling Nulls And Missing Data",
+    "path": "/1. Fundamentals/1.6 Handling Nulls And Missing Data/Readme",
+    "summary": "Nulls and missing data are common in real-world datasets. In Spark, null represents a missing or unknown value. Handling nulls correctly is essential for accurate analysis and to avoid unexpected resu"
+  },
+  {
+    "title": "1.7.1 How do you group by a column and find the row count per group?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.7 Basic Aggregations",
+    "path": "/1. Fundamentals/1.7 Basic Aggregations/1.7.1 How do you group by a column and find the row count per group",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "1.7.2 How do you calculate the sum and average of a column within a groupby?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.7 Basic Aggregations",
+    "path": "/1. Fundamentals/1.7 Basic Aggregations/1.7.2 How do you calculate the sum and average of a column within a groupby",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "1.7.3 What is the difference between count() and countDistinct()?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.7 Basic Aggregations",
+    "path": "/1. Fundamentals/1.7 Basic Aggregations/1.7.3 What is the difference between count() and countDistinct()",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "1.7.4 How do you use the agg() function to apply multiple aggregations at once?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.7 Basic Aggregations",
+    "path": "/1. Fundamentals/1.7 Basic Aggregations/1.7.4 How do you use the agg() function to apply multiple aggregations at once",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "1.7.5 How do you give an alias to an aggregated column?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.7 Basic Aggregations",
+    "path": "/1. Fundamentals/1.7 Basic Aggregations/1.7.5 How do you give an alias to an aggregated column",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "1.7.6 What happens to rows with null keys when you perform a groupBy?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.7 Basic Aggregations",
+    "path": "/1. Fundamentals/1.7 Basic Aggregations/1.7.6 What happens to rows with null keys when you perform a groupBy",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "1.7.7 How do you find the maximum and minimum values of a column globally without groupBy?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.7 Basic Aggregations",
+    "path": "/1. Fundamentals/1.7 Basic Aggregations/1.7.7 How do you find the maximum and minimum values of a column globally without groupBy",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "1.7 Basic Aggregations",
+    "module": "1. Fundamentals",
+    "subtopic": "1.7 Basic Aggregations",
+    "path": "/1. Fundamentals/1.7 Basic Aggregations/Readme",
+    "summary": "Aggregations summarize data by computing values such as count, sum, average, minimum, and maximum. In PySpark, aggregations are performed on DataFrames using `groupBy`, `agg`, and built-in functions f"
+  },
+  {
+    "title": "1.8.1 What is a SparkSession and how does it differ from SparkContext?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.8 SparkSession And Context",
+    "path": "/1. Fundamentals/1.8 SparkSession And Context/1.8.1 What is a SparkSession and how does it differ from SparkContext",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "1.8.2 How do you create or retrieve a SparkSession in PySpark?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.8 SparkSession And Context",
+    "path": "/1. Fundamentals/1.8 SparkSession And Context/1.8.2 How do you create or retrieve a SparkSession in PySpark",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "1.8.3 How do you set Spark configuration properties at runtime using SparkSession?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.8 SparkSession And Context",
+    "path": "/1. Fundamentals/1.8 SparkSession And Context/1.8.3 How do you set Spark configuration properties at runtime using SparkSession",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "1.8.4 What is the purpose of enableHiveSupport()?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.8 SparkSession And Context",
+    "path": "/1. Fundamentals/1.8 SparkSession And Context/1.8.4 What is the purpose of enableHiveSupport()",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "1.8.5 How do you stop a SparkSession?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.8 SparkSession And Context",
+    "path": "/1. Fundamentals/1.8 SparkSession And Context/1.8.5 How do you stop a SparkSession",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "1.8.6 Can you have multiple SparkSessions in a single application? If so, why?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.8 SparkSession And Context",
+    "path": "/1. Fundamentals/1.8 SparkSession And Context/1.8.6 Can you have multiple SparkSessions in a single application If so, why",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "1.8.7 How do you access the Spark UI URL programmatically?",
+    "module": "1. Fundamentals",
+    "subtopic": "1.8 SparkSession And Context",
+    "path": "/1. Fundamentals/1.8 SparkSession And Context/1.8.7 How do you access the Spark UI URL programmatically",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "Set checkpoint directory",
+    "module": "1. Fundamentals",
+    "subtopic": "1.8 SparkSession And Context",
+    "path": "/1. Fundamentals/1.8 SparkSession And Context/Readme",
+    "summary": "SparkSession and SparkContext are the entry points to Spark functionality. SparkContext is the original low-level entry point introduced with RDDs. SparkSession is the unified high-level entry point i"
+  },
+  {
+    "title": "+------+--------+-------+-------+-----------+",
+    "module": "2. Intermediate",
+    "subtopic": "2.1 Joins And Join Types",
+    "path": "/2. Intermediate/2.1 Joins And Join Types/2.1.1 List the different types of joins available in PySpark.",
+    "summary": "Here is a complete, working PySpark script that demonstrates the syntax and exact output for every join type."
+  },
+  {
+    "title": "Note: \"order_id\" and \"product\" columns are not in the output.",
+    "module": "2. Intermediate",
+    "subtopic": "2.1 Joins And Join Types",
+    "path": "/2. Intermediate/2.1 Joins And Join Types/2.1.2 What is a Left Semi Join and when would you use it",
+    "summary": "A **Left Semi Join** is a type of join that returns rows from the left DataFrame **only if a match exists** in the right DataFrame."
+  },
+  {
+    "title": "+---+-------+-----------+",
+    "module": "2. Intermediate",
+    "subtopic": "2.1 Joins And Join Types",
+    "path": "/2. Intermediate/2.1 Joins And Join Types/2.1.3 What is a Left Anti Join and how does it differ from a Left Join",
+    "summary": "A Left Anti Join returns only the rows from the left DataFrame that have no match in the right DataFrame, acting as a highly optimized \"NOT EXISTS\" filter. It differs from a Left Join by completely ig"
+  },
+  {
+    "title": "+-----+----+",
+    "module": "2. Intermediate",
+    "subtopic": "2.1 Joins And Join Types",
+    "path": "/2. Intermediate/2.1 Joins And Join Types/2.1.4 What is a Cross Join and why should it generally be avoided",
+    "summary": "A Cross Join creates a Cartesian product, pairing every single row in the left DataFrame with every row in the right. It\u2019s usually a massive red flag in interviews because it causes exponential data e"
+  },
+  {
+    "title": "+-------+--------+-----------+--------+",
+    "module": "2. Intermediate",
+    "subtopic": "2.1 Joins And Join Types",
+    "path": "/2. Intermediate/2.1 Joins And Join Types/2.1.5 How do you handle joining two DataFrames that have a column with the exact same name",
+    "summary": "Joining DataFrames with overlapping column names creates ambiguous references that will instantly break downstream transformations. You must resolve these collisions either by deduplicating the join k"
+  },
+  {
+    "title": "+--------+---------+-------+--------+--------+-----+",
+    "module": "2. Intermediate",
+    "subtopic": "2.1 Joins And Join Types",
+    "path": "/2. Intermediate/2.1 Joins And Join Types/2.1.6 How do you perform a join on multiple columns",
+    "summary": "Joining on multiple columns (composite keys) requires passing either a list of column names or a compound boolean condition. Getting this right is critical for accurately matching records like \"user +"
+  },
+  {
+    "title": "+-------+-------+--------+",
+    "module": "2. Intermediate",
+    "subtopic": "2.1 Joins And Join Types",
+    "path": "/2. Intermediate/2.1 Joins And Join Types/2.1.7 What happens if you join on a column that contains nulls",
+    "summary": "Joining on `null` values silently drops matches because `null == null` evaluates to `UNKNOWN`, not `TRUE`. You must explicitly handle null keys using null-safe equality or preprocessing, otherwise you"
+  },
+  {
+    "title": "+-------+--------+-----------+--------+",
+    "module": "2. Intermediate",
+    "subtopic": "2.1 Joins And Join Types",
+    "path": "/2. Intermediate/2.1 Joins And Join Types/2.1.8 How do you resolve ambiguous column name errors after a join",
+    "summary": "Ambiguous column errors (`AnalysisException: Reference 'X' is ambiguous`) happen when a join creates duplicate column names and downstream operations don't know which one to pick. You resolve them by "
+  },
+  {
+    "title": "Explicit broadcast hint",
+    "module": "2. Intermediate",
+    "subtopic": "2.1 Joins And Join Types",
+    "path": "/2. Intermediate/2.1 Joins And Join Types/Readme",
+    "summary": "Joins are the fundamental operation for combining rows from two or more DataFrames based on a related column or expression. In distributed computing, the choice of join type and execution strategy has"
+  },
+  {
+    "title": "because it tries to cast \"Tablet\" into an integer 'id' column).",
+    "module": "2. Intermediate",
+    "subtopic": "2.10 Set Operations",
+    "path": "/2. Intermediate/2.10 Set Operations/2.10.1 What is the difference between union() and unionAll() in PySpark",
+    "summary": "In modern PySpark (2.0+), `union()` and `unionAll()` do the exact same thing: they stack DataFrames vertically and keep all duplicate rows. The only difference is historical naming. The real interview"
+  },
+  {
+    "title": "+---+-------+-----------+",
+    "module": "2. Intermediate",
+    "subtopic": "2.10 Set Operations",
+    "path": "/2. Intermediate/2.10 Set Operations/2.10.2 What is the difference between union() and unionByName()",
+    "summary": "`union()` stacks DataFrames strictly by column position (index), while `unionByName()` matches them by column name. Relying on `union()` in production is a massive risk because any schema drift upstre"
+  },
+  {
+    "title": "+----+---+",
+    "module": "2. Intermediate",
+    "subtopic": "2.10 Set Operations",
+    "path": "/2. Intermediate/2.10 Set Operations/2.10.3 How do you find the common rows between two DataFrames",
+    "summary": "To find exact row matches between two DataFrames, you use `intersect()` or `intersectAll()`. They act as the PySpark equivalents to SQL's `INTERSECT` and `INTERSECT ALL`. The critical distinction is w"
+  },
+  {
+    "title": "+---+-------+",
+    "module": "2. Intermediate",
+    "subtopic": "2.10 Set Operations",
+    "path": "/2. Intermediate/2.10 Set Operations/2.10.4 How do you find rows that exist in df1 but not in df2",
+    "summary": "To find rows in the first DataFrame that are missing from the second, use `except()` or `exceptAll()` for full-row comparisons, or a `left_anti` join for key-based lookups. Choosing the wrong one will"
+  },
+  {
+    "title": "+---+-------+-----------+",
+    "module": "2. Intermediate",
+    "subtopic": "2.10 Set Operations",
+    "path": "/2. Intermediate/2.10 Set Operations/2.10.5 What happens if you union two DataFrames with different schemas",
+    "summary": "Unioning DataFrames with mismatched schemas will either silently corrupt your data through positional matching or instantly crash your pipeline with an `AnalysisException`. Spark is strictly typed and"
+  },
+  {
+    "title": "+---+-------+-----------+---------+",
+    "module": "2. Intermediate",
+    "subtopic": "2.10 Set Operations",
+    "path": "/2. Intermediate/2.10 Set Operations/2.10.6 How do you allow missing columns when using unionByName()",
+    "summary": "You use the `allowMissingColumns=True` parameter to safely stack DataFrames with different schemas without crashing. It aligns columns by name and fills any missing columns with nulls, making it the u"
+  },
+  {
+    "title": "Except all (SQL EXCEPT ALL)",
+    "module": "2. Intermediate",
+    "subtopic": "2.10 Set Operations",
+    "path": "/2. Intermediate/2.10 Set Operations/Readme",
+    "summary": "Set operations combine rows from two or more DataFrames using set semantics. They are essential for appending datasets, deduplicating records, finding common rows, and identifying rows that exist in o"
+  },
+  {
+    "title": "2.2.1 What is a Window Function in PySpark?",
+    "module": "2. Intermediate",
+    "subtopic": "2.2 Window Functions",
+    "path": "/2. Intermediate/2.2 Window Functions/2.2.1 What is a Window Function in PySpark",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "2.2.2 Explain the difference between row_number(), rank(), and dense_rank().",
+    "module": "2. Intermediate",
+    "subtopic": "2.2 Window Functions",
+    "path": "/2. Intermediate/2.2 Window Functions/2.2.2 Explain the difference between row_number(), rank(), and dense_rank().",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "2.2.3 How do you use Window.partitionBy() and Window.orderBy()?",
+    "module": "2. Intermediate",
+    "subtopic": "2.2 Window Functions",
+    "path": "/2. Intermediate/2.2 Window Functions/2.2.3 How do you use Window.partitionBy() and Window.orderBy()",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "2.2.4 How do you calculate a running total using a Window Function?",
+    "module": "2. Intermediate",
+    "subtopic": "2.2 Window Functions",
+    "path": "/2. Intermediate/2.2 Window Functions/2.2.4 How do you calculate a running total using a Window Function",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "2.2.5 What do the lead() and lag() functions do?",
+    "module": "2. Intermediate",
+    "subtopic": "2.2 Window Functions",
+    "path": "/2. Intermediate/2.2 Window Functions/2.2.5 What do the lead() and lag() functions do",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "2.2.6 How do you find the top 3 highest-paid employees in each department?",
+    "module": "2. Intermediate",
+    "subtopic": "2.2 Window Functions",
+    "path": "/2. Intermediate/2.2 Window Functions/2.2.6 How do you find the top 3 highest-paid employees in each department",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "2.2.7 What is ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW?",
+    "module": "2. Intermediate",
+    "subtopic": "2.2 Window Functions",
+    "path": "/2. Intermediate/2.2 Window Functions/2.2.7 What is ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "Aggregate window: total per department (no ordering, full frame)",
+    "module": "2. Intermediate",
+    "subtopic": "2.2 Window Functions",
+    "path": "/2. Intermediate/2.2 Window Functions/Readme",
+    "summary": "Window functions perform calculations across a set of rows that are related to the current row, without collapsing the result set like `groupBy` does. They are essential for ranking, running totals, m"
+  },
+  {
+    "title": "2.3.1 What are ArrayType, MapType, and StructType?",
+    "module": "2. Intermediate",
+    "subtopic": "2.3 Complex Data Types",
+    "path": "/2. Intermediate/2.3 Complex Data Types/2.3.1 What are ArrayType, MapType, and StructType",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "2.3.2 What does the explode() function do?",
+    "module": "2. Intermediate",
+    "subtopic": "2.3 Complex Data Types",
+    "path": "/2. Intermediate/2.3 Complex Data Types/2.3.2 What does the explode() function do",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "2.3.3 What is the difference between explode() and explode_outer()?",
+    "module": "2. Intermediate",
+    "subtopic": "2.3 Complex Data Types",
+    "path": "/2. Intermediate/2.3 Complex Data Types/2.3.3 What is the difference between explode() and explode_outer()",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "2.3.4 How do you query a specific field inside a Struct column?",
+    "module": "2. Intermediate",
+    "subtopic": "2.3 Complex Data Types",
+    "path": "/2. Intermediate/2.3 Complex Data Types/2.3.4 How do you query a specific field inside a Struct column",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "2.3.5 How do you flatten a nested DataFrame?",
+    "module": "2. Intermediate",
+    "subtopic": "2.3 Complex Data Types",
+    "path": "/2. Intermediate/2.3 Complex Data Types/2.3.5 How do you flatten a nested DataFrame",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "2.3.6 How do you create an array column from multiple existing columns?",
+    "module": "2. Intermediate",
+    "subtopic": "2.3 Complex Data Types",
+    "path": "/2. Intermediate/2.3 Complex Data Types/2.3.6 How do you create an array column from multiple existing columns",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "2.3.7 How do you extract the keys and values from a MapType column?",
+    "module": "2. Intermediate",
+    "subtopic": "2.3 Complex Data Types",
+    "path": "/2. Intermediate/2.3 Complex Data Types/2.3.7 How do you extract the keys and values from a MapType column",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "Explode nested array",
+    "module": "2. Intermediate",
+    "subtopic": "2.3 Complex Data Types",
+    "path": "/2. Intermediate/2.3 Complex Data Types/Readme",
+    "summary": "PySpark supports three primary complex data types: `ArrayType`, `MapType`, and `StructType`. These types allow you to store semi-structured and nested data directly in DataFrames, which is essential w"
+  },
+  {
+    "title": "2.4.1 How do you convert a String column to a Date column?",
+    "module": "2. Intermediate",
+    "subtopic": "2.4 Date And Time Functions",
+    "path": "/2. Intermediate/2.4 Date And Time Functions/2.4.1 How do you convert a String column to a Date column",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "2.4.2 How do you add or subtract days from a date column?",
+    "module": "2. Intermediate",
+    "subtopic": "2.4 Date And Time Functions",
+    "path": "/2. Intermediate/2.4 Date And Time Functions/2.4.2 How do you add or subtract days from a date column",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "2.4.3 How do you calculate the difference in days between two date columns?",
+    "module": "2. Intermediate",
+    "subtopic": "2.4 Date And Time Functions",
+    "path": "/2. Intermediate/2.4 Date And Time Functions/2.4.3 How do you calculate the difference in days between two date columns",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "2.4.4 How do you extract the year, month, or day from a timestamp?",
+    "module": "2. Intermediate",
+    "subtopic": "2.4 Date And Time Functions",
+    "path": "/2. Intermediate/2.4 Date And Time Functions/2.4.4 How do you extract the year, month, or day from a timestamp",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "2.4.5 What is the difference between to_date() and to_timestamp()?",
+    "module": "2. Intermediate",
+    "subtopic": "2.4 Date And Time Functions",
+    "path": "/2. Intermediate/2.4 Date And Time Functions/2.4.5 What is the difference between to_date() and to_timestamp()",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "2.4.6 How do you handle timezones in PySpark?",
+    "module": "2. Intermediate",
+    "subtopic": "2.4 Date And Time Functions",
+    "path": "/2. Intermediate/2.4 Date And Time Functions/2.4.6 How do you handle timezones in PySpark",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "2.4.7 How do you get the current system date and timestamp?",
+    "module": "2. Intermediate",
+    "subtopic": "2.4 Date And Time Functions",
+    "path": "/2. Intermediate/2.4 Date And Time Functions/2.4.7 How do you get the current system date and timestamp",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "Time zone conversion",
+    "module": "2. Intermediate",
+    "subtopic": "2.4 Date And Time Functions",
+    "path": "/2. Intermediate/2.4 Date And Time Functions/Readme",
+    "summary": "Date and time functions are fundamental for processing temporal data in PySpark. They enable parsing, formatting, extracting components, performing arithmetic, and handling time zones. Correct usage i"
+  },
+  {
+    "title": "2.5.1 How do you concatenate multiple string columns together?",
+    "module": "2. Intermediate",
+    "subtopic": "2.5 String Manipulation And Regex",
+    "path": "/2. Intermediate/2.5 String Manipulation And Regex/2.5.1 How do you concatenate multiple string columns together",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "2.5.2 What is concat_ws() and how does it handle null values?",
+    "module": "2. Intermediate",
+    "subtopic": "2.5 String Manipulation And Regex",
+    "path": "/2. Intermediate/2.5 String Manipulation And Regex/2.5.2 What is concat_ws() and how does it handle null values",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "2.5.3 How do you extract a substring from a string column?",
+    "module": "2. Intermediate",
+    "subtopic": "2.5 String Manipulation And Regex",
+    "path": "/2. Intermediate/2.5 String Manipulation And Regex/2.5.3 How do you extract a substring from a string column",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "2.5.4 How do you use regexp_replace() to clean data?",
+    "module": "2. Intermediate",
+    "subtopic": "2.5 String Manipulation And Regex",
+    "path": "/2. Intermediate/2.5 String Manipulation And Regex/2.5.4 How do you use regexp_replace() to clean data",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "2.5.5 How do you extract data using a Regex pattern?",
+    "module": "2. Intermediate",
+    "subtopic": "2.5 String Manipulation And Regex",
+    "path": "/2. Intermediate/2.5 String Manipulation And Regex/2.5.5 How do you extract data using a Regex pattern",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "2.5.6 How do you split a string by a delimiter into an Array?",
+    "module": "2. Intermediate",
+    "subtopic": "2.5 String Manipulation And Regex",
+    "path": "/2. Intermediate/2.5 String Manipulation And Regex/2.5.6 How do you split a string by a delimiter into an Array",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "2.5.7 How do you change the case of a string (upper, lower, initcap)?",
+    "module": "2. Intermediate",
+    "subtopic": "2.5 String Manipulation And Regex",
+    "path": "/2. Intermediate/2.5 String Manipulation And Regex/2.5.7 How do you change the case of a string (upper, lower, initcap)",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "Extract all numbers from a string",
+    "module": "2. Intermediate",
+    "subtopic": "2.5 String Manipulation And Regex",
+    "path": "/2. Intermediate/2.5 String Manipulation And Regex/Readme",
+    "summary": "String manipulation is one of the most common tasks in data engineering, covering cleaning, parsing, extracting, and transforming textual data. PySpark provides a comprehensive set of built-in string "
+  },
+  {
+    "title": "2.6.1 What does the pivot() function do?",
+    "module": "2. Intermediate",
+    "subtopic": "2.6 Aggregations And Pivoting",
+    "path": "/2. Intermediate/2.6 Aggregations And Pivoting/2.6.1 What does the pivot() function do",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "2.6.2 Why is passing a list of distinct values to pivot() crucial for performance?",
+    "module": "2. Intermediate",
+    "subtopic": "2.6 Aggregations And Pivoting",
+    "path": "/2. Intermediate/2.6 Aggregations And Pivoting/2.6.2 Why is passing a list of distinct values to pivot() crucial for performance",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "2.6.3 How do you unpivot a DataFrame in PySpark?",
+    "module": "2. Intermediate",
+    "subtopic": "2.6 Aggregations And Pivoting",
+    "path": "/2. Intermediate/2.6 Aggregations And Pivoting/2.6.3 How do you unpivot a DataFrame in PySpark",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "2.6.4 What is the difference between rollup() and cube()?",
+    "module": "2. Intermediate",
+    "subtopic": "2.6 Aggregations And Pivoting",
+    "path": "/2. Intermediate/2.6 Aggregations And Pivoting/2.6.4 What is the difference between rollup() and cube()",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "2.6.5 How do you handle missing values generated by a pivot operation?",
+    "module": "2. Intermediate",
+    "subtopic": "2.6 Aggregations And Pivoting",
+    "path": "/2. Intermediate/2.6 Aggregations And Pivoting/2.6.5 How do you handle missing values generated by a pivot operation",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "2.6.6 Write a snippet to pivot sales data by month.",
+    "module": "2. Intermediate",
+    "subtopic": "2.6 Aggregations And Pivoting",
+    "path": "/2. Intermediate/2.6 Aggregations And Pivoting/2.6.6 Write a snippet to pivot sales data by month.",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "Unpivot using stack",
+    "module": "2. Intermediate",
+    "subtopic": "2.6 Aggregations And Pivoting",
+    "path": "/2. Intermediate/2.6 Aggregations And Pivoting/Readme",
+    "summary": "Aggregations and pivoting are core operations for summarizing and reshaping data in PySpark. Aggregations collapse multiple rows into summary values, while pivoting rotates rows into columns to create"
+  },
+  {
+    "title": "2.7.1 What is a UDF (User Defined Function)?",
+    "module": "2. Intermediate",
+    "subtopic": "2.7 User Defined Functions UDFs",
+    "path": "/2. Intermediate/2.7 User Defined Functions UDFs/2.7.1 What is a UDF (User Defined Function)",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "2.7.2 Why are standard Python UDFs considered slow in PySpark?",
+    "module": "2. Intermediate",
+    "subtopic": "2.7 User Defined Functions UDFs",
+    "path": "/2. Intermediate/2.7 User Defined Functions UDFs/2.7.2 Why are standard Python UDFs considered slow in PySpark",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "2.7.3 Explain the serialization and deserialization overhead of Python UDFs.",
+    "module": "2. Intermediate",
+    "subtopic": "2.7 User Defined Functions UDFs",
+    "path": "/2. Intermediate/2.7 User Defined Functions UDFs/2.7.3 Explain the serialization and deserialization overhead of Python UDFs.",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "2.7.4 What is a Pandas UDF (Vectorized UDF) and how does it improve performance?",
+    "module": "2. Intermediate",
+    "subtopic": "2.7 User Defined Functions UDFs",
+    "path": "/2. Intermediate/2.7 User Defined Functions UDFs/2.7.4 What is a Pandas UDF (Vectorized UDF) and how does it improve performance",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "2.7.5 What is Apache Arrow and how does it relate to Pandas UDFs?",
+    "module": "2. Intermediate",
+    "subtopic": "2.7 User Defined Functions UDFs",
+    "path": "/2. Intermediate/2.7 User Defined Functions UDFs/2.7.5 What is Apache Arrow and how does it relate to Pandas UDFs",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "2.7.6 How do you register a UDF to be used in Spark SQL?",
+    "module": "2. Intermediate",
+    "subtopic": "2.7 User Defined Functions UDFs",
+    "path": "/2. Intermediate/2.7 User Defined Functions UDFs/2.7.6 How do you register a UDF to be used in Spark SQL",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "2.7.7 When should you avoid using a UDF entirely?",
+    "module": "2. Intermediate",
+    "subtopic": "2.7 User Defined Functions UDFs",
+    "path": "/2. Intermediate/2.7 User Defined Functions UDFs/2.7.7 When should you avoid using a UDF entirely",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "Series to Series Pandas UDF",
+    "module": "2. Intermediate",
+    "subtopic": "2.7 User Defined Functions UDFs",
+    "path": "/2. Intermediate/2.7 User Defined Functions UDFs/Readme",
+    "summary": "User Defined Functions (UDFs) allow you to extend PySpark's built-in functions with custom logic written in Python, Scala, or Java. They are essential when built-in functions cannot express a required"
+  },
+  {
+    "title": "2.8.1 What is the difference between dropDuplicates() and distinct()?",
+    "module": "2. Intermediate",
+    "subtopic": "2.8 Data Quality And Validation",
+    "path": "/2. Intermediate/2.8 Data Quality And Validation/2.8.1 What is the difference between dropDuplicates() and distinct()",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "2.8.2 How do you drop duplicates based on a specific subset of columns?",
+    "module": "2. Intermediate",
+    "subtopic": "2.8 Data Quality And Validation",
+    "path": "/2. Intermediate/2.8 Data Quality And Validation/2.8.2 How do you drop duplicates based on a specific subset of columns",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "2.8.3 How do you implement data quality checks?",
+    "module": "2. Intermediate",
+    "subtopic": "2.8 Data Quality And Validation",
+    "path": "/2. Intermediate/2.8 Data Quality And Validation/2.8.3 How do you implement data quality checks",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "2.8.4 How do you use regex to validate if an email column is formatted correctly?",
+    "module": "2. Intermediate",
+    "subtopic": "2.8 Data Quality And Validation",
+    "path": "/2. Intermediate/2.8 Data Quality And Validation/2.8.4 How do you use regex to validate if an email column is formatted correctly",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "2.8.5 What happens when you cast a string abc to an IntegerType?",
+    "module": "2. Intermediate",
+    "subtopic": "2.8 Data Quality And Validation",
+    "path": "/2. Intermediate/2.8 Data Quality And Validation/2.8.5 What happens when you cast a string abc to an IntegerType",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "2.8.6 How do you replace bad data with a default value using when().otherwise()?",
+    "module": "2. Intermediate",
+    "subtopic": "2.8 Data Quality And Validation",
+    "path": "/2. Intermediate/2.8 Data Quality And Validation/2.8.6 How do you replace bad data with a default value using when().otherwise()",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "Alternatively, compute in a distributed way without collecting",
+    "module": "2. Intermediate",
+    "subtopic": "2.8 Data Quality And Validation",
+    "path": "/2. Intermediate/2.8 Data Quality And Validation/Readme",
+    "summary": "Data quality and validation ensure that data is complete, accurate, consistent, and fit for its intended use before it reaches downstream consumers. In PySpark pipelines, validation must scale across "
+  },
+  {
+    "title": "2.9.1 What is the difference between row-based and columnar formats?",
+    "module": "2. Intermediate",
+    "subtopic": "2.9 File Formats And Compression",
+    "path": "/2. Intermediate/2.9 File Formats And Compression/2.9.1 What is the difference between row-based and columnar formats",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "2.9.2 Why is Parquet the default and preferred file format for PySpark?",
+    "module": "2. Intermediate",
+    "subtopic": "2.9 File Formats And Compression",
+    "path": "/2. Intermediate/2.9 File Formats And Compression/2.9.2 Why is Parquet the default and preferred file format for PySpark",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "2.9.3 Explain Parquet's predicate pushdown and filter pushdown capability.",
+    "module": "2. Intermediate",
+    "subtopic": "2.9 File Formats And Compression",
+    "path": "/2. Intermediate/2.9 File Formats And Compression/2.9.3 Explain Parquet's predicate pushdown and filter pushdown capability.",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "2.9.4 What are the benefits of using Snappy compression over Gzip in Spark?",
+    "module": "2. Intermediate",
+    "subtopic": "2.9 File Formats And Compression",
+    "path": "/2. Intermediate/2.9 File Formats And Compression/2.9.4 What are the benefits of using Snappy compression over Gzip in Spark",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "2.9.5 How does schema evolution work with Parquet files?",
+    "module": "2. Intermediate",
+    "subtopic": "2.9 File Formats And Compression",
+    "path": "/2. Intermediate/2.9 File Formats And Compression/2.9.5 How does schema evolution work with Parquet files",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "2.9.6 How do you write a DataFrame with a specific compression codec?",
+    "module": "2. Intermediate",
+    "subtopic": "2.9 File Formats And Compression",
+    "path": "/2. Intermediate/2.9 File Formats And Compression/2.9.6 How do you write a DataFrame with a specific compression codec",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "CSV with gzip (note: not splittable)",
+    "module": "2. Intermediate",
+    "subtopic": "2.9 File Formats And Compression",
+    "path": "/2. Intermediate/2.9 File Formats And Compression/Readme",
+    "summary": "File format and compression choices are among the highest-leverage decisions in a PySpark pipeline. They directly determine storage cost, read and write throughput, network shuffle volume, and even wh"
+  },
+  {
+    "title": "3.1.1 What is the difference between repartition() and coalesce()?",
+    "module": "3. Advanced",
+    "subtopic": "3.1 Partitioning And Bucketing",
+    "path": "/3. Advanced/3.1 Partitioning And Bucketing/3.1.1 What is the difference between repartition() and coalesce()",
+    "summary": "<img width=\"1536\" height=\"1024\" alt=\"image\" src=\"https://github.com/user-attachments/assets/e7255c26-62f5-46d1-918f-5c04be16f228\" />"
+  },
+  {
+    "title": "3.1.2 When would you use repartition() over coalesce(), and vice versa?",
+    "module": "3. Advanced",
+    "subtopic": "3.1 Partitioning And Bucketing",
+    "path": "/3. Advanced/3.1 Partitioning And Bucketing/3.1.2 When would you use repartition() over coalesce(), and vice versa",
+    "summary": "Use `repartition()` when you need a shuffle to change the partition layout. Use `coalesce()` when you only need to reduce the number of partitions and can avoid a shuffle."
+  },
+  {
+    "title": "3.1.3 What is bucketing in Spark and how does it improve join performance?",
+    "module": "3. Advanced",
+    "subtopic": "3.1 Partitioning And Bucketing",
+    "path": "/3. Advanced/3.1 Partitioning And Bucketing/3.1.3 What is bucketing in Spark and how does it improve join performance",
+    "summary": "Bucketing is a data organization technique in Spark that groups data into a fixed number of buckets based on the hash of one or more bucketing columns. It is typically used with file-based tables such"
+  },
+  {
+    "title": "3.1.4 Explain the difference between partitionBy and bucketBy.",
+    "module": "3. Advanced",
+    "subtopic": "3.1 Partitioning And Bucketing",
+    "path": "/3. Advanced/3.1 Partitioning And Bucketing/3.1.4 Explain the difference between partitionBy and bucketBy.",
+    "summary": "partitionBy and bucketBy are both ways to organize data physically in Spark, but they solve different problems and have different mechanics."
+  },
+  {
+    "title": "For Delta Lake, compact small files",
+    "module": "3. Advanced",
+    "subtopic": "3.1 Partitioning And Bucketing",
+    "path": "/3. Advanced/3.1 Partitioning And Bucketing/3.1.5 What happens if you have too many small partitions",
+    "summary": "Too many small partitions means the number of partitions is far larger than needed for the data volume and cluster size. In Spark, each partition becomes a task, so many small partitions create many t"
+  },
+  {
+    "title": "For a large result, distribute evenly",
+    "module": "3. Advanced",
+    "subtopic": "3.1 Partitioning And Bucketing",
+    "path": "/3. Advanced/3.1 Partitioning And Bucketing/3.1.6 How do you determine the optimal number of partitions for a dataset",
+    "summary": "There is no single optimal number of partitions. The right number depends on data size, cluster cores, memory, shuffle behavior, and output requirements. The goal is to keep partitions large enough to"
+  },
+  {
+    "title": "3.1.7 What is the default number of shuffle partitions in Spark, and how do you change it",
+    "module": "3. Advanced",
+    "subtopic": "3.1 Partitioning And Bucketing",
+    "path": "/3. Advanced/3.1 Partitioning And Bucketing/3.1.7 What is the default number of shuffle partitions in Spark, and how do you change it",
+    "summary": "The default number of shuffle partitions in Spark SQL and the DataFrame API is 200. This is controlled by the configuration property spark.sql.shuffle.partitions. It applies to shuffles caused by oper"
+  },
+  {
+    "title": "For a large result, distribute evenly",
+    "module": "3. Advanced",
+    "subtopic": "3.1 Partitioning And Bucketing",
+    "path": "/3. Advanced/3.1 Partitioning And Bucketing/Readme",
+    "summary": "<img width=\"1024\" height=\"1536\" alt=\"image\" src=\"https://github.com/user-attachments/assets/4481025d-969c-4302-b3e4-e511f05fbfc0\" />"
+  },
+  {
+    "title": "3.10.1 What are Higher-Order Functions in PySpark SQL?",
+    "module": "3. Advanced",
+    "subtopic": "3.10 High Order Functions",
+    "path": "/3. Advanced/3.10 High Order Functions/3.10.1 What are Higher-Order Functions in PySpark SQL",
+    "summary": "Higher-order functions in PySpark SQL are built-in functions that accept one or more lambda functions as arguments. They operate directly on complex data types such as arrays and maps. Instead of expl"
+  },
+  {
+    "title": "3.10.2 How do you use the transform() function to modify elements in an array column?",
+    "module": "3. Advanced",
+    "subtopic": "3.10 High Order Functions",
+    "path": "/3. Advanced/3.10 High Order Functions/3.10.2 How do you use the transform() function to modify elements in an array column",
+    "summary": "The `transform()` function applies a lambda expression to each element of an array column and returns a new array of the same length. It is a higher-order function in Spark SQL that operates natively "
+  },
+  {
+    "title": "Array-level filter",
+    "module": "3. Advanced",
+    "subtopic": "3.10 High Order Functions",
+    "path": "/3. Advanced/3.10 High Order Functions/3.10.3 How do you use the filter() function on an array column",
+    "summary": "The `filter()` higher-order function returns a new array containing only the elements that satisfy a given predicate. It operates on an array column and takes a lambda expression that evaluates to a b"
+  },
+  {
+    "title": "3.10.4 Explain the aggregate() function for arrays.",
+    "module": "3. Advanced",
+    "subtopic": "3.10 High Order Functions",
+    "path": "/3. Advanced/3.10 High Order Functions/3.10.4 Explain the aggregate() function for arrays.",
+    "summary": "The `aggregate()` higher-order function reduces an array to a single value. It takes an initial accumulator value, a merge function that combines the accumulator with each element, and an optional fin"
+  },
+  {
+    "title": "3.10.5 Why are Higher-Order Functions generally better than explode()?",
+    "module": "3. Advanced",
+    "subtopic": "3.10 High Order Functions",
+    "path": "/3. Advanced/3.10 High Order Functions/3.10.5 Why are Higher-Order Functions generally better than explode()",
+    "summary": "Higher-order functions in Spark SQL operate directly on arrays and maps using lambda expressions. The `explode()` function, by contrast, turns each element of an array or map into a separate row. Whil"
+  },
+  {
+    "title": "3.10 High Order Functions",
+    "module": "3. Advanced",
+    "subtopic": "3.10 High Order Functions",
+    "path": "/3. Advanced/3.10 High Order Functions/Readme",
+    "summary": "High order functions in Spark SQL are built-in functions that operate on complex data types such as arrays and maps. They accept lambda expressions (anonymous functions) as arguments, allowing you to "
+  },
+  {
+    "title": "3.2.1 What is a Shuffle in Spark and why is it an expensive operation?",
+    "module": "3. Advanced",
+    "subtopic": "3.2 Shuffling And Data Exchange",
+    "path": "/3. Advanced/3.2 Shuffling And Data Exchange/3.2.1 What is a Shuffle in Spark and why is it an expensive operation",
+    "summary": "A shuffle in Spark is the process of redistributing data across partitions so that records with the same key are co-located on the same executor. It is required whenever an operation needs to bring to"
+  },
+  {
+    "title": "orderBy is wide because it requires a global sort",
+    "module": "3. Advanced",
+    "subtopic": "3.2 Shuffling And Data Exchange",
+    "path": "/3. Advanced/3.2 Shuffling And Data Exchange/3.2.2 What is the difference between Narrow and Wide transformations",
+    "summary": "In Spark, transformations are classified as narrow or wide based on how data moves between partitions. This classification determines whether a shuffle is required, how stages are formed, and how faul"
+  },
+  {
+    "title": "3.2.3 How does Spark write shuffle files to the disk?",
+    "module": "3. Advanced",
+    "subtopic": "3.2 Shuffling And Data Exchange",
+    "path": "/3. Advanced/3.2 Shuffling And Data Exchange/3.2.3 How does Spark write shuffle files to the disk",
+    "summary": "Spark's shuffle write process is designed to efficiently manage large volumes of data that cannot fit in memory. Since Spark 2.0, the default and only shuffle manager is `SortShuffleManager`, which wr"
+  },
+  {
+    "title": "3.2.4 What are the common causes of a FetchFailedException during a shuffle?",
+    "module": "3. Advanced",
+    "subtopic": "3.2 Shuffling And Data Exchange",
+    "path": "/3. Advanced/3.2 Shuffling And Data Exchange/3.2.4 What are the common causes of a FetchFailedException during a shuffle",
+    "summary": "A `FetchFailedException` is thrown when a reduce task cannot fetch its shuffle data from a map task's executor. It tells you where the stage noticed damage, not necessarily where the damage began. The"
+  },
+  {
+    "title": "Better: use a proper join condition",
+    "module": "3. Advanced",
+    "subtopic": "3.2 Shuffling And Data Exchange",
+    "path": "/3. Advanced/3.2 Shuffling And Data Exchange/3.2.5 What techniques can you use to minimize or avoid shuffling in your Spark jobs",
+    "summary": "Shuffling is the most expensive operation in Spark. While some shuffles are unavoidable, such as grouping by a high-cardinality key or joining two large tables, you can significantly reduce their numb"
+  },
+  {
+    "title": "Bad: no map-side combine, all values are shuffled",
+    "module": "3. Advanced",
+    "subtopic": "3.2 Shuffling And Data Exchange",
+    "path": "/3. Advanced/3.2 Shuffling And Data Exchange/Readme",
+    "summary": "Shuffling is the process of redistributing data across partitions and executors so that records with the same key are co-located for operations such as joins, aggregations, and sorting. Data exchange "
+  },
+  {
+    "title": "3.3.1 What is a Broadcast Hash Join and when should you use it?",
+    "module": "3. Advanced",
+    "subtopic": "3.3 Join Strategies",
+    "path": "/3. Advanced/3.3 Join Strategies/3.3.1 What is a Broadcast Hash Join and when should you use it",
+    "summary": "A Broadcast Hash Join (BHJ) is a join strategy where one side of the join is small enough to be broadcast to every executor. Spark collects the small side to the driver, then broadcasts it to all exec"
+  },
+  {
+    "title": "3.3.2 What is the default broadcast threshold size, and how do you configure it?",
+    "module": "3. Advanced",
+    "subtopic": "3.3 Join Strategies",
+    "path": "/3. Advanced/3.3 Join Strategies/3.3.2 What is the default broadcast threshold size, and how do you configure it",
+    "summary": "The default broadcast threshold in Spark is **10 MB** (exactly 10,485,760 bytes). This is controlled by the configuration property `spark.sql.autoBroadcastJoinThreshold`, which sets the maximum table "
+  },
+  {
+    "title": "3.3.3 Explain how Sort Merge Join works under the hood.",
+    "module": "3. Advanced",
+    "subtopic": "3.3 Join Strategies",
+    "path": "/3. Advanced/3.3 Join Strategies/3.3.3 Explain how Sort Merge Join works under the hood.",
+    "summary": "Sort Merge Join (SMJ) is the default join strategy for large-to-large equi-joins in Spark. It is scalable because it does not require holding an entire partition side in memory, unlike Shuffle Hash Jo"
+  },
+  {
+    "title": "3.3.4 What is a Shuffle Hash Join and when does Spark prefer it over Sort Merge Join?",
+    "module": "3. Advanced",
+    "subtopic": "3.3 Join Strategies",
+    "path": "/3. Advanced/3.3 Join Strategies/3.3.4 What is a Shuffle Hash Join and when does Spark prefer it over Sort Merge Join",
+    "summary": "A Shuffle Hash Join (SHJ) is a join strategy where both sides of the join are shuffled by the join key, and then each partition builds an in-memory hash map from one side and probes it with the other "
+  },
+  {
+    "title": "Force sort-merge join, but AQE may still convert to broadcast if one side is small",
+    "module": "3. Advanced",
+    "subtopic": "3.3 Join Strategies",
+    "path": "/3. Advanced/3.3 Join Strategies/3.3.5 How do you force Spark to use a specific join strategy using hints",
+    "summary": "Spark allows you to influence the join strategy through hints. Hints are directives you add to a DataFrame join or SQL query to tell the optimizer which strategy you prefer. They are useful when Spark"
+  },
+  {
+    "title": "Disable broadcast and force sort-merge join",
+    "module": "3. Advanced",
+    "subtopic": "3.3 Join Strategies",
+    "path": "/3. Advanced/3.3 Join Strategies/3.3.6 Why might a Broadcast Join fail with an Out Of Memory (OOM) error on the driver",
+    "summary": "A Broadcast Join fails with an OutOfMemoryError (OOM) on the driver when the table being broadcast is too large to fit in the driver's JVM heap. The driver must collect the entire broadcast dataset in"
+  },
+  {
+    "title": "Second phase: final aggregation",
+    "module": "3. Advanced",
+    "subtopic": "3.3 Join Strategies",
+    "path": "/3. Advanced/3.3 Join Strategies/Readme",
+    "summary": "Joins are one of the most common and most expensive operations in Spark. Spark chooses a join strategy based on table sizes, join type, join condition, and configuration. Understanding these strategie"
+  },
+  {
+    "title": "3.4.1 What is the difference between cache() and persist()?",
+    "module": "3. Advanced",
+    "subtopic": "3.4 Caching And Persistence",
+    "path": "/3. Advanced/3.4 Caching And Persistence/3.4.1 What is the difference between cache() and persist()",
+    "summary": "`cache()` and `persist()` are both used to store a DataFrame, Dataset, or RDD in memory or on disk so that it can be reused efficiently across multiple actions. The main difference is that `cache()` i"
+  },
+  {
+    "title": "Always unpersist when done",
+    "module": "3. Advanced",
+    "subtopic": "3.4 Caching And Persistence",
+    "path": "/3. Advanced/3.4 Caching And Persistence/3.4.2 What are the different Storage Levels in Spark",
+    "summary": "Spark provides several storage levels that offer different trade-offs between memory usage and CPU efficiency. These levels are configured through the `StorageLevel` class and are used with `persist()"
+  },
+  {
+    "title": "3.4.3 When should you choose MEMORY_AND_DISK over MEMORY_ONLY?",
+    "module": "3. Advanced",
+    "subtopic": "3.4 Caching And Persistence",
+    "path": "/3. Advanced/3.4 Caching And Persistence/3.4.3 When should you choose MEMORY_AND_DISK over MEMORY_ONLY",
+    "summary": "`MEMORY_ONLY` and `MEMORY_AND_DISK` are two storage levels used with `persist()`. The choice depends on whether the dataset fits in memory, how expensive it is to recompute lost partitions, and how mu"
+  },
+  {
+    "title": "Explicit MEMORY_ONLY",
+    "module": "3. Advanced",
+    "subtopic": "3.4 Caching And Persistence",
+    "path": "/3. Advanced/3.4 Caching And Persistence/3.4.4 What happens if you try to cache a DataFrame but there isn't enough memory",
+    "summary": "When you cache a DataFrame and there is not enough memory to hold all partitions, Spark does not fail immediately. Instead, it falls back to the behavior defined by the storage level. The default stor"
+  },
+  {
+    "title": "Check again",
+    "module": "3. Advanced",
+    "subtopic": "3.4 Caching And Persistence",
+    "path": "/3. Advanced/3.4 Caching And Persistence/3.4.5 How do you unpersist a cached DataFrame",
+    "summary": "To unpersist a cached DataFrame, call the `unpersist()` method on the DataFrame. This removes its cached blocks from memory and disk across all executors. The DataFrame itself is not destroyed. It sti"
+  },
+  {
+    "title": "multiple actions on filtered",
+    "module": "3. Advanced",
+    "subtopic": "3.4 Caching And Persistence",
+    "path": "/3. Advanced/3.4 Caching And Persistence/3.4.6 Is caching always beneficial Describe a scenario where you should avoid caching.",
+    "summary": "No, caching is not always beneficial. Caching trades memory and disk for speed. It only helps when the dataset is reused multiple times and recomputing it is expensive. If the dataset is used only onc"
+  },
+  {
+    "title": "3.4 Caching And Persistence",
+    "module": "3. Advanced",
+    "subtopic": "3.4 Caching And Persistence",
+    "path": "/3. Advanced/3.4 Caching And Persistence/Readme",
+    "summary": "*(Brief explanation of the concept goes here)*"
+  },
+  {
+    "title": "3.5.1 What is Data Skewness and how does it impact Spark job performance",
+    "module": "3. Advanced",
+    "subtopic": "3.5 Handling Data Skewness",
+    "path": "/3. Advanced/3.5 Handling Data Skewness/3.5.1 What is Data Skewness and how does it impact Spark job performance",
+    "summary": "Data skewness is the uneven distribution of data across partitions in a distributed dataset. In an ideal Spark job, each partition contains roughly the same amount of data, so all tasks finish in abou"
+  },
+  {
+    "title": "3.5.2 How do you identify a skewed dataset using the Spark UI",
+    "module": "3. Advanced",
+    "subtopic": "3.5 Handling Data Skewness",
+    "path": "/3. Advanced/3.5 Handling Data Skewness/3.5.2 How do you identify a skewed dataset using the Spark UI",
+    "summary": "The Spark UI is the primary tool for detecting data skew. Skew is not always obvious from code or data alone, but it leaves clear signatures in task durations, shuffle sizes, spill metrics, and execut"
+  },
+  {
+    "title": "Final aggregation without salt",
+    "module": "3. Advanced",
+    "subtopic": "3.5 Handling Data Skewness",
+    "path": "/3. Advanced/3.5 Handling Data Skewness/3.5.3 What is Salting and how does it solve skewness during joins",
+    "summary": "Salting is a technique to distribute a hot key across multiple partitions by adding a random suffix (called salt) to the key. This breaks the hot key into many smaller keys, each going to a different "
+  },
+  {
+    "title": "Phase 2: final aggregation",
+    "module": "3. Advanced",
+    "subtopic": "3.5 Handling Data Skewness",
+    "path": "/3. Advanced/3.5 Handling Data Skewness/3.5.4 Write a PySpark pseudo-code to salt a skewed join.",
+    "summary": "Salting a skewed join means adding a random suffix (salt) to the join key on the large table, replicating the small table for each salt value, joining on the salted key, and then cleaning up the salt."
+  },
+  {
+    "title": "Union",
+    "module": "3. Advanced",
+    "subtopic": "3.5 Handling Data Skewness",
+    "path": "/3. Advanced/3.5 Handling Data Skewness/3.5.5 How does isolating the skewed key and processing it separately help",
+    "summary": "Isolating the skewed key means splitting the data into two parts: the rows whose join or group key is a hot key, and the rows with all other keys. You process the hot-key part with a technique that ha"
+  },
+  {
+    "title": "Perform the join",
+    "module": "3. Advanced",
+    "subtopic": "3.5 Handling Data Skewness",
+    "path": "/3. Advanced/3.5 Handling Data Skewness/3.5.6 How does Adaptive Query Execution (AQE) handle skewness in Spark 3.x",
+    "summary": "Adaptive Query Execution (AQE) is a Spark 3.x feature that re-optimizes the query plan at runtime based on statistics gathered from completed stages. It is enabled by default from Spark 3.2.0 onward. "
+  },
+  {
+    "title": "Process skewed with broadcast, normal with regular join, then union",
+    "module": "3. Advanced",
+    "subtopic": "3.5 Handling Data Skewness",
+    "path": "/3. Advanced/3.5 Handling Data Skewness/Readme",
+    "summary": "Data skewness is the uneven distribution of data across partitions. It occurs when one or a few keys are much more frequent than others. During a shuffle, all records with the same key go to the same "
+  },
+  {
+    "title": "3.6.1 What is the Catalyst Optimizer and what are its main phases?",
+    "module": "3. Advanced",
+    "subtopic": "3.6 Spark SQL Engine",
+    "path": "/3. Advanced/3.6 Spark SQL Engine/3.6.1 What is the Catalyst Optimizer and what are its main phases",
+    "summary": "The Catalyst Optimizer is the query optimization framework in Spark SQL. It transforms a user's query into an optimized physical plan through a series of rule-based and cost-based transformations. It "
+  },
+  {
+    "title": "3.6.2 Explain the difference between a Logical Plan and a Physical Plan.",
+    "module": "3. Advanced",
+    "subtopic": "3.6 Spark SQL Engine",
+    "path": "/3. Advanced/3.6 Spark SQL Engine/3.6.2 Explain the difference between a Logical Plan and a Physical Plan.",
+    "summary": "A logical plan describes what to compute. A physical plan describes how to compute it. Spark SQL uses both during query execution. The logical plan is declarative and does not specify execution detail"
+  },
+  {
+    "title": "3.6.3 What is Rule-based optimization vs Cost-based optimization (CBO)?",
+    "module": "3. Advanced",
+    "subtopic": "3.6 Spark SQL Engine",
+    "path": "/3. Advanced/3.6 Spark SQL Engine/3.6.3 What is Rule-based optimization vs Cost-based optimization (CBO)",
+    "summary": "Spark SQL uses two main types of query optimization: rule-based optimization (RBO) and cost-based optimization (CBO). Rule-based optimization applies a fixed set of heuristic rules that are always con"
+  },
+  {
+    "title": "3.6.4 What is Project Tungsten and how does it optimize CPU and memory?",
+    "module": "3. Advanced",
+    "subtopic": "3.6 Spark SQL Engine",
+    "path": "/3. Advanced/3.6 Spark SQL Engine/3.6.4 What is Project Tungsten and how does it optimize CPU and memory",
+    "summary": "Project Tungsten is a set of improvements to Spark's execution engine that focus on CPU and memory efficiency. It was introduced in Spark 1.5 and is a core part of Spark SQL. Tungsten shifts Spark fro"
+  },
+  {
+    "title": "3.6.5 How do you view the execution plan of a DataFrame query?",
+    "module": "3. Advanced",
+    "subtopic": "3.6 Spark SQL Engine",
+    "path": "/3. Advanced/3.6 Spark SQL Engine/3.6.5 How do you view the execution plan of a DataFrame query",
+    "summary": "You can view the execution plan of a DataFrame query using the `explain()` method. It prints the plan to the console without executing the query. Spark provides several explain modes that show differe"
+  },
+  {
+    "title": "3.6.6 What does df.explain(mode='extended') output?",
+    "module": "3. Advanced",
+    "subtopic": "3.6 Spark SQL Engine",
+    "path": "/3. Advanced/3.6 Spark SQL Engine/3.6.6 What does df.explain(mode='extended') output",
+    "summary": "`df.explain(mode='extended')`, or equivalently `df.explain(True)`, prints four plans to the console. It does not execute the query. It shows how Spark transforms the DataFrame from raw syntax into an "
+  },
+  {
+    "title": "3.6 Spark SQL Engine",
+    "module": "3. Advanced",
+    "subtopic": "3.6 Spark SQL Engine",
+    "path": "/3. Advanced/3.6 Spark SQL Engine/Readme",
+    "summary": "The Spark SQL engine is the component that powers DataFrame, Dataset, and SQL execution. It includes the Catalyst optimizer, the Tungsten execution engine, and the whole-stage code generation framewor"
+  },
+  {
+    "title": "3.7.1 What is Adaptive Query Execution (AQE) introduced in Spark 3.0?",
+    "module": "3. Advanced",
+    "subtopic": "3.7 Adaptive Query Execution AQE",
+    "path": "/3. Advanced/3.7 Adaptive Query Execution AQE/3.7.1 What is Adaptive Query Execution (AQE) introduced in Spark 3.0",
+    "summary": "Adaptive Query Execution (AQE) is a runtime optimization framework introduced in Spark 3.0 that re-optimizes query plans based on statistics collected during query execution. It was designed to addres"
+  },
+  {
+    "title": "3.7.2 How does AQE dynamically coalesce shuffle partitions?",
+    "module": "3. Advanced",
+    "subtopic": "3.7 Adaptive Query Execution AQE",
+    "path": "/3. Advanced/3.7 Adaptive Query Execution AQE/3.7.2 How does AQE dynamically coalesce shuffle partitions",
+    "summary": "Adaptive Query Execution (AQE) dynamically coalesces shuffle partitions by collecting runtime statistics after each shuffle stage completes and merging small contiguous partitions into larger ones. Th"
+  },
+  {
+    "title": "After execution, the plan shows BroadcastHashJoin if AQE converted it",
+    "module": "3. Advanced",
+    "subtopic": "3.7 Adaptive Query Execution AQE",
+    "path": "/3. Advanced/3.7 Adaptive Query Execution AQE/3.7.3 How does AQE dynamically switch join strategies at runtime",
+    "summary": "Adaptive Query Execution (AQE) dynamically switches join strategies at runtime by collecting actual data size statistics after shuffle stages complete, then re-optimizing the remaining query plan befo"
+  },
+  {
+    "title": "Perform the join. AQE will detect and split the skewed partition at runtime",
+    "module": "3. Advanced",
+    "subtopic": "3.7 Adaptive Query Execution AQE",
+    "path": "/3. Advanced/3.7 Adaptive Query Execution AQE/3.7.4 How does AQE dynamically optimize skewed joins without manual salting",
+    "summary": "Adaptive Query Execution (AQE) dynamically optimizes skewed joins by detecting skewed partitions at runtime and splitting them into smaller sub-partitions. This process, called `OptimizeSkewedJoin`, e"
+  },
+  {
+    "title": "3.7.5 How do you enable or disable AQE in Spark configurations?",
+    "module": "3. Advanced",
+    "subtopic": "3.7 Adaptive Query Execution AQE",
+    "path": "/3. Advanced/3.7 Adaptive Query Execution AQE/3.7.5 How do you enable or disable AQE in Spark configurations",
+    "summary": "Adaptive Query Execution (AQE) is controlled by the `spark.sql.adaptive.enabled` configuration property. In Spark 3.2.0 and later, AQE is enabled by default. To disable it, set the property to `false`"
+  },
+  {
+    "title": "Look for AQEShuffleRead and BroadcastHashJoin in the physical plan",
+    "module": "3. Advanced",
+    "subtopic": "3.7 Adaptive Query Execution AQE",
+    "path": "/3. Advanced/3.7 Adaptive Query Execution AQE/Readme",
+    "summary": "Adaptive Query Execution (AQE) is an additional optimization layer introduced in Spark 3.0 that re-optimizes query plans at runtime based on statistics collected during query execution. It is enabled "
+  },
+  {
+    "title": "Release the broadcast data when no longer needed",
+    "module": "3. Advanced",
+    "subtopic": "3.8 Broadcast Variables And Accumulators",
+    "path": "/3. Advanced/3.8 Broadcast Variables And Accumulators/3.8.1 What are Broadcast Variables and how do they reduce network IO",
+    "summary": "A broadcast variable is a read-only shared variable that Spark distributes to all executors once and caches on each machine. Instead of shipping the same data with every task, the driver sends the bro"
+  },
+  {
+    "title": "Release memory",
+    "module": "3. Advanced",
+    "subtopic": "3.8 Broadcast Variables And Accumulators",
+    "path": "/3. Advanced/3.8 Broadcast Variables And Accumulators/3.8.2 How do you create and access a Broadcast Variable in PySpark",
+    "summary": "In PySpark, you create a broadcast variable using `sc.broadcast(value)` where `sc` is the SparkContext. The value can be any serializable Python object, such as a dictionary, list, tuple, set, or a sm"
+  },
+  {
+    "title": "Read the final value on the driver",
+    "module": "3. Advanced",
+    "subtopic": "3.8 Broadcast Variables And Accumulators",
+    "path": "/3. Advanced/3.8 Broadcast Variables And Accumulators/3.8.3 What are Accumulators and what are they typically used for",
+    "summary": "An accumulator is a write-only shared variable that allows executors to add values to a shared counter or sum. The driver can read the accumulator's value only after an action completes. Accumulators "
+  },
+  {
+    "title": "Correct: accumulator update inside an action (foreach)",
+    "module": "3. Advanced",
+    "subtopic": "3.8 Broadcast Variables And Accumulators",
+    "path": "/3. Advanced/3.8 Broadcast Variables And Accumulators/3.8.4 Why can Accumulators sometimes be inaccurate when used inside Transformations",
+    "summary": "Accumulators are write-only shared variables that executors can add to, and the driver reads the final value after an action completes. They are designed to be used inside actions such as `foreach` or"
+  },
+  {
+    "title": "Forced broadcast join",
+    "module": "3. Advanced",
+    "subtopic": "3.8 Broadcast Variables And Accumulators",
+    "path": "/3. Advanced/3.8 Broadcast Variables And Accumulators/3.8.5 What is the difference between using a Broadcast Variable and broadcasting a DataFrame join",
+    "summary": "Both broadcast variables and broadcast joins use Spark's broadcast mechanism to distribute data to executors, but they serve different purposes and operate at different levels of the API. A broadcast "
+  },
+  {
+    "title": "Create an accumulator",
+    "module": "3. Advanced",
+    "subtopic": "3.8 Broadcast Variables And Accumulators",
+    "path": "/3. Advanced/3.8 Broadcast Variables And Accumulators/Readme",
+    "summary": "Broadcast variables and accumulators are two types of shared variables in Spark that allow efficient communication between the driver and executors. Broadcast variables are read-only and are used to d"
+  },
+  {
+    "title": "Convert the Spark DataFrame back to a Pandas DataFrame using Arrow",
+    "module": "3. Advanced",
+    "subtopic": "3.9 Vectorized UDFs And Pandas UDFs",
+    "path": "/3. Advanced/3.9 Vectorized UDFs And Pandas UDFs/3.9.1 What is Apache Arrow and how does it relate to PySpark",
+    "summary": "Apache Arrow is an in-memory columnar data format that is used in Spark to efficiently transfer data between JVM and Python processes. It is a cross-language development platform for in-memory data th"
+  },
+  {
+    "title": "3.9.2 How do Pandas UDFs execute faster than standard Python UDFs?",
+    "module": "3. Advanced",
+    "subtopic": "3.9 Vectorized UDFs And Pandas UDFs",
+    "path": "/3. Advanced/3.9 Vectorized UDFs And Pandas UDFs/3.9.2 How do Pandas UDFs execute faster than standard Python UDFs",
+    "summary": "Pandas UDFs execute faster than standard Python UDFs because they process data in batches using Apache Arrow and vectorized operations, instead of processing one row at a time with per-row serializati"
+  },
+  {
+    "title": "Expensive initialization once per function call",
+    "module": "3. Advanced",
+    "subtopic": "3.9 Vectorized UDFs And Pandas UDFs",
+    "path": "/3. Advanced/3.9 Vectorized UDFs And Pandas UDFs/3.9.3 Explain the difference between Series-to-Series and Iterator-to-Iterator Pandas UDFs.",
+    "summary": "Pandas UDFs can be categorized by their input and output types. The two most common types for scalar transformations are Series-to-Series and Iterator-to-Iterator (formally, Iterator of Series to Iter"
+  },
+  {
+    "title": "Convert the Spark DataFrame back to a pandas DataFrame using Arrow",
+    "module": "3. Advanced",
+    "subtopic": "3.9 Vectorized UDFs And Pandas UDFs",
+    "path": "/3. Advanced/3.9 Vectorized UDFs And Pandas UDFs/3.9.4 How do you configure Spark to enable Arrow-based columnar data transfers",
+    "summary": "To enable Arrow-based columnar data transfers in Spark, you set the configuration property `spark.sql.execution.arrow.pyspark.enabled` to `true`. This optimization is used when converting a PySpark Da"
+  },
+  {
+    "title": "Some API that expects a single record",
+    "module": "3. Advanced",
+    "subtopic": "3.9 Vectorized UDFs And Pandas UDFs",
+    "path": "/3. Advanced/3.9 Vectorized UDFs And Pandas UDFs/3.9.5 When would you still need to use a standard Python UDF instead of a Pandas UDF",
+    "summary": "Pandas UDFs are faster for vectorizable operations because they use Apache Arrow and process data in batches. However, standard Python UDFs (scalar UDFs) still have important use cases. You should use"
+  },
+  {
+    "title": "Handle nulls explicitly",
+    "module": "3. Advanced",
+    "subtopic": "3.9 Vectorized UDFs And Pandas UDFs",
+    "path": "/3. Advanced/3.9 Vectorized UDFs And Pandas UDFs/Readme",
+    "summary": "PySpark provides several mechanisms for executing custom Python logic on distributed data. The most performant of these are Vectorized UDFs, commonly known as Pandas UDFs, which process data in batche"
+  },
+  {
+    "title": "1. Spark Executor Memory Architecture",
+    "module": "4. Senior Dev",
+    "subtopic": "4.1 Memory Management And OOM Errors",
+    "path": "/4. Senior Dev/4.1 Memory Management And OOM Errors/4.1.1 Describe the Spark Executor Memory architecture.",
+    "summary": "subgraph Total_Container_Memory [Total Executor Container Memory]"
+  },
+  {
+    "title": "1. Spark Unified Memory Manager (UMM)",
+    "module": "4. Senior Dev",
+    "subtopic": "4.1 Memory Management And OOM Errors",
+    "path": "/4. Senior Dev/4.1 Memory Management And OOM Errors/4.1.2 What is the Unified Memory Manager in Spark",
+    "summary": "subgraph Unified_Memory_Manager [Unified Memory Manager Pool]"
+  },
+  {
+    "title": "1. Understanding Spark Executor Memory Overhead",
+    "module": "4. Senior Dev",
+    "subtopic": "4.1 Memory Management And OOM Errors",
+    "path": "/4. Senior Dev/4.1 Memory Management And OOM Errors/4.1.3 What is Executor Memory Overhead and when do you need to increase it",
+    "summary": "subgraph Container_Quota [Resource Manager Container Memory Limit]"
+  },
+  {
+    "title": "1. Debugging Java Heap Space OOM",
+    "module": "4. Senior Dev",
+    "subtopic": "4.1 Memory Management And OOM Errors",
+    "path": "/4. Senior Dev/4.1 Memory Management And OOM Errors/4.1.4 You get a java.lang.OutOfMemoryError Java heap space. How do you debug it",
+    "summary": "A[OOM Error: Java Heap Space] --> B{Where did it occur?}"
+  },
+  {
+    "title": "1. Causes of Driver Out of Memory (OOM) Errors",
+    "module": "4. Senior Dev",
+    "subtopic": "4.1 Memory Management And OOM Errors",
+    "path": "/4. Senior Dev/4.1 Memory Management And OOM Errors/4.1.5 You get an OOM error on the Driver node. What could be the cause",
+    "summary": "A[Driver Node JVM Heap] --> B{What is filling the Heap?}"
+  },
+  {
+    "title": "4.1.6 How does Garbage Collection (GC) affect Spark performance?",
+    "module": "4. Senior Dev",
+    "subtopic": "4.1 Memory Management And OOM Errors",
+    "path": "/4. Senior Dev/4.1 Memory Management And OOM Errors/4.1.6 How does Garbage Collection (GC) affect Spark performance",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "4.1.7 What happens when a node runs out of disk space during a shuffle?",
+    "module": "4. Senior Dev",
+    "subtopic": "4.1 Memory Management And OOM Errors",
+    "path": "/4. Senior Dev/4.1 Memory Management And OOM Errors/4.1.7 What happens when a node runs out of disk space during a shuffle",
+    "summary": "*(Provide your answer, code snippets, and explanations here)*"
+  },
+  {
+    "title": "Unpersist when no longer needed",
+    "module": "4. Senior Dev",
+    "subtopic": "4.1 Memory Management And OOM Errors",
+    "path": "/4. Senior Dev/4.1 Memory Management And OOM Errors/Readme",
+    "summary": "Memory management is the single most common source of production failures in PySpark. An `OutOfMemoryError` (OOM) can terminate an executor task, crash the entire driver, or silently degrade performan"
+  },
+  {
+    "title": "4.2.1 What are the most important tabs in the Spark UI for performance debugging?",
+    "module": "4. Senior Dev",
+    "subtopic": "4.2 Spark UI And Log Analysis",
+    "path": "/4. Senior Dev/4.2 Spark UI And Log Analysis/4.2.1 What are the most important tabs in the Spark UI for performance debugging",
+    "summary": "A[Performance Issue / Slow Job] --> B{Failing or Slow?}"
+  },
+  {
+    "title": "4.2.2 How do you identify a straggler task in the Spark UI?",
+    "module": "4. Senior Dev",
+    "subtopic": "4.2 Spark UI And Log Analysis",
+    "path": "/4. Senior Dev/4.2 Spark UI And Log Analysis/4.2.2 How do you identify a straggler task in the Spark UI",
+    "summary": "A[Stage Slows or Hangs] --> B[Open Stages Tab in Spark UI]"
+  },
+  {
+    "title": "1. Spill (Memory) vs. Spill (Disk) in Spark",
+    "module": "4. Senior Dev",
+    "subtopic": "4.2 Spark UI And Log Analysis",
+    "path": "/4. Senior Dev/4.2 Spark UI And Log Analysis/4.2.3 What does Spill (Memory) and Spill (Disk) mean in the Spark UI",
+    "summary": "A[Execution Memory Limit Exceeded] --> B[Data in Memory: Uncompressed]"
+  },
+  {
+    "title": "1. Decoding Spark UI DAG Visualizations",
+    "module": "4. Senior Dev",
+    "subtopic": "4.2 Spark UI And Log Analysis",
+    "path": "/4. Senior Dev/4.2 Spark UI And Log Analysis/4.2.4 How do you read a DAG (Directed Acyclic Graph) visualization",
+    "summary": "subgraph Stage_0 [Stage 0: Reader & Map Operations]"
+  },
+  {
+    "title": "1. Diagnosing a Single Straggler Task out of 200",
+    "module": "4. Senior Dev",
+    "subtopic": "4.2 Spark UI And Log Analysis",
+    "path": "/4. Senior Dev/4.2 Spark UI And Log Analysis/4.2.5 If a stage has 200 tasks and 1 task takes 10x longer than the rest, what is the likely issue",
+    "summary": "A[1 Task Out of 200 Running Extremely Slow] --> B{Check Task Metrics in Spark UI}"
+  },
+  {
+    "title": "1. Finding Logs for a Crashed Spark Executor",
+    "module": "4. Senior Dev",
+    "subtopic": "4.2 Spark UI And Log Analysis",
+    "path": "/4. Senior Dev/4.2 Spark UI And Log Analysis/4.2.6 Where do you find the application logs for a crashed executor",
+    "summary": "A[Executor Crashes] --> B{Cluster Manager?}"
+  },
+  {
+    "title": "Event logs are written under file:///tmp/spark-events for the History Server.",
+    "module": "4. Senior Dev",
+    "subtopic": "4.2 Spark UI And Log Analysis",
+    "path": "/4. Senior Dev/4.2 Spark UI And Log Analysis/Readme",
+    "summary": "Spark UI and log analysis are the primary observability skills for diagnosing PySpark job performance, correctness, and failures. The Spark UI exposes jobs, stages, tasks, SQL plans, executor memory, "
+  },
+  {
+    "title": "Self-contained input: an RDD queued as a single batch",
+    "module": "4. Senior Dev",
+    "subtopic": "4.3 Structured Streaming",
+    "path": "/4. Senior Dev/4.3 Structured Streaming/4.3.1 What is the difference between Spark Streaming and Structured Streaming",
+    "summary": "**Spark Streaming** is the original streaming engine built on **DStreams** and the RDD API. It processes data as a sequence of small batches, but it does not use the Spark SQL optimizer, does not have"
+  },
+  {
+    "title": "Stateless transformation only: continuous mode does not support aggregations or joins.",
+    "module": "4. Senior Dev",
+    "subtopic": "4.3 Structured Streaming",
+    "path": "/4. Senior Dev/4.3 Structured Streaming/4.3.2 Explain the concept of Micro-batch vs Continuous Processing.",
+    "summary": "Structured Streaming provides two execution modes: **micro-batch** and **continuous processing**. Micro-batch is the default and production-ready mode that processes data in small, deterministic batch"
+  },
+  {
+    "title": "4.3.3 What is the purpose of Checkpointing in Structured Streaming?",
+    "module": "4. Senior Dev",
+    "subtopic": "4.3 Structured Streaming",
+    "path": "/4. Senior Dev/4.3 Structured Streaming/4.3.3 What is the purpose of Checkpointing in Structured Streaming",
+    "summary": "Checkpointing is the durable write-ahead log and state store that enables Structured Streaming queries to recover from failures and maintain exactly-once processing guarantees. In a streaming context,"
+  },
+  {
+    "title": "Windowed aggregation: 5-second windows",
+    "module": "4. Senior Dev",
+    "subtopic": "4.3 Structured Streaming",
+    "path": "/4. Senior Dev/4.3 Structured Streaming/4.3.4 How do you handle late-arriving data using Watermarking",
+    "summary": "**Late-arriving data** is data whose event time is older than the current progress of a streaming query. In real-world streams, events can be delayed by network issues, mobile offline periods, or upst"
+  },
+  {
+    "title": "Complete mode: emit the entire result table for a streaming aggregation.",
+    "module": "4. Senior Dev",
+    "subtopic": "4.3 Structured Streaming",
+    "path": "/4. Senior Dev/4.3 Structured Streaming/4.3.5 What are the different Output Modes (Append, Update, Complete)",
+    "summary": "In Structured Streaming, an **output mode** determines which rows of the result table are written to the sink after each micro-batch. Spark maintains an internal result table that is updated as new da"
+  },
+  {
+    "title": "Write idempotently, for example to a Delta table with merge",
+    "module": "4. Senior Dev",
+    "subtopic": "4.3 Structured Streaming",
+    "path": "/4. Senior Dev/4.3 Structured Streaming/4.3.6 How do you join a streaming DataFrame with a static DataFrame",
+    "summary": "A **stream-static join** combines an incrementally processed streaming DataFrame with a batch DataFrame that is read once at the start of the query. It is the standard pattern for enriching streaming "
+  },
+  {
+    "title": "4.3 Structured Streaming",
+    "module": "4. Senior Dev",
+    "subtopic": "4.3 Structured Streaming",
+    "path": "/4. Senior Dev/4.3 Structured Streaming/Readme",
+    "summary": "**Structured Streaming** is Spark's scalable, fault-tolerant stream processing engine built on the Spark SQL engine. It models a stream as an **unbounded table** that receives new rows over time, and "
+  },
+  {
+    "title": "Read the previous version",
+    "module": "4. Senior Dev",
+    "subtopic": "4.4 Delta Lake And Lakehouse Architecture",
+    "path": "/4. Senior Dev/4.4 Delta Lake And Lakehouse Architecture/4.4.1 What is Delta Lake and how does it bring ACID transactions to Spark",
+    "summary": "**Delta Lake** is an open-source storage layer that adds a transactional log on top of Parquet files, enabling ACID transactions on Spark data lakes. Traditional data lakes built directly on Parquet o"
+  },
+  {
+    "title": "List the transaction log directory",
+    "module": "4. Senior Dev",
+    "subtopic": "4.4 Delta Lake And Lakehouse Architecture",
+    "path": "/4. Senior Dev/4.4 Delta Lake And Lakehouse Architecture/4.4.2 Explain the Delta Transaction Log.",
+    "summary": "The **Delta transaction log** is the ordered, append-only record of every change made to a Delta table. It lives in the `_delta_log` directory alongside the table's Parquet data files and acts as the "
+  },
+  {
+    "title": "Restore to version 0 and verify",
+    "module": "4. Senior Dev",
+    "subtopic": "4.4 Delta Lake And Lakehouse Architecture",
+    "path": "/4. Senior Dev/4.4 Delta Lake And Lakehouse Architecture/4.4.3 What is Time Travel in Delta Lake and how do you use it",
+    "summary": "**Time travel** in Delta Lake allows you to query a table as it existed at a specific version number or timestamp. It is built directly on the Delta transaction log, which records every change to the "
+  },
+  {
+    "title": "Query with a filter on the Z-Ordered column",
+    "module": "4. Senior Dev",
+    "subtopic": "4.4 Delta Lake And Lakehouse Architecture",
+    "path": "/4. Senior Dev/4.4 Delta Lake And Lakehouse Architecture/4.4.4 What is the OPTIMIZE command and how does Z-Ordering improve read performance",
+    "summary": "**OPTIMIZE** and **Z-Ordering** are Delta Lake's primary tools for maintaining read performance as tables grow. Frequent writes, streaming ingestion, and updates create many small Parquet files, a con"
+  },
+  {
+    "title": "This requires disabling the safety check, which is shown for demonstration only.",
+    "module": "4. Senior Dev",
+    "subtopic": "4.4 Delta Lake And Lakehouse Architecture",
+    "path": "/4. Senior Dev/4.4 Delta Lake And Lakehouse Architecture/4.4.5 Why do we need the VACUUM command and what does it do",
+    "summary": "**VACUUM** is the Delta Lake command that physically deletes data files that are no longer referenced by the current transaction log and are older than a specified retention threshold. Delta Lake reta"
+  },
+  {
+    "title": "Now appends with new columns succeed without the mergeSchema option",
+    "module": "4. Senior Dev",
+    "subtopic": "4.4 Delta Lake And Lakehouse Architecture",
+    "path": "/4. Senior Dev/4.4 Delta Lake And Lakehouse Architecture/4.4.6 How do you handle schema evolution in Delta Lake",
+    "summary": "**Schema evolution** is the controlled modification of a Delta table's schema over time as source data changes. In a Lakehouse, upstream systems frequently add, rename, or widen columns, and pipelines"
+  },
+  {
+    "title": "Time travel: read version 0",
+    "module": "4. Senior Dev",
+    "subtopic": "4.4 Delta Lake And Lakehouse Architecture",
+    "path": "/4. Senior Dev/4.4 Delta Lake And Lakehouse Architecture/4.4.7 What is the difference between a Data Lake, a Data Warehouse, and a Lakehouse",
+    "summary": "A **Data Warehouse** stores structured, processed data with schema-on-write, optimized for SQL analytics and business intelligence. A **Data Lake** stores raw data in any format on cheap object storag"
+  },
+  {
+    "title": "Read changes since version 5",
+    "module": "4. Senior Dev",
+    "subtopic": "4.4 Delta Lake And Lakehouse Architecture",
+    "path": "/4. Senior Dev/4.4 Delta Lake And Lakehouse Architecture/Readme",
+    "summary": "**Delta Lake** is an open-source storage layer that brings ACID transactions, schema enforcement, time travel, and scalable metadata handling to data lakes built on Parquet files. A **Lakehouse** arch"
+  },
+  {
+    "title": "A simple aggregation to exercise the cluster",
+    "module": "4. Senior Dev",
+    "subtopic": "4.5 Cluster Sizing And Dynamic Allocation",
+    "path": "/4. Senior Dev/4.5 Cluster Sizing And Dynamic Allocation/4.5.1 How do you decide the number of Executors, Cores per Executor, and Executor Memory",
+    "summary": "Deciding the number of executors, cores per executor, and executor memory is one of the most consequential tuning decisions in a Spark application. A configuration that is too small leads to underutil"
+  },
+  {
+    "title": "Bad: 15 cores per executor, GC and HDFS bottleneck",
+    "module": "4. Senior Dev",
+    "subtopic": "4.5 Cluster Sizing And Dynamic Allocation",
+    "path": "/4. Senior Dev/4.5 Cluster Sizing And Dynamic Allocation/4.5.2 Why is assigning 1 core per executor bad Why is assigning 15 cores per executor bad",
+    "summary": "Executor core count controls how many tasks an executor can run concurrently and how much JVM and memory overhead is duplicated per executor. Two extremes are common mistakes: assigning **1 core per e"
+  },
+  {
+    "title": "Monitor the Spark UI at http://<driver-host>:4040 to see executor count change.",
+    "module": "4. Senior Dev",
+    "subtopic": "4.5 Cluster Sizing And Dynamic Allocation",
+    "path": "/4. Senior Dev/4.5 Cluster Sizing And Dynamic Allocation/4.5.3 What is Dynamic Allocation and how does it work",
+    "summary": "**Dynamic allocation** is a Spark feature that automatically adjusts the number of executors assigned to an application based on the current workload. Instead of reserving a fixed set of executors for"
+  },
+  {
+    "title": "and that executors can be released without causing fetch failures.",
+    "module": "4. Senior Dev",
+    "subtopic": "4.5 Cluster Sizing And Dynamic Allocation",
+    "path": "/4. Senior Dev/4.5 Cluster Sizing And Dynamic Allocation/4.5.4 What is the External Shuffle Service and why is it required for Dynamic Allocation",
+    "summary": "The **External Shuffle Service (ESS)** is a long-running auxiliary process that runs on each worker node and serves shuffle files independently of Spark executors. It is the classic mechanism that mak"
+  },
+  {
+    "title": "4.5.5 What are the pros and cons of running Spark on Kubernetes vs YARN?",
+    "module": "4. Senior Dev",
+    "subtopic": "4.5 Cluster Sizing And Dynamic Allocation",
+    "path": "/4. Senior Dev/4.5 Cluster Sizing And Dynamic Allocation/4.5.5 What are the pros and cons of running Spark on Kubernetes vs YARN",
+    "summary": "**YARN** and **Kubernetes** are the two most common cluster managers for Spark in production. YARN is the battle-tested scheduler of the Hadoop ecosystem, purpose-built for data workloads with mature "
+  },
+  {
+    "title": "A simple aggregation to exercise the cluster",
+    "module": "4. Senior Dev",
+    "subtopic": "4.5 Cluster Sizing And Dynamic Allocation",
+    "path": "/4. Senior Dev/4.5 Cluster Sizing And Dynamic Allocation/Readme",
+    "summary": "Cluster sizing and dynamic allocation determine how Spark distributes compute resources across a job. **Cluster sizing** is the deliberate choice of executor count, cores per executor, and memory per "
+  },
+  {
+    "title": "Test the batch function directly with a static DataFrame",
+    "module": "4. Senior Dev",
+    "subtopic": "4.6 Unit Testing In PySpark",
+    "path": "/4. Senior Dev/4.6 Unit Testing In PySpark/4.6.1 How do you write unit tests for PySpark data transformations using pytest",
+    "summary": "Unit testing PySpark data transformations with **pytest** verifies that your DataFrame logic produces correct results before it runs on a cluster. The challenge is that Spark is designed for distribut"
+  },
+  {
+    "title": "4.6.2 What is the chispa library and how does it help with DataFrame testing?",
+    "module": "4. Senior Dev",
+    "subtopic": "4.6 Unit Testing In PySpark",
+    "path": "/4. Senior Dev/4.6 Unit Testing In PySpark/4.6.2 What is the chispa library and how does it help with DataFrame testing",
+    "summary": "**chispa** is a lightweight, open-source PySpark testing library created by Matthew Powers (MrPowers) that provides assertion helpers for comparing DataFrames, schemas, and columns. The name means \"Sp"
+  },
+  {
+    "title": "test_transforms.py",
+    "module": "4. Senior Dev",
+    "subtopic": "4.6 Unit Testing In PySpark",
+    "path": "/4. Senior Dev/4.6 Unit Testing In PySpark/4.6.3 How do you mock or isolate the SparkSession for unit tests to run faster",
+    "summary": "Creating a **SparkSession** is expensive. Each new session starts a JVM, initializes a SparkContext, allocates memory, and sets up internal services. When a test suite creates a new SparkSession for e"
+  },
+  {
+    "title": "4.6.4 What are the best practices for comparing two DataFrames in a test?",
+    "module": "4. Senior Dev",
+    "subtopic": "4.6 Unit Testing In PySpark",
+    "path": "/4. Senior Dev/4.6 Unit Testing In PySpark/4.6.4 What are the best practices for comparing two DataFrames in a test",
+    "summary": "Comparing two DataFrames is the core assertion in any PySpark unit test. The goal is to verify that a transformation produces the expected logical result, regardless of physical row order, partition l"
+  },
+  {
+    "title": "test_pandas_udfs.py",
+    "module": "4. Senior Dev",
+    "subtopic": "4.6 Unit Testing In PySpark",
+    "path": "/4. Senior Dev/4.6 Unit Testing In PySpark/4.6.5 How do you test UDFs locally without spinning up a full Spark cluster",
+    "summary": "User-defined functions (UDFs) encapsulate custom logic that cannot be expressed with built-in Spark functions. Testing them does not require a cluster. The key insight is that a UDF is just a Python f"
+  },
+  {
+    "title": "Assert on captured batches",
+    "module": "4. Senior Dev",
+    "subtopic": "4.6 Unit Testing In PySpark",
+    "path": "/4. Senior Dev/4.6 Unit Testing In PySpark/Readme",
+    "summary": "Unit testing in PySpark verifies that individual transformations, DataFrame operations, and user-defined functions behave correctly before they are deployed to a cluster. Because Spark jobs are distri"
+  },
+  {
+    "title": "pending stages exist over a sustained period.",
+    "module": "4. Senior Dev",
+    "subtopic": "4.7 Cost Optimization And FinOps",
+    "path": "/4. Senior Dev/4.7 Cost Optimization And FinOps/4.7.1 How do you identify zombie or idle Spark clusters in the cloud",
+    "summary": "A **zombie Spark cluster** is a compute resource that is running but serving no useful workload. It may have been left running after a job completed, may be attached to an interactive session that no "
+  },
+  {
+    "title": "A shuffle-heavy aggregation that writes shuffle data to executors",
+    "module": "4. Senior Dev",
+    "subtopic": "4.7 Cost Optimization And FinOps",
+    "path": "/4. Senior Dev/4.7 Cost Optimization And FinOps/4.7.2 When should you use Spot or Preemptible instances for Spark nodes",
+    "summary": "**Spot instances** (AWS, Azure) and **Preemptible VMs** (GCP) are discounted compute resources that cloud providers can reclaim at short notice. They offer savings of up to 90% compared to on-demand p"
+  },
+  {
+    "title": "A shuffle-heavy aggregation that exercises executor shuffle writes",
+    "module": "4. Senior Dev",
+    "subtopic": "4.7 Cost Optimization And FinOps",
+    "path": "/4. Senior Dev/4.7 Cost Optimization And FinOps/4.7.3 Which Spark nodes should never be placed on Spot instances",
+    "summary": "**Spot instances** (AWS, Azure) and **Preemptible VMs** (GCP) offer discounts of up to 90% compared to on-demand pricing, but they can be reclaimed by the cloud provider with as little as 30 seconds o"
+  },
+  {
+    "title": "A shuffle-heavy aggregation that will trigger rapid scaling and shuffle loss",
+    "module": "4. Senior Dev",
+    "subtopic": "4.7 Cost Optimization And FinOps",
+    "path": "/4. Senior Dev/4.7 Cost Optimization And FinOps/4.7.4 How does aggressive auto-scaling sometimes increase costs or slow down jobs",
+    "summary": "**Dynamic allocation** is designed to reduce cost and improve cluster utilization by scaling the number of executors up and down with demand. However, when configured aggressively, it can produce the "
+  },
+  {
+    "title": "Reduce the number of output files before writing",
+    "module": "4. Senior Dev",
+    "subtopic": "4.7 Cost Optimization And FinOps",
+    "path": "/4. Senior Dev/4.7 Cost Optimization And FinOps/4.7.5 What are some common ways to reduce cloud storage API costs",
+    "summary": "Cloud storage API costs are a hidden but significant component of Spark and Lakehouse spending. Every `LIST`, `GET`, `PUT`, `HEAD`, and `KMS Decrypt` operation is billed separately from storage capaci"
+  },
+  {
+    "title": "4.7 Cost Optimization And FinOps",
+    "module": "4. Senior Dev",
+    "subtopic": "4.7 Cost Optimization And FinOps",
+    "path": "/4. Senior Dev/4.7 Cost Optimization And FinOps/Readme",
+    "summary": "**FinOps** is the practice of bringing financial accountability to cloud spend through cross-functional collaboration between engineering, finance, and operations. In Spark, cost optimization means re"
+  },
+  {
+    "title": "Tag the table and columns for governance",
+    "module": "4. Senior Dev",
+    "subtopic": "4.8 Security And Governance",
+    "path": "/4. Senior Dev/4.8 Security And Governance/4.8.1 How do you handle PII data in Spark pipelines",
+    "summary": "Handling Personally Identifiable Information (PII) in Spark pipelines requires a defense-in-depth strategy that spans data classification, transformation at ingest, access control at query time, and v"
+  },
+  {
+    "title": "Tag the table and columns for governance",
+    "module": "4. Senior Dev",
+    "subtopic": "4.8 Security And Governance",
+    "path": "/4. Senior Dev/4.8 Security And Governance/4.8.2 How do you implement Data Masking or Anonymization in PySpark",
+    "summary": "**Data masking** and **anonymization** are the primary techniques for protecting Personally Identifiable Information (PII) in Spark pipelines. Masking replaces sensitive values with realistic but alte"
+  },
+  {
+    "title": "Write to a Lake Formation-registered table",
+    "module": "4. Senior Dev",
+    "subtopic": "4.8 Security And Governance",
+    "path": "/4. Senior Dev/4.8 Security And Governance/4.8.3 What is Unity Catalog or AWS Lake Formation, and how do they enforce security",
+    "summary": "**Unity Catalog** and **AWS Lake Formation** are centralized data governance platforms that enforce fine-grained access control across an organization's data assets. Unity Catalog governs data and AI "
+  },
+  {
+    "title": "Run a simple aggregation to verify the configuration",
+    "module": "4. Senior Dev",
+    "subtopic": "4.8 Security And Governance",
+    "path": "/4. Senior Dev/4.8 Security And Governance/4.8.4 How do you encrypt data at rest and data in transit for Spark applications",
+    "summary": "Encryption is the last line of defense when perimeter security, authentication, and access control fail. Spark applications move data across three planes: **in transit** between the driver, executors,"
+  },
+  {
+    "title": "Use the credentials in a JDBC read",
+    "module": "4. Senior Dev",
+    "subtopic": "4.8 Security And Governance",
+    "path": "/4. Senior Dev/4.8 Security And Governance/4.8.5 How do you manage secrets securely in PySpark",
+    "summary": "**Secrets management** is the practice of storing, accessing, and rotating sensitive credentials\u2014database passwords, API keys, tokens, and certificates\u2014without exposing them in code, configuration fil"
+  },
+  {
+    "title": "Run a simple query",
+    "module": "4. Senior Dev",
+    "subtopic": "4.8 Security And Governance",
+    "path": "/4. Senior Dev/4.8 Security And Governance/Readme",
+    "summary": "Spark security and governance cover the controls that protect data, compute, and metadata in a distributed environment. A Spark cluster processes data across multiple nodes, reads from and writes to e"
+  }
+]
