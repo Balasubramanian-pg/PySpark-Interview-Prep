@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vitepress'
 import {
   getCompletedLessons,
@@ -29,7 +29,6 @@ const pomodoroStats = ref<{ completedBlocks: number }>({ completedBlocks: 0 })
 const activityMap = ref<Record<string, string[]>>({})
 const selectedTimeframe = ref<'week' | 'month'>('week')
 const activeFilter = ref<'all' | '1. Fundamentals' | '2. Intermediate' | '3. Advanced' | '4. Senior Dev'>('all')
-const conceptQuery = ref('')
 
 // Pomodoro state
 const POMO_KEY = 'portal_pomo_state'
@@ -86,7 +85,6 @@ function startTimerLoop() {
 
 function togglePomo() {
   if (pomoRunning.value) {
-    // Pause
     pomoRunning.value = false
     if (timerInterval) clearInterval(timerInterval)
     localStorage.setItem(POMO_KEY, JSON.stringify({
@@ -96,7 +94,6 @@ function togglePomo() {
       totalSeconds: pomoTotal.value
     }))
   } else {
-    // Start or Resume
     pomoRunning.value = true
     const targetEnd = Date.now() + pomoRemaining.value * 1000
     localStorage.setItem(POMO_KEY, JSON.stringify({
@@ -149,7 +146,7 @@ const readinessScore = computed(() => {
   return Math.min(100, Math.round((completedCount.value / totalQuestionsCount.value) * 100))
 })
 
-// Circular Pomodoro Progress Ring Math (r = 48 -> C = 301.59)
+// Pomodoro Progress Ring
 const pomoStrokeOffset = computed(() => {
   const r = 48
   const c = 2 * Math.PI * r
@@ -164,7 +161,7 @@ const formattedPomoTime = computed(() => {
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
 })
 
-// Dynamic Performance Spline Wave Math
+// Dynamic Performance Spline Wave
 const waveData = computed(() => {
   const s = Math.max(8, readinessScore.value)
   const peakX = 30 + (s * 1.8)
@@ -174,18 +171,15 @@ const waveData = computed(() => {
   return { peakX, peakY, curve, area }
 })
 
-// Weekly and Monthly Capsule Bar Chart Data
+// Weekly & Monthly Data
 const weeklyData = computed(() => {
   const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-  // Calculate relative count based on activityMap
   const today = new Date()
   return days.map((day, idx) => {
-    // Generate dates for current week
     const d = new Date()
     d.setDate(today.getDate() - (6 - idx))
     const dateStr = d.toISOString().slice(0, 10)
     const count = activityMap.value[dateStr] ? activityMap.value[dateStr].length : 0
-    // baseline height if zero
     const maxVal = 10
     const heightPercent = count > 0 ? Math.min(100, Math.max(15, (count / maxVal) * 100)) : 10
     return {
@@ -213,7 +207,6 @@ const monthlyData = computed(() => {
   })
 })
 
-// Favorite items resolved from search index
 const favoriteQuestions = computed(() => {
   return searchIndexData.filter(item => {
     const clean = item.path.replace(/\/$/, '')
@@ -221,7 +214,6 @@ const favoriteQuestions = computed(() => {
   }).slice(0, 6)
 })
 
-// Next uncompleted lesson for "Quick Jump"
 const nextUncompletedLesson = computed(() => {
   const found = searchIndexData.find(item => {
     const clean = item.path.replace(/\/$/, '')
@@ -230,7 +222,6 @@ const nextUncompletedLesson = computed(() => {
   return found || searchIndexData[0]
 })
 
-// Filtered Curriculum
 const modulesList = [
   {
     id: '1. Fundamentals',
@@ -299,40 +290,51 @@ function navigateTo(path: string) {
 
 <template>
   <div class="dash-viewport">
-    <!-- Global Sticky Top Navigation Bar -->
+    <!-- Streamlined Minimal Header: Brand + Search Bar + 1 GitHub + 1 LinkedIn ONLY -->
     <header class="dash-top-bar">
-      <div class="brand-wrap">
-        <span class="brand-icon">⚡</span>
+      <div class="brand-wrap" @click="navigateTo('/')">
+        <!-- Simple Icons: Apache Spark -->
+        <svg class="brand-spark-svg" viewBox="0 0 24 24" width="24" height="24" fill="#FF6B35">
+          <path d="M10.812 0c-.425.013-.845.215-1.196.605a3.593 3.593 0 00-.493.722c-.355.667-.425 1.415-.556 2.143a551.9 551.9 0 00-.726 4.087c-.027.16-.096.227-.244.273C5.83 8.386 4.06 8.94 2.3 9.514c-.387.125-.773.289-1.114.506-1.042.665-1.196 1.753-.415 2.71.346.422.79.715 1.284.936 1.1.49 2.202.976 3.3 1.47.019.01.036.013.053.019h-.004l1.306.535c0 .023.002.045 0 .073-.2 2.03-.39 4.063-.58 6.095-.04.419-.012.831.134 1.23.317.87 1.065 1.148 1.881.701.372-.204.666-.497.937-.818 1.372-1.623 2.746-3.244 4.113-4.872.111-.133.205-.15.363-.098.349.117.697.231 1.045.347h.001c.02.012.045.02.073.03l.142.042c1.248.416 2.68.775 3.929 1.19.4.132.622.164 1.045.098.311-.048.592-.062.828-.236.602-.33.995-.957.988-1.682-.005-.427-.154-.813-.35-1.186-.82-1.556-1.637-3.113-2.461-4.666-.078-.148-.076-.243.037-.375 1.381-1.615 2.756-3.236 4.133-4.855.272-.32.513-.658.653-1.058.308-.878-.09-1.57-1-1.741a2.783 2.783 0 00-1.235.069c-1.974.521-3.947 1.041-5.918 1.57-.175.047-.26.015-.355-.144a353.08 353.08 0 00-2.421-4.018 4.61 4.61 0 00-.652-.849c-.371-.37-.802-.549-1.227-.536zm.172 3.703a.592.592 0 01.189.211c.87 1.446 1.742 2.89 2.609 4.338.07.118.135.16.277.121 1.525-.41 3.052-.813 4.579-1.217.367-.098.735-.193 1.103-.289a.399.399 0 01-.1.2c-1.259 1.48-2.516 2.962-3.779 4.438-.11.13-.12.22-.04.37.937 1.803 1.768 3.309 2.498 4.76l-3.696-1.019c-.538-.18-1.077-.358-1.615-.539-.163-.055-.25-.03-.36.1-1.248 1.488-2.504 2.97-3.759 4.454a.398.398 0 01-.18.132c.035-.378.068-.757.104-1.136.149-1.572.297-3.144.451-4.716-.03-.318.117-.405-.322-.545-1.493-.593-3.346-1.321-4.816-1.905a.595.595 0 01.24-.134c1.797-.57 3.595-1.14 5.394-1.705.127-.04.199-.092.211-.233.013-.148.05-.294.076-.441.241-1.363.483-2.726.726-4.088.068-.386.14-.771.21-1.157z"/>
+        </svg>
         <span class="brand-logo-text">PySpark Wiki</span>
-        <span class="brand-badge">PRO</span>
       </div>
 
-      <!-- Center Search Pill matching screenshot -->
+      <!-- Center Search Pill -->
       <div id="walkthrough-top-right" class="dash-search-pill" @click="openSearch">
-        <span class="search-magnifier">🔍</span>
-        <span class="search-placeholder">Search 260+ PySpark interview questions, code, concepts...</span>
+        <svg class="search-svg-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <span class="search-placeholder">Search 260+ questions, concepts, code...</span>
         <span class="search-kbd">Ctrl K</span>
       </div>
 
-      <!-- Right Header Actions -->
+      <!-- Right Header Actions: Exactly ONE LinkedIn and ONE GitHub icon ONLY -->
       <div class="dash-header-actions">
-        <button class="tour-trigger-btn" @click="openTour">
-          <span class="tour-icon">🧭</span>
-          <span>Tour Guide</span>
-        </button>
-        <button class="quiz-trigger-btn" @click="showQuizModal = true">
-          <span class="quiz-icon">🏆</span>
-          <span>Scenario Quiz</span>
-        </button>
+        <!-- Simple Icons: GitHub -->
         <a
           href="https://github.com/Balasubramanian-pg/PySpark-Interview-Prep"
           target="_blank"
           rel="noopener"
           class="header-icon-btn"
-          title="GitHub Repo"
+          title="GitHub Repository"
         >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
             <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+          </svg>
+        </a>
+
+        <!-- Simple Icons: LinkedIn -->
+        <a
+          href="https://linkedin.com/in/balasubramanian-pg"
+          target="_blank"
+          rel="noopener"
+          class="header-icon-btn"
+          title="LinkedIn Profile"
+        >
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+            <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
           </svg>
         </a>
       </div>
@@ -340,44 +342,64 @@ function navigateTo(path: string) {
 
     <!-- Main 3-Column Bowwow Layout Container -->
     <div class="dash-grid-layout">
-      <!-- LEFT COLUMN: Favs & Saved Bookmarks -->
+      <!-- LEFT COLUMN: Favs with Simple Icons & Saved Bookmarks -->
       <aside class="dash-col-left">
         <div class="sidebar-block">
           <div class="sidebar-section-title">Favs</div>
           <ul class="fav-list">
             <li class="fav-item" @click="navigateTo('/1. Fundamentals/1.1 Spark Architecture Basics/Readme')">
-              <span class="fav-icon">⚡</span>
+              <!-- Simple Icons: Apache Spark -->
+              <svg viewBox="0 0 24 24" class="fav-icon-svg" fill="currentColor">
+                <path d="M10.812 0c-.425.013-.845.215-1.196.605a3.593 3.593 0 00-.493.722c-.355.667-.425 1.415-.556 2.143a551.9 551.9 0 00-.726 4.087c-.027.16-.096.227-.244.273C5.83 8.386 4.06 8.94 2.3 9.514c-.387.125-.773.289-1.114.506-1.042.665-1.196 1.753-.415 2.71.346.422.79.715 1.284.936 1.1.49 2.202.976 3.3 1.47.019.01.036.013.053.019h-.004l1.306.535c0 .023.002.045 0 .073-.2 2.03-.39 4.063-.58 6.095-.04.419-.012.831.134 1.23.317.87 1.065 1.148 1.881.701.372-.204.666-.497.937-.818 1.372-1.623 2.746-3.244 4.113-4.872.111-.133.205-.15.363-.098.349.117.697.231 1.045.347h.001c.02.012.045.02.073.03l.142.042c1.248.416 2.68.775 3.929 1.19.4.132.622.164 1.045.098.311-.048.592-.062.828-.236.602-.33.995-.957.988-1.682-.005-.427-.154-.813-.35-1.186-.82-1.556-1.637-3.113-2.461-4.666-.078-.148-.076-.243.037-.375 1.381-1.615 2.756-3.236 4.133-4.855.272-.32.513-.658.653-1.058.308-.878-.09-1.57-1-1.741a2.783 2.783 0 00-1.235.069c-1.974.521-3.947 1.041-5.918 1.57-.175.047-.26.015-.355-.144a353.08 353.08 0 00-2.421-4.018 4.61 4.61 0 00-.652-.849c-.371-.37-.802-.549-1.227-.536zm.172 3.703a.592.592 0 01.189.211c.87 1.446 1.742 2.89 2.609 4.338.07.118.135.16.277.121 1.525-.41 3.052-.813 4.579-1.217.367-.098.735-.193 1.103-.289a.399.399 0 01-.1.2c-1.259 1.48-2.516 2.962-3.779 4.438-.11.13-.12.22-.04.37.937 1.803 1.768 3.309 2.498 4.76l-3.696-1.019c-.538-.18-1.077-.358-1.615-.539-.163-.055-.25-.03-.36.1-1.248 1.488-2.504 2.97-3.759 4.454a.398.398 0 01-.18.132c.035-.378.068-.757.104-1.136.149-1.572.297-3.144.451-4.716-.03-.318.117-.405-.322-.545-1.493-.593-3.346-1.321-4.816-1.905a.595.595 0 01.24-.134c1.797-.57 3.595-1.14 5.394-1.705.127-.04.199-.092.211-.233.013-.148.05-.294.076-.441.241-1.363.483-2.726.726-4.088.068-.386.14-.771.21-1.157z"/>
+              </svg>
               <span class="fav-text">Spark Architecture</span>
             </li>
             <li class="fav-item" @click="navigateTo('/3. Advanced/3.6 Spark SQL Engine/Readme')">
-              <span class="fav-icon">⚙️</span>
+              <!-- Simple Icons: Databricks -->
+              <svg viewBox="0 0 24 24" class="fav-icon-svg" fill="currentColor">
+                <path d="M.95 14.184L12 20.403l9.919-5.55v2.21L12 22.662l-11.05-6.23zm0-4.398L12 16.005l9.919-5.55v2.21L12 18.264l-11.05-6.23zm0-4.398L12 11.608l9.919-5.55v2.21L12 13.866l-11.05-6.23zm11.05-5.388l11.05 6.23-2.21 1.24-8.84-4.96-8.84 4.96-2.21-1.24z"/>
+              </svg>
               <span class="fav-text">Catalyst Optimizer</span>
             </li>
             <li class="fav-item" @click="navigateTo('/3. Advanced/3.3 Join Strategies/Readme')">
-              <span class="fav-icon">🔀</span>
+              <!-- Simple Icons: PostgreSQL -->
+              <svg viewBox="0 0 24 24" class="fav-icon-svg" fill="currentColor">
+                <path d="M23.5594 14.7228a.5269.5269 0 0 0-.0563-.1191c-.13-.1824-.6278-.6098-1.5794-1.0776a8.8795 8.8795 0 0 0-3.3283-.7507c-.432 0-.8255.0381-1.1895.1054a3.8153 3.8153 0 0 0-1.2783-.9904 3.7538 3.7538 0 0 0-1.8028-.437c-.366 0-.712.0624-1.037.1857-.325-.1233-.671-.1857-1.037-.1857a3.7538 3.7538 0 0 0-1.8028.437 3.8153 3.8153 0 0 0-1.2783.9904c-.364-.0673-.7575-.1054-1.1895-.1054a8.8795 8.8795 0 0 0-3.3283.7507c-.9516.4678-1.4494.8952-1.5794 1.0776a.5269.5269 0 0 0-.0563.1191C.0134 14.9575 0 15.228 0 15.5332c0 2.456 1.9427 4.4534 4.3468 4.4534.6214 0 1.2098-.135 1.741-.3773.5312.2423 1.1196.3773 1.741.3773 1.769 0 3.2847-1.0792 3.9432-2.6186.228.0587.467.0898.711.0898.244 0 .483-.0311.711-.0898.6585 1.5394 2.1742 2.6186 3.9432 2.6186.6214 0 1.2098-.135 1.741-.3773.5312.2423 1.1196.3773 1.741.3773 2.4041 0 4.3468-1.9974 4.3468-4.4534 0-.3052-.0134-.5757-.027-.8104z"/>
+              </svg>
               <span class="fav-text">Join Strategies</span>
             </li>
             <li class="fav-item" @click="navigateTo('/4. Senior Dev/4.1 Memory Management And OOM Errors/Readme')">
-              <span class="fav-icon">💾</span>
+              <!-- Simple Icons: Linux -->
+              <svg viewBox="0 0 24 24" class="fav-icon-svg" fill="currentColor">
+                <path d="M12.504 0c-.155 0-.315.008-.48.021-4.226.333-3.105 4.807-3.17 6.298-.076 1.092-.3 1.953-1.05 3.02-.885 1.051-2.127 2.75-2.716 4.521-.278.832-.41 1.684-.287 2.489a.424.424 0 00-.11.135c-.26.268-.45.6-.663.839-.199.199-.485.267-.797.4-.313.136-.658.269-.864.68-.09.189-.136.394-.132.602 0 .199.027.4.055.536.058.399.116.728.04.97-.249.68-.28 1.145-.106 1.484.174.334.535.47.94.601.81.2 1.91.135 2.774.6.926.466 1.866.67 2.616.47.526-.116.97-.464 1.208-.946.587-.003 1.23-.269 2.26-.334.699-.058 1.574.267 2.577.2.025.134.063.198.114.333l.003.003c.391.778 1.113 1.132 1.884 1.071.771-.06 1.592-.536 2.257-1.306.631-.765 1.683-1.084 2.378-1.503.348-.199.629-.469.649-.853.023-.4-.2-.811-.714-1.376v-.097l-.003-.003c-.17-.2-.25-.535-.338-.926-.085-.401-.182-.786-.492-1.046h-.003c-.059-.054-.123-.067-.188-.135a.357.357 0 00-.19-.064c.431-1.278.264-2.55-.173-3.694-.533-1.41-1.465-2.638-2.175-3.483-.796-1.005-1.576-1.957-1.56-3.368.026-2.152.236-6.133-3.544-6.139z"/>
+              </svg>
               <span class="fav-text">Memory & OOMs</span>
             </li>
             <li class="fav-item" @click="navigateTo('/4. Senior Dev/4.3 Structured Streaming/Readme')">
-              <span class="fav-icon">🌊</span>
+              <!-- Simple Icons: Apache Kafka -->
+              <svg viewBox="0 0 24 24" class="fav-icon-svg" fill="currentColor">
+                <path d="M9.71 2.136a1.43 1.43 0 0 0-2.047 0h-.007a1.48 1.48 0 0 0 0 2.08l.007.007 7.07 7.184-7.07 7.185a1.48 1.48 0 0 0 0 2.08l.007.006a1.43 1.43 0 0 0 2.047 0l8.1-8.228a1.48 1.48 0 0 0 0-2.08z"/>
+              </svg>
               <span class="fav-text">Streaming & Watermarks</span>
             </li>
             <li class="fav-item" @click="navigateTo('/4. Senior Dev/4.4 Delta Lake And Lakehouse Architecture/Readme')">
-              <span class="fav-icon">🧊</span>
+              <!-- Simple Icons: Apache Parquet -->
+              <svg viewBox="0 0 24 24" class="fav-icon-svg" fill="currentColor">
+                <path d="M10.953 20.391c-.95-1.013-.978-1.057-.807-1.248.27-.3.729-.283 1.272.048.43.262.778.365 1.096.326.319-.039.69-.25 1.057-.597 1.109-1.052 1.942-2.827 2.503-5.328l.228-1.018-.748.276c-1.396.516-2.585.698-3.565.545-1.127-.176-1.891-.689-2.3-1.545-.37-.775-.326-1.745.132-2.89.475-1.189 1.343-2.399 2.518-3.513 1.503-1.424 3.097-2.316 4.606-2.58 1.074-.188 1.966-.028 2.6.467.625.488.947 1.297.947 2.378 0 1.943-.787 4.417-2.223 6.993-1.365 2.447-3.159 4.444-5.068 5.642-.988.621-1.89.923-2.593.923a2.12 2.12 0 0 1-.648-.09z"/>
+              </svg>
               <span class="fav-text">Delta Lake & ACID</span>
             </li>
           </ul>
         </div>
 
-        <!-- My Bowws / Saved Notes Section matching screenshot -->
+        <!-- Saved Questions Section -->
         <div class="sidebar-block">
           <div class="sidebar-section-title">Saved Questions</div>
           <div v-if="favoriteQuestions.length === 0" class="empty-favs">
-            <span class="empty-icon">🔖</span>
-            <p class="empty-text">No bookmarked questions yet. Click the bookmark star in any lesson to pin it here.</p>
+            <svg class="empty-bookmark-svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <p class="empty-text">No bookmarked questions yet. Click the bookmark in any lesson to pin it here.</p>
           </div>
           <div v-else class="saved-cards-list">
             <div
@@ -398,7 +420,7 @@ function navigateTo(path: string) {
           <div class="resume-label">RESUME ACTIVE TOPIC</div>
           <div class="resume-title">{{ nextUncompletedLesson.title }}</div>
           <button class="resume-action-btn" @click="navigateTo(nextUncompletedLesson.path)">
-            Continue Reading →
+            Continue Reading
           </button>
         </div>
       </aside>
@@ -460,7 +482,7 @@ function navigateTo(path: string) {
               How Apache Spark reconstructs lost partitions using deterministic Directed Acyclic Graphs (DAG) without memory replication overhead.
             </p>
             <div class="feat-footer">
-              <span class="read-link">Read deep dive →</span>
+              <span class="read-link">Read deep dive</span>
               <button class="feat-pill-btn">Study Concept</button>
             </div>
           </div>
@@ -476,8 +498,8 @@ function navigateTo(path: string) {
               SortMergeJoin vs BroadcastHashJoin vs ShuffleHashJoin. How Adaptive Query Execution (AQE) dynamically resolves joins at runtime.
             </p>
             <div class="feat-footer">
-              <span class="read-link" style="color: #FF6B35;">Read more →</span>
-              <button class="feat-pill-orange">Explore Joins!</button>
+              <span class="read-link" style="color: #FF6B35;">Read more</span>
+              <button class="feat-pill-orange">Explore Joins</button>
             </div>
           </div>
 
@@ -492,7 +514,7 @@ function navigateTo(path: string) {
               Storage vs Execution memory borrowing boundaries, off-heap buffers, and GC tuning for production clusters.
             </p>
             <div class="feat-footer">
-              <span class="read-link" style="color: #2563EB;">Read architecture →</span>
+              <span class="read-link" style="color: #2563EB;">Read architecture</span>
               <button class="feat-pill-dark">Master Sizing</button>
             </div>
           </div>
@@ -640,7 +662,7 @@ function navigateTo(path: string) {
 
               <div class="module-card-footer">
                 <span>{{ getModuleCompletedCount(mod.id) }} / {{ mod.total }} Completed</span>
-                <span class="card-arrow">Start →</span>
+                <span class="card-arrow">Start</span>
               </div>
             </div>
           </div>
@@ -683,17 +705,29 @@ function navigateTo(path: string) {
         <!-- Mini Grid of Action Cards matching screenshot bottom right -->
         <div class="action-cards-grid">
           <div class="mini-card add-card" @click="showQuizModal = true">
-            <span class="plus-icon">+</span>
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#FF6B35" stroke-width="2.5">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
             <span class="mini-title">Scenario Quiz</span>
           </div>
 
           <div class="mini-card outline-card" @click="navigateTo('/3. Advanced/3.2 Shuffling And Data Exchange/Readme')">
-            <div class="line-art">〰️</div>
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#9CA3AF" stroke-width="2">
+              <path d="M2 12c3-4 6-4 10 0s7 4 10 0"></path>
+            </svg>
             <span class="mini-title">Be patient with shuffles</span>
           </div>
 
           <div class="mini-card outline-card" @click="navigateTo('/4. Senior Dev/4.1 Memory Management And OOM Errors/Readme')">
-            <div class="ladder-art">🪜</div>
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#9CA3AF" stroke-width="2">
+              <line x1="8" y1="6" x2="21" y2="6"></line>
+              <line x1="8" y1="12" x2="21" y2="12"></line>
+              <line x1="8" y1="18" x2="21" y2="18"></line>
+              <line x1="3" y1="6" x2="3.01" y2="6"></line>
+              <line x1="3" y1="12" x2="3.01" y2="12"></line>
+              <line x1="3" y1="18" x2="3.01" y2="18"></line>
+            </svg>
             <span class="mini-title">12 Steps to Debug OOMs</span>
           </div>
 
@@ -720,7 +754,7 @@ function navigateTo(path: string) {
   padding: 24px 32px 64px 32px;
 }
 
-/* Header */
+/* Streamlined Header matching user specification */
 .dash-top-bar {
   display: flex;
   align-items: center;
@@ -736,35 +770,27 @@ function navigateTo(path: string) {
 .brand-wrap {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  cursor: pointer;
 }
 
-.brand-icon {
-  font-size: 22px;
+.brand-spark-svg {
+  flex-shrink: 0;
 }
 
 .brand-logo-text {
   font-size: 18px;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: -0.02em;
   color: #FFFFFF;
 }
 
-.brand-badge {
-  font-size: 10px;
-  font-weight: 800;
-  color: #FF6B35;
-  background: rgba(255, 107, 53, 0.15);
-  padding: 2px 7px;
-  border-radius: 6px;
-}
-
 .dash-search-pill {
   flex: 1;
-  max-width: 580px;
+  max-width: 620px;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   padding: 8px 18px;
@@ -778,9 +804,9 @@ function navigateTo(path: string) {
   border-color: rgba(255, 107, 53, 0.4);
 }
 
-.search-magnifier {
-  font-size: 15px;
-  opacity: 0.7;
+.search-svg-icon {
+  color: #9CA3AF;
+  flex-shrink: 0;
 }
 
 .search-placeholder {
@@ -804,28 +830,7 @@ function navigateTo(path: string) {
 .dash-header-actions {
   display: flex;
   align-items: center;
-  gap: 12px;
-}
-
-.tour-trigger-btn, .quiz-trigger-btn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #FFFFFF;
-  padding: 8px 14px;
-  border-radius: 12px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.tour-trigger-btn:hover, .quiz-trigger-btn:hover {
-  background: rgba(255, 107, 53, 0.18);
-  border-color: rgba(255, 107, 53, 0.45);
-  color: #FF6B35;
+  gap: 10px;
 }
 
 .header-icon-btn {
@@ -843,8 +848,9 @@ function navigateTo(path: string) {
 }
 
 .header-icon-btn:hover {
-  color: #FFFFFF;
-  background: rgba(255, 255, 255, 0.12);
+  color: #FF6B35;
+  background: rgba(255, 107, 53, 0.15);
+  border-color: rgba(255, 107, 53, 0.4);
 }
 
 /* 3-Column Grid */
@@ -903,14 +909,21 @@ function navigateTo(path: string) {
   color: #FF6B35;
 }
 
+.fav-icon-svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: #FF6B35;
+}
+
 .empty-favs {
   padding: 14px 6px;
   text-align: center;
 }
 
-.empty-icon {
-  font-size: 20px;
-  opacity: 0.6;
+.empty-bookmark-svg {
+  color: #6E7387;
+  margin-bottom: 6px;
 }
 
 .empty-text {
@@ -1017,7 +1030,7 @@ function navigateTo(path: string) {
 
 .feed-title {
   font-size: 20px;
-  font-weight: 800;
+  font-weight: 700;
   margin: 0;
 }
 
@@ -1047,7 +1060,7 @@ function navigateTo(path: string) {
   color: #FF6B35;
 }
 
-/* Featured Hero Cards Grid matching screenshot */
+/* Featured Hero Cards Grid */
 .featured-cards-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1129,7 +1142,7 @@ function navigateTo(path: string) {
 
 .feat-title {
   font-size: 18px;
-  font-weight: 800;
+  font-weight: 700;
   margin: 0 0 10px 0;
   line-height: 1.35;
 }
@@ -1191,7 +1204,7 @@ function navigateTo(path: string) {
 /* Analytics Bento */
 .bento-section-title {
   font-size: 15px;
-  font-weight: 800;
+  font-weight: 700;
   color: #FFFFFF;
   letter-spacing: -0.01em;
 }
@@ -1282,7 +1295,7 @@ function navigateTo(path: string) {
 
 .digits {
   font-size: 20px;
-  font-weight: 800;
+  font-weight: 700;
   font-family: var(--vp-font-family-mono);
 }
 
@@ -1418,7 +1431,7 @@ function navigateTo(path: string) {
   background: #FF6B35;
   color: #FFFFFF;
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 700;
   padding: 2px 7px;
   border-radius: 9999px;
   box-shadow: 0 0 10px rgba(255, 107, 53, 0.6);
@@ -1447,7 +1460,7 @@ function navigateTo(path: string) {
 
 .section-title {
   font-size: 18px;
-  font-weight: 800;
+  font-weight: 700;
   margin: 0;
 }
 
@@ -1498,7 +1511,7 @@ function navigateTo(path: string) {
 
 .module-percent {
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 700;
   color: #FFFFFF;
 }
 
@@ -1573,7 +1586,7 @@ function navigateTo(path: string) {
   background: linear-gradient(135deg, #FF6B35 0%, #EA580C 100%);
   color: #FFFFFF;
   font-size: 18px;
-  font-weight: 800;
+  font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1582,7 +1595,7 @@ function navigateTo(path: string) {
 
 .profile-name {
   font-size: 16px;
-  font-weight: 800;
+  font-weight: 700;
   color: #FFFFFF;
   margin-bottom: 2px;
 }
@@ -1633,7 +1646,7 @@ function navigateTo(path: string) {
 
 .stat-num {
   font-size: 18px;
-  font-weight: 800;
+  font-weight: 700;
   color: #FFFFFF;
 }
 
@@ -1643,7 +1656,7 @@ function navigateTo(path: string) {
   text-transform: uppercase;
 }
 
-/* Action Cards Mini Grid matching screenshot */
+/* Action Cards Mini Grid */
 .action-cards-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1673,19 +1686,9 @@ function navigateTo(path: string) {
   gap: 6px;
 }
 
-.plus-icon {
-  font-size: 24px;
-  color: #FF6B35;
-  font-weight: 300;
-}
-
 .outline-card {
   background: #12131A;
   border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.line-art, .ladder-art {
-  font-size: 22px;
 }
 
 .mini-title {
@@ -1707,7 +1710,7 @@ function navigateTo(path: string) {
 
 .mini-title-bold {
   font-size: 13.5px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 @media (max-width: 1200px) {
