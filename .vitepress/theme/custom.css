@@ -1,97 +1,104 @@
 /* ==========================================================================
-   Repo-Wiki Design System: Anti-Vibe-Coding Standards & Tokens
-   Strict Typography: Avenir Next Cyr for literally everything
+   PySpark Interview Prep - Modern Wiki Design System
+   Clean, Minimal, Active & Easy on the Eyes
+   Primary Font: Open Sans | Code Font: Cabin
+   Inspired by Riddle UI & Kirrivan
    ========================================================================== */
 
-@import url('https://fonts.cdnfonts.com/css/avenir-next-cyr');
-
-/* Embedded @font-face rules guarantee font availability without external CSS blocking */
-@font-face {
-  font-family: 'Avenir Next Cyr';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: local('Avenir Next Cyr'), local('AvenirNextCyr-Regular'),
-       url('https://fonts.cdnfonts.com/s/14867/AvenirNextCyr-Regular.woff') format('woff');
-}
-
-@font-face {
-  font-family: 'Avenir Next Cyr';
-  font-style: italic;
-  font-weight: 400;
-  font-display: swap;
-  src: local('Avenir Next Cyr'), local('AvenirNextCyr-Italic'),
-       url('https://fonts.cdnfonts.com/s/14867/AvenirNextCyr-Italic.woff') format('woff');
-}
-
-@font-face {
-  font-family: 'Avenir Next Cyr';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: local('Avenir Next Cyr Medium'), local('AvenirNextCyr-Medium'),
-       url('https://fonts.cdnfonts.com/s/14867/AvenirNextCyr-Medium.woff') format('woff');
-}
-
-@font-face {
-  font-family: 'Avenir Next Cyr';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: local('Avenir Next Cyr Demi'), local('AvenirNextCyr-Demi'),
-       url('https://fonts.cdnfonts.com/s/14867/AvenirNextCyr-Demi.woff') format('woff');
-}
-
-@font-face {
-  font-family: 'Avenir Next Cyr';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: local('Avenir Next Cyr Bold'), local('AvenirNextCyr-Bold'),
-       url('https://fonts.cdnfonts.com/s/14867/AvenirNextCyr-Bold.woff') format('woff');
-}
+@import url('https://fonts.googleapis.com/css2?family=Cabin:ital,wght@0,400..700;1,400..700&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
 
 :root {
-  /* Font Family Definitions: Avenir Next Cyr with modern geometric fallback, NEVER Calibri */
-  --vp-font-family-base: "Avenir Next Cyr", "Avenir Next", "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --vp-font-family-headings: "Avenir Next Cyr", "Avenir Next", "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --vp-font-family-mono: "JetBrains Mono", Consolas, Monaco, monospace;
+  /* Font Family Definitions */
+  --vp-font-family-base: 'Open Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  --vp-font-family-headings: 'Open Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --vp-font-family-mono: 'Cabin', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
-  /* Surfaces & Canvas */
-  --canvas-bg: #0D0E12;
-  --surface-panel: #12131A;
-  --card-bg: #15161E;
-  --card-light: #FFFFFF;
-  --capsule-container: #191B24;
-  --track-bg: #232532;
+  /* Color System - Easy on the Eyes (Light Mode Default) */
+  --canvas-bg: #F8FAFC;
+  --surface-panel: #FFFFFF;
+  --card-bg: #FFFFFF;
+  --card-hover: #F1F5F9;
+  --capsule-container: #F1F5F9;
+  --track-bg: #E2E8F0;
 
   /* Borders */
-  --border-subtle: rgba(255, 255, 255, 0.07);
-  --border-medium: rgba(255, 255, 255, 0.12);
-  --border-active: rgba(255, 107, 53, 0.4);
+  --border-subtle: #E2E8F0;
+  --border-medium: #CBD5E1;
+  --border-active: #F97316;
 
-  /* Primary Brand & Spark Orange Accents */
-  --accent-orange: #FF6B35;
-  --accent-orange-glow: rgba(255, 107, 53, 0.35);
-  --accent-mint: #34D399;
-  --accent-mint-bg: rgba(52, 211, 153, 0.15);
-  --accent-coral: #F87171;
-  --accent-blue-soft: #E0E7FF;
-  --accent-blue-card: #EEF2FF;
+  /* Brand Accents (Apache Spark Warm Orange) */
+  --accent-orange: #F97316;
+  --accent-orange-dark: #EA580C;
+  --accent-orange-soft: rgba(249, 115, 22, 0.12);
+  --accent-mint: #10B981;
+  --accent-mint-bg: rgba(16, 185, 129, 0.12);
+  --accent-blue-soft: #F0F9FF;
+  --accent-blue-border: #BAE6FD;
+  --accent-blue-text: #0284C7;
 
-  /* Text Colors */
-  --text-primary: #FFFFFF;
-  --text-secondary: #9CA3AF;
-  --text-muted: #6E7387;
-  --text-dark: #1E293B;
+  /* Typography Colors */
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #64748B;
+  --text-dark: #0F172A;
 
-  /* VitePress Overrides */
-  --vp-c-brand-1: #FF6B35;
-  --vp-c-brand-2: #FF6B35;
-  --vp-c-brand-soft: rgba(255, 107, 53, 0.14);
+  /* VitePress Root Overrides */
+  --vp-c-bg: #F8FAFC;
+  --vp-c-bg-alt: #F1F5F9;
+  --vp-c-bg-elv: #FFFFFF;
+  --vp-c-bg-soft: #F1F5F9;
+  --vp-c-border: #E2E8F0;
+  --vp-c-divider: #E2E8F0;
+  --vp-c-gutter: #E2E8F0;
+  
+  --vp-c-text-1: #0F172A;
+  --vp-c-text-2: #475569;
+  --vp-c-text-3: #64748B;
+
+  --vp-c-brand-1: #F97316;
+  --vp-c-brand-2: #EA580C;
+  --vp-c-brand-3: #C2410C;
+  --vp-c-brand-soft: rgba(249, 115, 22, 0.12);
+
+  --vp-sidebar-bg-color: #FFFFFF;
+  --vp-nav-bg-color: rgba(255, 255, 255, 0.95);
 }
 
-/* Enforce Avenir Next Cyr across literally everything */
+/* Dark Theme Overrides (Rich, Soft Slate - No Eye Strain) */
+.dark {
+  --canvas-bg: #0B0F17;
+  --surface-panel: #111827;
+  --card-bg: #151D2E;
+  --card-hover: #1E293B;
+  --capsule-container: #1E293B;
+  --track-bg: #334155;
+
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-medium: rgba(255, 255, 255, 0.15);
+  --border-active: rgba(249, 115, 22, 0.6);
+
+  --text-primary: #F8FAFC;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+  --text-dark: #F8FAFC;
+
+  --vp-c-bg: #0B0F17;
+  --vp-c-bg-alt: #111827;
+  --vp-c-bg-elv: #151D2E;
+  --vp-c-bg-soft: #1E293B;
+  --vp-c-border: rgba(255, 255, 255, 0.08);
+  --vp-c-divider: rgba(255, 255, 255, 0.08);
+  --vp-c-gutter: rgba(255, 255, 255, 0.08);
+
+  --vp-c-text-1: #F8FAFC;
+  --vp-c-text-2: #94A3B8;
+  --vp-c-text-3: #64748B;
+
+  --vp-sidebar-bg-color: #0F1420;
+  --vp-nav-bg-color: rgba(11, 15, 23, 0.92);
+}
+
+/* Enforce Open Sans across all non-code elements */
 *, *::before, *::after,
 html, body, #app, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote,
@@ -99,7 +106,7 @@ a, abbr, acronym, address, big, cite,
 del, dfn, em, ins, q, s,
 small, strike, strong, sub, sup, tt, var,
 b, u, i, center,
-dl, dt, dd, ol, ul, li,
+dl, dt, dd,
 fieldset, form, label, legend,
 table, caption, tbody, tfoot, thead, tr, th, td,
 article, aside, canvas, details, embed, 
@@ -107,62 +114,322 @@ figure, figcaption, footer, header, hgroup,
 menu, nav, output, ruby, section, summary,
 time, mark, audio, video,
 input, button, select, textarea,
-.vp-doc, .vp-doc h1, .vp-doc h2, .vp-doc h3, .vp-doc h4, .vp-doc p, .vp-doc li,
+.vp-doc, .vp-doc h1, .vp-doc h2, .vp-doc h3, .vp-doc h4, .vp-doc p,
 .VPDoc, .VPContent, .VPNavBar, .VPNav, .title, .text, .link, .brand-logo-text,
-.spotlight-title, .column-title, .widget-title, .module-title,
-[class*="vp-"], [class*="dash-"], [class*="feat-"], [class*="card-"],
-[class*="module-"], [class*="filter-"], [class*="pomo-"], [class*="search-"],
-[class*="guide-"], [class*="quiz-"], [class*="question-"] {
-  font-family: 'Avenir Next Cyr', 'Avenir Next', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+[class*="vp-"], [class*="dash-"], [class*="card-"], [class*="feed-"] {
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
 }
 
+/* Enforce Cabin on all Code Elements */
+code, kbd, samp, pre, .pomo-digits, .digits, .code-snippet, pre code, :not(pre) > code {
+  font-family: 'Cabin', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+}
+
+/* Headings Typography */
 h1, h2, h3, h4, h5, h6 {
   font-weight: 700 !important;
-  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  letter-spacing: -0.015em;
 }
 
-code, kbd, samp, pre, .pomo-digits, .digits, .code-snippet {
-  font-family: var(--vp-font-family-mono) !important;
+/* ==========================================================================
+   Inside Each Wiki Page (Minimal & Simple Documentation - Riddle UI Style)
+   ========================================================================== */
+
+.VPDoc .container {
+  max-width: 860px !important;
+  margin: 0 auto !important;
+  padding: 32px 24px 80px !important;
 }
 
-/* Hide default VitePress redundant top navigation on home page */
-.home-page .VPNav {
-  display: none !important;
-}
-
-/* Reader Mode Article Formatting & Anti-Clip Rules */
 .vp-doc {
-  overflow-wrap: break-word !important;
-  word-wrap: break-word !important;
-  word-break: break-word !important;
-  min-width: 0 !important;
+  font-size: 15.5px !important;
+  line-height: 1.8 !important;
+  color: var(--text-primary) !important;
 }
 
+.vp-doc h1 {
+  font-size: 2.1rem !important;
+  line-height: 1.3 !important;
+  font-weight: 800 !important;
+  margin-bottom: 1.25rem !important;
+  padding-bottom: 0.75rem !important;
+  border-bottom: 1px solid var(--border-subtle) !important;
+  letter-spacing: -0.02em !important;
+}
+
+.vp-doc h2 {
+  font-size: 1.45rem !important;
+  line-height: 1.4 !important;
+  font-weight: 700 !important;
+  margin-top: 2.25rem !important;
+  margin-bottom: 0.85rem !important;
+  letter-spacing: -0.015em !important;
+}
+
+.vp-doc h3 {
+  font-size: 1.2rem !important;
+  line-height: 1.45 !important;
+  font-weight: 600 !important;
+  margin-top: 1.75rem !important;
+  margin-bottom: 0.75rem !important;
+  color: var(--text-primary) !important;
+}
+
+.vp-doc p {
+  margin-top: 0.9rem !important;
+  margin-bottom: 0.9rem !important;
+  line-height: 1.8 !important;
+  color: var(--text-secondary) !important;
+}
+
+/* Bullet Lists (Riddle UI Clean Style) */
+.vp-doc ul {
+  padding-left: 1.4rem !important;
+  margin: 1rem 0 1.5rem !important;
+}
+
+.vp-doc ul > li {
+  margin-top: 0.5rem !important;
+  margin-bottom: 0.5rem !important;
+  line-height: 1.75 !important;
+  color: var(--text-secondary) !important;
+}
+
+.vp-doc ul > li::marker {
+  color: var(--accent-orange) !important;
+}
+
+/* Procedural Step Lists (Kirrivan Connected Steps Style) */
+.vp-doc ol {
+  list-style: none !important;
+  counter-reset: step-counter !important;
+  padding-left: 0 !important;
+  margin: 1.75rem 0 2rem !important;
+  position: relative;
+}
+
+.vp-doc ol::before {
+  content: '';
+  position: absolute;
+  top: 18px;
+  bottom: 24px;
+  left: 17px;
+  width: 2px;
+  background: var(--border-subtle);
+  z-index: 0;
+}
+
+.vp-doc ol > li {
+  counter-increment: step-counter !important;
+  position: relative !important;
+  padding-left: 50px !important;
+  margin-bottom: 1.25rem !important;
+  min-height: 38px !important;
+  line-height: 1.7 !important;
+  color: var(--text-secondary) !important;
+}
+
+.vp-doc ol > li::before {
+  content: counter(step-counter) !important;
+  position: absolute !important;
+  left: 0 !important;
+  top: 2px !important;
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 10px !important;
+  background: var(--surface-panel) !important;
+  border: 2px solid var(--accent-orange) !important;
+  color: var(--accent-orange) !important;
+  font-weight: 700 !important;
+  font-size: 14px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04) !important;
+  z-index: 1 !important;
+}
+
+/* Code Blocks (Cabin Font & Clean High-Contrast Surfaces) */
 .vp-doc pre {
+  padding: 18px 20px !important;
+  border-radius: 12px !important;
+  background: #0F172A !important;
+  color: #F8FAFC !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
   overflow-x: auto !important;
-  max-width: 100% !important;
-  border-radius: 14px !important;
+  font-size: 14.5px !important;
+  line-height: 1.65 !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important;
+}
+
+.vp-doc code {
+  font-size: 0.9em !important;
+}
+
+:not(pre) > code {
+  background: rgba(249, 115, 22, 0.1) !important;
+  color: var(--accent-orange-dark) !important;
+  border: 1px solid rgba(249, 115, 22, 0.2) !important;
+  padding: 2px 6px !important;
+  border-radius: 5px !important;
+  font-size: 0.88em !important;
+}
+
+.dark :not(pre) > code {
+  background: rgba(249, 115, 22, 0.15) !important;
+  color: #FB923C !important;
+  border-color: rgba(249, 115, 22, 0.3) !important;
+}
+
+/* Clean Minimal Callouts (> [!NOTE], > [!IMPORTANT], etc.) */
+.custom-block {
+  margin: 1.5rem 0 !important;
+  padding: 14px 18px !important;
+  border-radius: 10px !important;
+  border-left-width: 4px !important;
+  background: var(--surface-panel) !important;
   border: 1px solid var(--border-subtle) !important;
 }
 
+.custom-block.info, .custom-block.note {
+  border-left: 4px solid #0EA5E9 !important;
+  background: rgba(14, 165, 233, 0.06) !important;
+}
+
+.custom-block.tip {
+  border-left: 4px solid var(--accent-mint) !important;
+  background: var(--accent-mint-bg) !important;
+}
+
+.custom-block.warning {
+  border-left: 4px solid #F59E0B !important;
+  background: rgba(245, 158, 11, 0.06) !important;
+}
+
+.custom-block.danger {
+  border-left: 4px solid #EF4444 !important;
+  background: rgba(239, 68, 68, 0.06) !important;
+}
+
+.custom-block .custom-block-title {
+  font-weight: 700 !important;
+  font-size: 14px !important;
+  margin-bottom: 4px !important;
+}
+
+/* Clean Tables */
 .vp-doc table {
-  display: block;
-  width: 100%;
-  overflow-x: auto;
-  border-collapse: collapse;
-  margin: 1.5rem 0;
-  border-radius: 12px;
+  width: 100% !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  margin: 1.5rem 0 !important;
+  border-radius: 10px !important;
+  overflow: hidden !important;
+  border: 1px solid var(--border-subtle) !important;
 }
 
-.vp-doc th, .vp-doc td {
-  padding: 10px 16px;
-  border: 1px solid var(--border-subtle);
+.vp-doc th {
+  background: var(--capsule-container) !important;
+  font-weight: 600 !important;
+  padding: 10px 16px !important;
+  color: var(--text-primary) !important;
+  border-bottom: 1px solid var(--border-subtle) !important;
 }
 
-/* Minimal Custom Scrollbar */
+.vp-doc td {
+  padding: 10px 16px !important;
+  border-bottom: 1px solid var(--border-subtle) !important;
+  color: var(--text-secondary) !important;
+}
+
+.vp-doc tr:last-child td {
+  border-bottom: none !important;
+}
+
+/* ==========================================================================
+   Left Sidebar Navigation Styling (Riddle UI Tree Hierarchy)
+   ========================================================================== */
+
+.VPSidebar {
+  background: var(--vp-sidebar-bg-color) !important;
+  border-right: 1px solid var(--border-subtle) !important;
+}
+
+.VPSidebarItem.level-0 > .item .text {
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  color: var(--text-muted) !important;
+}
+
+.VPSidebarItem.level-1 > .item .text {
+  font-size: 13.5px !important;
+  font-weight: 600 !important;
+  color: var(--text-primary) !important;
+}
+
+.VPSidebarItem.level-2 > .item .text,
+.VPSidebarItem.level-3 > .item .text {
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  color: var(--text-secondary) !important;
+}
+
+/* Active Item - Soft Rounded Pill with Dot (Image 2 Riddle UI) */
+.VPSidebarItem.is-active > .item {
+  background: var(--accent-orange-soft) !important;
+  border-radius: 8px !important;
+}
+
+.VPSidebarItem.is-active > .item .text {
+  color: var(--accent-orange-dark) !important;
+  font-weight: 600 !important;
+}
+
+.dark .VPSidebarItem.is-active > .item .text {
+  color: #FB923C !important;
+}
+
+/* Right TOC ("On this page") Styling */
+.VPDocAside {
+  border-left: 1px solid var(--border-subtle) !important;
+  padding-left: 16px !important;
+}
+
+.VPDocAside .outline-title {
+  font-size: 12.5px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  color: var(--text-muted) !important;
+}
+
+.VPDocAside .outline-link {
+  font-size: 13px !important;
+  color: var(--text-secondary) !important;
+  line-height: 1.6 !important;
+}
+
+.VPDocAside .outline-link.active {
+  color: var(--accent-orange-dark) !important;
+  font-weight: 600 !important;
+  border-left: 2px solid var(--accent-orange) !important;
+  padding-left: 6px !important;
+}
+
+/* Top Navbar Styling */
+.VPNavBar {
+  background: var(--vp-nav-bg-color) !important;
+  backdrop-filter: blur(12px) !important;
+  border-bottom: 1px solid var(--border-subtle) !important;
+}
+
+/* Subtle Modern Scrollbar */
 ::-webkit-scrollbar {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -170,10 +437,10 @@ code, kbd, samp, pre, .pomo-digits, .digits, .code-snippet {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(148, 163, 184, 0.3);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.28);
+  background: rgba(148, 163, 184, 0.5);
 }

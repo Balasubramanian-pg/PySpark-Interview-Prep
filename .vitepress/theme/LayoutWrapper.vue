@@ -134,47 +134,49 @@ function openSearch() {
 .reader-top-bar {
   display: flex;
   align-items: center;
-  gap: 16px;
-  margin-left: 20px;
+  gap: 14px;
+  margin-left: 16px;
 }
 
 .reader-search-trigger {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--vp-c-bg-alt);
+  border: 1px solid var(--border-subtle);
   padding: 6px 14px;
-  border-radius: 9999px;
-  color: #9CA3AF;
+  border-radius: 20px;
+  color: var(--text-muted);
   font-size: 13px;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .reader-search-trigger:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #FFFFFF;
-  border-color: rgba(255, 107, 53, 0.4);
+  background: var(--surface-panel);
+  color: var(--text-primary);
+  border-color: var(--accent-orange);
 }
 
 .search-svg {
-  color: #9CA3AF;
+  color: var(--text-muted);
   flex-shrink: 0;
 }
 
 .kbd-shortcut {
   font-size: 10px;
-  background: rgba(255, 255, 255, 0.1);
+  font-family: var(--vp-font-family-mono);
+  background: var(--surface-panel);
+  border: 1px solid var(--border-subtle);
   padding: 2px 6px;
   border-radius: 4px;
-  color: #D1D5DB;
+  color: var(--text-secondary);
 }
 
 .reader-quick-actions {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .action-icon-link {
@@ -184,31 +186,30 @@ function openSearch() {
   width: 32px;
   height: 32px;
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #9CA3AF;
+  background: var(--vp-c-bg-alt);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
   text-decoration: none;
   transition: all 0.2s ease;
 }
 
 .action-icon-link:hover {
-  background: rgba(255, 107, 53, 0.15);
-  border-color: rgba(255, 107, 53, 0.4);
-  color: #FF6B35;
+  background: var(--accent-orange-soft);
+  border-color: var(--accent-orange);
+  color: var(--accent-orange-dark);
 }
 
 .floating-pomo-pill {
   display: flex;
   align-items: center;
   gap: 6px;
-  background: rgba(255, 107, 53, 0.18);
-  border: 1px solid rgba(255, 107, 53, 0.45);
-  padding: 4px 12px;
+  background: var(--accent-orange-soft);
+  border: 1px solid rgba(249, 115, 22, 0.4);
+  padding: 4px 10px;
   border-radius: 9999px;
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: 700;
-  color: #FF6B35;
-  box-shadow: 0 0 12px rgba(255, 107, 53, 0.25);
+  color: var(--accent-orange-dark);
   animation: pulseFlame 2s infinite ease-in-out;
 }
 

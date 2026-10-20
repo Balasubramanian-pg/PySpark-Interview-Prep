@@ -3,13 +3,36 @@ import fs from 'node:fs'
 import path from 'node:path'
 
 // Read precomputed sidebar
-let sidebar = {}
+let sidebarData: Record<string, any[]> = {}
 try {
-  const sidebarData = fs.readFileSync(path.resolve(__dirname, 'sidebar.json'), 'utf-8')
-  sidebar = JSON.parse(sidebarData)
+  const raw = fs.readFileSync(path.resolve(__dirname, 'sidebar.json'), 'utf-8')
+  sidebarData = JSON.parse(raw)
 } catch (e) {
-  sidebar = {}
+  sidebarData = {}
 }
+
+const unifiedSidebar = [
+  {
+    text: '1. Fundamentals',
+    collapsed: false,
+    items: sidebarData['/1. Fundamentals/'] || []
+  },
+  {
+    text: '2. Intermediate',
+    collapsed: true,
+    items: sidebarData['/2. Intermediate/'] || []
+  },
+  {
+    text: '3. Advanced',
+    collapsed: true,
+    items: sidebarData['/3. Advanced/'] || []
+  },
+  {
+    text: '4. Senior Dev',
+    collapsed: true,
+    items: sidebarData['/4. Senior Dev/'] || []
+  }
+]
 
 export default defineConfig({
   title: 'PySpark Interview Prep',
@@ -19,25 +42,36 @@ export default defineConfig({
   head: [
     ['link', { rel: 'preconnect', href: 'https://fonts.googleapis.com' }],
     ['link', { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' }],
-    ['link', { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap' }],
-    ['link', { rel: 'preconnect', href: 'https://fonts.cdnfonts.com', crossorigin: '' }],
-    ['link', { rel: 'stylesheet', href: 'https://fonts.cdnfonts.com/css/avenir-next-cyr' }],
-    ['meta', { name: 'theme-color', content: '#0D0E12' }],
+    ['link', { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Cabin:ital,wght@0,400..700;1,400..700&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap' }],
+    ['meta', { name: 'theme-color', content: '#f8fafc' }],
     ['meta', { name: 'author', content: 'Balasubramanian PG' }],
     ['meta', { property: 'og:title', content: 'PySpark Interview Prep Wiki' }],
     ['meta', { property: 'og:description', content: '260+ Curated PySpark Interview Questions, Architecture Diagrams, and Interactive Study Engine' }]
   ],
 
   themeConfig: {
-    siteTitle: 'PySpark Prep',
+    siteTitle: 'PySpark Wiki',
     logo: {
       light: '/spark-logo.svg',
       dark: '/spark-logo.svg',
-      alt: 'PySpark Prep'
+      alt: 'PySpark Wiki'
     },
-    nav: [],
-    sidebar: sidebar,
-    socialLinks: [],
+    nav: [
+      { text: 'Fundamentals', link: '/1. Fundamentals/1.1 Spark Architecture Basics/1.1.1 What is the role of the Spark Driver' },
+      { text: 'Intermediate', link: '/2. Intermediate/2.1 Joins And Join Types/2.1.1 What are the different types of joins supported in PySpark' },
+      { text: 'Advanced', link: '/3. Advanced/3.1 Partitioning And Bucketing/3.1.1 What is the difference between partitioning and bucketing' },
+      { text: 'Senior Dev', link: '/4. Senior Dev/4.1 Memory Management And OOM Errors/4.1.1 How does PySpark manage JVM off-heap and on-heap memory' }
+    ],
+    sidebar: {
+      '/': unifiedSidebar,
+      '/1. Fundamentals/': unifiedSidebar,
+      '/2. Intermediate/': unifiedSidebar,
+      '/3. Advanced/': unifiedSidebar,
+      '/4. Senior Dev/': unifiedSidebar
+    },
+    socialLinks: [
+      { icon: 'github', link: 'https://github.com/Balasubramanian-pg/PySpark-Interview-Prep' }
+    ],
     footer: {
       message: 'Zero-backend, client-first interactive learning portal for PySpark engineers.',
       copyright: 'Maintained by Balasubramanian PG'
