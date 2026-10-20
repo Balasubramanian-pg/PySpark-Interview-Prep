@@ -97,38 +97,67 @@ function navigateTo(path: string) {
 
 <template>
   <div class="completion-bar">
-    <!-- Active Recall & Spaced Repetition Bar -->
+    <!-- Active Recall & Spaced Repetition Card -->
     <div class="srs-retention-pill">
       <div class="srs-pill-header">
-        <span class="pill-tag">ACTIVE RECALL CHECK</span>
-        <span class="pill-desc">How easily could you answer this in a real interview?</span>
+        <div class="pill-badge-row">
+          <span class="pill-tag">ACTIVE RECALL CHECK</span>
+          <span class="pill-retention-badge">Spaced Repetition</span>
+        </div>
+        <h4 class="pill-heading">How easily could you answer this question in a live technical interview?</h4>
+        <p class="pill-subtext">Rating your confidence schedules this question into your personalized Ebbinghaus spaced repetition review queue.</p>
       </div>
 
       <div v-if="!srsGraded" class="srs-pill-actions">
         <button class="srs-btn hard" @click="handleSRSGrade('hard')">
-          <span class="srs-btn-label">
-            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 4.44-2.04z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-4.44-2.04z"/></svg>
-            Hard
-          </span>
-          <small>Review in 1d</small>
+          <div class="srs-btn-icon-wrap hard-icon">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+          </div>
+          <div class="srs-btn-content">
+            <span class="srs-btn-title">Hard</span>
+            <span class="srs-btn-interval">Review in 1 day</span>
+          </div>
         </button>
+
         <button class="srs-btn good" @click="handleSRSGrade('good')">
-          <span class="srs-btn-label">
-            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-            Good
-          </span>
-          <small>Review in 3d</small>
+          <div class="srs-btn-icon-wrap good-icon">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+          </div>
+          <div class="srs-btn-content">
+            <span class="srs-btn-title">Good</span>
+            <span class="srs-btn-interval">Review in 3 days</span>
+          </div>
         </button>
+
         <button class="srs-btn mastered" @click="handleSRSGrade('mastered')">
-          <span class="srs-btn-label">
-            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.45 1-1 1H8c-.55 0-1 .45-1 1v1h10v-1c0-.55-.45-1-1-1h-1c-.55 0-1-.45-1-1v-2.34"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg>
-            Mastered
-          </span>
-          <small>Review in 7d</small>
+          <div class="srs-btn-icon-wrap mastered-icon">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.45 1-1 1H8c-.55 0-1 .45-1 1v1h10v-1c0-.55-.45-1-1-1h-1c-.55 0-1-.45-1-1v-2.34"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/>
+            </svg>
+          </div>
+          <div class="srs-btn-content">
+            <span class="srs-btn-title">Mastered</span>
+            <span class="srs-btn-interval">Review in 7 days</span>
+          </div>
         </button>
       </div>
+
       <div v-else class="srs-graded-confirmation">
-        <span>Scheduled into your Ebbinghaus Spaced Repetition queue!</span>
+        <div class="confirm-icon-wrap">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#10B981" stroke-width="2.5">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </div>
+        <div class="confirm-text-wrap">
+          <strong>Review Scheduled!</strong>
+          <p>Scheduled into your Spaced Repetition queue according to the Ebbinghaus forgetting curve.</p>
+        </div>
       </div>
     </div>
 
@@ -207,101 +236,175 @@ function navigateTo(path: string) {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 14px;
+  gap: 16px;
   padding: 0;
+  font-family: 'Jost', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 .srs-retention-pill {
   width: 100%;
   max-width: 100%;
-  background: var(--surface-panel);
+  background: #FFFFFF;
   border: 1px solid var(--border-subtle);
-  border-radius: 12px;
-  padding: 12px 20px;
+  border-radius: 14px;
+  padding: 24px 28px;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  flex-direction: column;
+  gap: 18px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
 }
 
-.dark .srs-retention-pill {
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
-}
-
-.srs-pill-header {
+.pill-badge-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  margin-bottom: 8px;
 }
 
 .pill-tag {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   color: var(--accent-orange-dark);
   letter-spacing: 0.06em;
   background: var(--accent-orange-soft);
-  padding: 2px 6px;
-  border-radius: 4px;
+  padding: 3px 8px;
+  border-radius: 5px;
 }
 
-.pill-desc {
-  font-size: 13px;
+.pill-retention-badge {
+  font-size: 11px;
+  font-weight: 600;
   color: var(--text-muted);
+  background: #F1F5F9;
+  padding: 3px 8px;
+  border-radius: 5px;
+}
+
+.pill-heading {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 4px 0;
+  letter-spacing: -0.01em;
+}
+
+.pill-subtext {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.5;
 }
 
 .srs-pill-actions {
-  display: flex;
-  gap: 8px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  width: 100%;
 }
 
 .srs-btn {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  background: var(--vp-c-bg-alt);
-  border: 1px solid var(--border-subtle);
-  border-radius: 8px;
-  padding: 4px 10px;
+  justify-content: flex-start;
+  gap: 14px;
+  padding: 14px 20px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border-subtle);
+  background: #FFFFFF;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
 }
 
-.srs-btn span {
-  font-size: 11.5px;
+.srs-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.srs-btn-icon-wrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.srs-btn.hard .hard-icon {
+  background: #FEE2E2;
+  color: #DC2626;
+}
+
+.srs-btn.hard:hover {
+  border-color: #F87171;
+  background: #FEF2F2;
+}
+
+.srs-btn.good .good-icon {
+  background: #FEF3C7;
+  color: #D97706;
+}
+
+.srs-btn.good:hover {
+  border-color: #FBBF24;
+  background: #FFFBEB;
+}
+
+.srs-btn.mastered .mastered-icon {
+  background: #D1FAE5;
+  color: #059669;
+}
+
+.srs-btn.mastered:hover {
+  border-color: #34D399;
+  background: #ECFDF5;
+}
+
+.srs-btn-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.srs-btn-title {
+  font-size: 15px;
   font-weight: 700;
   color: var(--text-primary);
 }
 
-.srs-btn-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.srs-btn small {
-  font-size: 9px;
+.srs-btn-interval {
+  font-size: 11.5px;
   color: var(--text-muted);
-}
-
-.srs-btn.hard:hover {
-  border-color: #EF4444;
-  background: rgba(239, 68, 68, 0.1);
-}
-
-.srs-btn.good:hover {
-  border-color: #F59E0B;
-  background: rgba(245, 158, 11, 0.1);
-}
-
-.srs-btn.mastered:hover {
-  border-color: #10B981;
-  background: rgba(16, 185, 129, 0.1);
+  font-weight: 500;
 }
 
 .srs-graded-confirmation {
-  font-size: 11.5px;
-  font-weight: 600;
-  color: #10B981;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  border-radius: 10px;
+  background: #F0FDF4;
+  border: 1px solid #BBF7D0;
+}
+
+.confirm-icon-wrap {
+  flex-shrink: 0;
+}
+
+.confirm-text-wrap strong {
+  display: block;
+  font-size: 14px;
+  color: #15803D;
+  margin-bottom: 2px;
+}
+
+.confirm-text-wrap p {
+  margin: 0;
+  font-size: 12.5px;
+  color: #166534;
 }
 
 .completion-inner {
@@ -311,15 +414,11 @@ function navigateTo(path: string) {
   gap: 16px;
   width: 100%;
   max-width: 100%;
-  background: var(--surface-panel);
+  background: #FFFFFF;
   border: 1px solid var(--border-subtle);
   border-radius: 12px;
-  padding: 12px 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-}
-
-.dark .completion-inner {
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+  padding: 14px 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .nav-links {
@@ -332,12 +431,12 @@ function navigateTo(path: string) {
   display: flex;
   align-items: center;
   gap: 6px;
-  background: var(--vp-c-bg-alt);
+  background: #FFFFFF;
   border: 1px solid var(--border-subtle);
   color: var(--text-secondary);
-  font-size: 13px;
-  font-weight: 500;
-  padding: 7px 13px;
+  font-size: 13.5px;
+  font-weight: 600;
+  padding: 8px 16px;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -358,19 +457,19 @@ function navigateTo(path: string) {
 .action-buttons {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .fav-btn {
   display: flex;
   align-items: center;
   gap: 7px;
-  background: var(--vp-c-bg-alt);
+  background: #FFFFFF;
   border: 1px solid var(--border-subtle);
   color: var(--text-secondary);
-  font-size: 13px;
-  font-weight: 500;
-  padding: 7px 13px;
+  font-size: 13.5px;
+  font-weight: 600;
+  padding: 8px 16px;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -395,30 +494,33 @@ function navigateTo(path: string) {
   background: var(--accent-orange);
   border: none;
   color: #FFFFFF;
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 600;
-  padding: 8px 16px;
+  padding: 9px 18px;
   border-radius: 8px;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.25);
   transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(249, 115, 22, 0.3);
 }
 
 .complete-btn:hover {
   background: var(--accent-orange-dark);
   transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.35);
 }
 
 .complete-btn.completed {
   background: var(--accent-mint);
-  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
+  box-shadow: 0 1px 3px rgba(16, 185, 129, 0.3);
 }
 
-@media (max-width: 680px) {
-  .srs-retention-pill {
-    flex-direction: column;
-    gap: 8px;
-    align-items: flex-start;
+.complete-btn.completed:hover {
+  background: #059669;
+}
+
+@media (max-width: 768px) {
+  .srs-pill-actions {
+    grid-template-columns: 1fr;
   }
   .completion-inner {
     flex-direction: column;

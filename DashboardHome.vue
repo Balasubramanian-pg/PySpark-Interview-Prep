@@ -234,80 +234,19 @@ onUnmounted(() => {
 <template>
   <div class="app-viewport-root">
     <!-- ═════════════════════════════════════════════════════════════════
-         TOP NAVIGATION BAR (Dark charcoal Kirrivan style, full width)
-         ═════════════════════════════════════════════════════════════════ -->
-    <header class="app-top-header">
-      <div class="top-header-left">
-        <div class="app-brand" @click="selectTrack('overview')">
-          <svg class="brand-spark-icon" viewBox="0 0 24 24" width="22" height="22" fill="#F97316">
-            <path d="M12 0c-.28 0-.5.22-.5.5 0 2.24-1.32 3.63-2.6 4.98C7.54 6.89 6 8.52 6 11.5c0 3.59 2.91 6.5 6.5 6.5s6.5-2.91 6.5-6.5c0-4.08-3.08-6.19-5.58-8.75C12.74 2.05 12.08 1.13 12 0zm0 15c-1.93 0-3.5-1.57-3.5-3.5 0-1.3.7-2.31 1.6-3.3.8-1 1.9-2.12 1.9-4.2 1.34 1.5 3.5 3.32 3.5 6 0 2.76-1.57 5-3.5 5z"/>
-          </svg>
-          <span class="brand-name">PySpark Wiki</span>
-        </div>
-        <div class="header-divider"></div>
-        <span class="header-module-label">Curriculum</span>
-      </div>
-
-      <!-- Center Search Bar -->
-      <div class="top-header-center">
-        <div class="search-input-pill" @click="openSearch">
-          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
-          <span class="search-text">Search 260+ questions, concepts, code...</span>
-          <span class="search-shortcut">Ctrl K</span>
-        </div>
-      </div>
-
-      <!-- Right Header Actions -->
-      <div class="top-header-right">
-        <!-- Streak pill -->
-        <div class="streak-badge" :title="`Streak: ${studyStreak.currentStreak} days`">
-          <svg viewBox="0 0 24 24" width="13" height="13" fill="#F97316">
-            <path d="M12 0c-.28 0-.5.22-.5.5 0 2.24-1.32 3.63-2.6 4.98C7.54 6.89 6 8.52 6 11.5c0 3.59 2.91 6.5 6.5 6.5s6.5-2.91 6.5-6.5c0-4.08-3.08-6.19-5.58-8.75C12.74 2.05 12.08 1.13 12 0zm0 15c-1.93 0-3.5-1.57-3.5-3.5 0-1.3.7-2.31 1.6-3.3.8-1 1.9-2.12 1.9-4.2 1.34 1.5 3.5 3.32 3.5 6 0 2.76-1.57 5-3.5 5z"/>
-          </svg>
-          <span>{{ studyStreak.currentStreak > 0 ? `${studyStreak.currentStreak}d Streak` : 'Active' }}</span>
-        </div>
-
-        <!-- 5-min Diagnostic -->
-        <button class="header-action-btn" @click="showDiagnosticModal = true">
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"></circle>
-            <circle cx="12" cy="12" r="6"></circle>
-          </svg>
-          <span>Diagnostic</span>
-        </button>
-
-        <!-- Flashcards -->
-        <button class="header-action-btn" @click="showFlashcardModal = true">
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
-            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-          </svg>
-          <span>Flashcards</span>
-        </button>
-
-        <!-- GitHub -->
-        <a
-          href="https://github.com/Balasubramanian-pg/PySpark-Interview-Prep"
-          target="_blank"
-          rel="noopener"
-          class="header-icon-circle"
-          title="GitHub Repository"
-        >
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-          </svg>
-        </a>
-      </div>
-    </header>
-
-    <!-- ═════════════════════════════════════════════════════════════════
          FULL 1920 CANVAS: Icon Rail + Secondary Panel + Main Workspace
          ═════════════════════════════════════════════════════════════════ -->
     <div class="app-workspace-body">
       <!-- 1. Slim Left Icon Rail (Kirrivan far left strip, 60px) -->
       <nav class="icon-rail">
+        <!-- Streak Indicator in Rail -->
+        <div class="rail-streak-badge" :title="`Study Streak: ${studyStreak.currentStreak} days active`">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="#F97316">
+            <path d="M12 0c-.28 0-.5.22-.5.5 0 2.24-1.32 3.63-2.6 4.98C7.54 6.89 6 8.52 6 11.5c0 3.59 2.91 6.5 6.5 6.5s6.5-2.91 6.5-6.5c0-4.08-3.08-6.19-5.58-8.75C12.74 2.05 12.08 1.13 12 0zm0 15c-1.93 0-3.5-1.57-3.5-3.5 0-1.3.7-2.31 1.6-3.3.8-1 1.9-2.12 1.9-4.2 1.34 1.5 3.5 3.32 3.5 6 0 2.76-1.57 5-3.5 5z"/>
+          </svg>
+          <span class="rail-streak-num">{{ studyStreak.currentStreak > 0 ? `${studyStreak.currentStreak}d` : '1d' }}</span>
+        </div>
+
         <button
           class="rail-btn"
           :class="{ active: activeView.startsWith('1.') || activeView.startsWith('2.') || activeView.startsWith('3.') || activeView.startsWith('4.') || activeView === 'overview' }"
@@ -557,7 +496,7 @@ onUnmounted(() => {
                 {{ currentTrackMeta ? currentTrackMeta.subtitle : 'Personal collection of PySpark interview concepts and architectural patterns.' }}
               </p>
               <div class="preview-meta-row">
-                <span class="meta-item">{{ activeQuestions.length }} steps</span>
+                <span class="meta-item">{{ activeQuestions.length }} lessons</span>
                 <span class="meta-dot">&bull;</span>
                 <span class="meta-item">{{ currentTrackMeta ? `${getTrackProgress(currentTrackMeta.id).completed} of ${currentTrackMeta.count} completed` : `${activeQuestions.length} questions` }}</span>
               </div>
@@ -586,7 +525,7 @@ onUnmounted(() => {
               <!-- Step Pill & Vertical Connected Line -->
               <div class="timeline-gutter">
                 <div class="step-counter-pill">
-                  Steep {{ index + 1 }}
+                  Lesson {{ index + 1 }}
                 </div>
                 <div v-if="index < activeQuestions.length - 1" class="connecting-line"></div>
               </div>
@@ -686,154 +625,26 @@ onUnmounted(() => {
   overflow-x: hidden;
 }
 
-/* ─── Top Header (Dark Charcoal Kirrivan Style, Full Width) ─────────────── */
-.app-top-header {
-  width: 100%;
-  height: 56px;
-  background: #181920;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+/* ─── Rail Streak Badge ─────────────────────────────────────────────────── */
+.rail-streak-badge {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 24px;
-  flex-shrink: 0;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.top-header-left {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.app-brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-}
-
-.brand-spark-icon {
-  flex-shrink: 0;
-}
-
-.brand-name {
-  font-size: 17px;
-  font-weight: 700;
-  color: #FFFFFF;
-  letter-spacing: -0.01em;
-}
-
-.header-divider {
-  width: 1px;
-  height: 20px;
-  background: rgba(255, 255, 255, 0.15);
-}
-
-.header-module-label {
-  font-size: 14px;
-  font-weight: 500;
-  color: #9CA3AF;
-}
-
-.top-header-center {
-  flex: 1;
-  max-width: 520px;
-  margin: 0 24px;
-}
-
-.search-input-pill {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  padding: 7px 14px;
-  border-radius: 8px;
-  color: #9CA3AF;
-  font-size: 13.5px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.search-input-pill:hover {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: #F97316;
-  color: #FFFFFF;
-}
-
-.search-text {
-  flex: 1;
-  text-align: left;
-}
-
-.search-shortcut {
-  font-size: 11px;
-  font-family: 'Cabin', monospace;
-  background: rgba(255, 255, 255, 0.1);
-  padding: 2px 6px;
-  border-radius: 4px;
-  color: #D1D5DB;
-}
-
-.top-header-right {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.streak-badge {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(249, 115, 22, 0.15);
-  border: 1px solid rgba(249, 115, 22, 0.35);
-  padding: 5px 10px;
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 600;
-  color: #F97316;
-}
-
-.header-action-btn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 12.5px;
-  font-weight: 600;
-  color: #D1D5DB;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.header-action-btn:hover {
-  background: rgba(255, 255, 255, 0.15);
-  color: #FFFFFF;
-}
-
-.header-icon-circle {
-  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.08);
-  color: #D1D5DB;
-  text-decoration: none;
-  transition: all 0.2s ease;
+  gap: 2px;
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background: rgba(249, 115, 22, 0.08);
+  border: 1px solid rgba(249, 115, 22, 0.25);
+  margin-bottom: 8px;
+  cursor: pointer;
 }
 
-.header-icon-circle:hover {
-  background: rgba(249, 115, 22, 0.2);
-  color: #F97316;
+.rail-streak-num {
+  font-size: 10px;
+  font-weight: 700;
+  color: #EA580C;
 }
 
 /* ─── Body Layout: Icon Rail + Secondary Panel + Main Canvas ────────────── */
@@ -1400,13 +1211,14 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 68px;
+  width: 80px;
   flex-shrink: 0;
 }
 
 .step-counter-pill {
-  width: 68px;
+  min-width: 76px;
   height: 28px;
+  padding: 0 10px;
   background: #111827;
   color: #FFFFFF;
   border-radius: 6px;
@@ -1416,6 +1228,7 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   letter-spacing: 0.02em;
+  white-space: nowrap;
   z-index: 2;
 }
 
