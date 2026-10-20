@@ -82,7 +82,7 @@ function openSearch() {
 
         <!-- Active Pomodoro Indicator with SVG flame -->
         <div v-if="pomoRunning" class="floating-pomo-pill">
-          <svg class="flame-svg" viewBox="0 0 24 24" width="14" height="14" fill="#FF6B35">
+          <svg class="flame-svg" viewBox="0 0 24 24" width="14" height="14" fill="#2563EB">
             <path d="M12 0c-.28 0-.5.22-.5.5 0 2.24-1.32 3.63-2.6 4.98C7.54 6.89 6 8.52 6 11.5c0 3.59 2.91 6.5 6.5 6.5s6.5-2.91 6.5-6.5c0-4.08-3.08-6.19-5.58-8.75C12.74 2.05 12.08 1.13 12 0zm0 15c-1.93 0-3.5-1.57-3.5-3.5 0-1.3.7-2.31 1.6-3.3.8-1 1.9-2.12 1.9-4.2 1.34 1.5 3.5 3.32 3.5 6 0 2.76-1.57 5-3.5 5z"/>
           </svg>
           <span class="pomo-digits">{{ pomoFormattedTime }}</span>

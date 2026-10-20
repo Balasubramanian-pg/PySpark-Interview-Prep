@@ -99,7 +99,7 @@ function downloadCheatSheet() {
 const completedCount = computed(() => getCompletedLessons().length)
 const totalCount = computed(() => searchIndexData.length)
 const badgeText = computed(() => {
-  return `[![PySpark Interview Mastery](https://img.shields.io/badge/PySpark_Interview_Hub-Staff_Readiness_${completedCount.value}%2F${totalCount.value}-FF6B35?style=for-the-badge&logo=apachespark&logoColor=white)](https://github.com/Balasubramanian-pg/PySpark-Interview-Prep)`
+  return `[![PySpark Interview Mastery](https://img.shields.io/badge/PySpark_Interview_Hub-Staff_Readiness_${completedCount.value}%2F${totalCount.value}-2563EB?style=for-the-badge&logo=apachespark&logoColor=white)](https://github.com/Balasubramanian-pg/PySpark-Interview-Prep)`
 })
 
 const badgeCopied = ref(false)
@@ -227,7 +227,7 @@ function copyBadge() {
           </p>
           <div class="badge-preview-wrap">
             <div class="badge-pill">
-              <svg class="spark-logo-mini" viewBox="0 0 24 24" width="16" height="16" fill="#E25A1C">
+              <svg class="spark-logo-mini" viewBox="0 0 24 24" width="16" height="16" fill="#2563EB">
                 <path d="M10.812 0c-.425.013-.845.215-1.196.605a3.593 3.593 0 00-.493.722c-.355.667-.425 1.415-.556 2.143a551.9 551.9 0 00-.726 4.087c-.027.16-.096.227-.244.273C5.83 8.386 4.06 8.94 2.3 9.514c-.387.125-.773.289-1.114.506-1.042.665-1.196 1.753-.415 2.71.346.422.79.715 1.284.936 1.1.49 2.202.976 3.3 1.47.019.01.036.013.053.019h-.004l1.306.535c0 .023.002.045 0 .073-.2 2.03-.39 4.063-.58 6.095-.04.419-.012.831.134 1.23.317.87 1.065 1.148 1.881.701.372-.204.666-.497.937-.818 1.372-1.623 2.746-3.244 4.113-4.872.111-.133.205-.15.363-.098.349.117.697.231 1.045.347h.001c.02.012.045.02.073.03l.142.042c1.248.416 2.68.775 3.929 1.19.4.132.622.164 1.045.098.311-.048.592-.062.828-.236.602-.33.995-.957.988-1.682-.005-.427-.154-.813-.35-1.186-.82-1.556-1.637-3.113-2.461-4.666-.078-.148-.076-.243.037-.375 1.381-1.615 2.756-3.236 4.133-4.855.272-.32.513-.658.653-1.058.308-.878-.09-1.57-1-1.741a2.783 2.783 0 00-1.235.069c-1.974.521-3.947 1.041-5.918 1.57-.175.047-.26.015-.355-.144a353.08 353.08 0 00-2.421-4.018 4.61 4.61 0 00-.652-.849c-.371-.37-.802-.549-1.227-.536z"/>
               </svg>
               <span class="badge-label">PySpark Interview Hub</span>
@@ -256,7 +256,7 @@ function copyBadge() {
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: rgba(8, 9, 13, 0.85);
+  background: rgba(15, 23, 42, 0.65);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   display: flex;
@@ -268,22 +268,32 @@ function copyBadge() {
 .sync-dialog {
   width: 100%;
   max-width: 640px;
-  background: #141521;
-  border: 1px solid rgba(255, 107, 53, 0.35);
+  background: #FAF7F0;
+  border: 1px solid #E2DAC9;
   border-radius: 24px;
   padding: 24px;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.15);
   display: flex;
   flex-direction: column;
   gap: 18px;
+}
+
+:global(.dark) .sync-dialog {
+  background: #2D3238;
+  border: 1px solid #4B535E;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
 }
 
 .modal-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid #E2DAC9;
   padding-bottom: 14px;
+}
+
+:global(.dark) .modal-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .tab-triggers {
@@ -294,7 +304,7 @@ function copyBadge() {
 .tab-btn {
   background: transparent;
   border: none;
-  color: #8C93A8;
+  color: #6B7280;
   font-size: 13px;
   font-weight: 600;
   padding: 6px 12px;
@@ -303,25 +313,46 @@ function copyBadge() {
   transition: all 0.2s ease;
 }
 
+:global(.dark) .tab-btn {
+  color: #8C93A8;
+}
+
 .tab-btn:hover {
+  color: #1F2937;
+}
+
+:global(.dark) .tab-btn:hover {
   color: #FFFFFF;
 }
 
 .tab-btn.active {
-  background: rgba(255, 107, 53, 0.15);
-  color: #FF6B35;
+  background: rgba(37, 99, 235, 0.1);
+  color: #2563EB;
+}
+
+:global(.dark) .tab-btn.active {
+  background: rgba(37, 99, 235, 0.2);
+  color: #60A5FA;
 }
 
 .close-icon {
   background: none;
   border: none;
-  color: #8C93A8;
+  color: #6B7280;
   font-size: 24px;
   cursor: pointer;
   line-height: 1;
 }
 
+:global(.dark) .close-icon {
+  color: #8C93A8;
+}
+
 .close-icon:hover {
+  color: #1F2937;
+}
+
+:global(.dark) .close-icon:hover {
   color: #FFFFFF;
 }
 
@@ -332,8 +363,8 @@ function copyBadge() {
 }
 
 .feature-box {
-  background: #11121C;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: #FFFFFF;
+  border: 1px solid #E2DAC9;
   border-radius: 16px;
   padding: 18px;
   display: flex;
@@ -341,18 +372,31 @@ function copyBadge() {
   gap: 10px;
 }
 
+:global(.dark) .feature-box {
+  background: #22262B;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
 .feature-title {
   font-size: 14.5px;
   font-weight: 700;
-  color: #FFFFFF;
+  color: #1F2937;
   margin: 0;
+}
+
+:global(.dark) .feature-title {
+  color: #EEEEEE;
 }
 
 .feature-desc {
   font-size: 12.5px;
-  color: #8C93A8;
+  color: #4B5563;
   line-height: 1.45;
   margin: 0;
+}
+
+:global(.dark) .feature-desc {
+  color: #9CA3AF;
 }
 
 .token-copy-row {
@@ -363,9 +407,9 @@ function copyBadge() {
 
 .token-input {
   flex: 1;
-  background: #181926;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #D1D5DB;
+  background: #FAF7F0;
+  border: 1px solid #E2DAC9;
+  color: #1F2937;
   font-size: 12px;
   font-family: var(--vp-font-family-mono);
   padding: 8px 12px;
@@ -373,8 +417,14 @@ function copyBadge() {
   outline: none;
 }
 
+:global(.dark) .token-input {
+  background: #1A1D20;
+  border: 1px solid #4B535E;
+  color: #EEEEEE;
+}
+
 .copy-btn, .action-btn {
-  background: linear-gradient(135deg, #FF6B35 0%, #EA580C 100%);
+  background: #2563EB;
   border: none;
   color: #FFFFFF;
   font-size: 12px;
@@ -383,6 +433,11 @@ function copyBadge() {
   border-radius: 8px;
   cursor: pointer;
   white-space: nowrap;
+  transition: background 0.15s ease;
+}
+
+.copy-btn:hover, .action-btn:hover {
+  background: #1D4ED8;
 }
 
 .file-backup-row {
@@ -393,9 +448,9 @@ function copyBadge() {
 .secondary-btn {
   flex: 1;
   text-align: center;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #D1D5DB;
+  background: #FAF7F0;
+  border: 1px solid #E2DAC9;
+  color: #374151;
   font-size: 12px;
   font-weight: 600;
   padding: 10px;
@@ -404,10 +459,22 @@ function copyBadge() {
   transition: all 0.2s;
 }
 
+:global(.dark) .secondary-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #D1D5DB;
+}
+
 .secondary-btn:hover {
-  background: rgba(255, 107, 53, 0.12);
-  border-color: rgba(255, 107, 53, 0.35);
-  color: #FF6B35;
+  background: rgba(37, 99, 235, 0.08);
+  border-color: rgba(37, 99, 235, 0.35);
+  color: #2563EB;
+}
+
+:global(.dark) .secondary-btn:hover {
+  background: rgba(37, 99, 235, 0.2);
+  border-color: rgba(37, 99, 235, 0.4);
+  color: #60A5FA;
 }
 
 .file-upload-btn {
@@ -434,21 +501,32 @@ function copyBadge() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #181926;
+  background: #FAF7F0;
+  border: 1px solid #E2DAC9;
   padding: 12px 16px;
   border-radius: 10px;
   font-size: 12px;
-  color: #8C93A8;
+  color: #4B5563;
+}
+
+:global(.dark) .cheatsheet-preview {
+  background: #1A1D20;
+  border-color: #4B535E;
+  color: #9CA3AF;
 }
 
 .preview-stat strong {
-  color: #FF6B35;
+  color: #2563EB;
   margin-left: 6px;
+}
+
+:global(.dark) .preview-stat strong {
+  color: #60A5FA;
 }
 
 .cta-primary-btn {
   width: 100%;
-  background: linear-gradient(135deg, #FF6B35 0%, #EA580C 100%);
+  background: #2563EB;
   border: none;
   color: #FFFFFF;
   font-size: 13.5px;
@@ -456,6 +534,11 @@ function copyBadge() {
   padding: 12px;
   border-radius: 10px;
   cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.cta-primary-btn:hover {
+  background: #1D4ED8;
 }
 
 .badge-preview-wrap {
@@ -468,22 +551,31 @@ function copyBadge() {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: #000000;
-  border: 1px solid rgba(255, 107, 53, 0.5);
+  background: #FAF7F0;
+  border: 1px solid #E2DAC9;
   border-radius: 6px;
   padding: 6px 14px;
+}
+
+:global(.dark) .badge-pill {
+  background: #1A1D20;
+  border-color: #4B535E;
 }
 
 .badge-label {
   font-size: 12px;
   font-weight: 700;
-  color: #FFFFFF;
+  color: #1F2937;
+}
+
+:global(.dark) .badge-label {
+  color: #EEEEEE;
 }
 
 .badge-score {
   font-size: 11px;
   font-weight: 700;
-  background: #FF6B35;
+  background: #2563EB;
   color: #FFFFFF;
   padding: 2px 8px;
   border-radius: 4px;

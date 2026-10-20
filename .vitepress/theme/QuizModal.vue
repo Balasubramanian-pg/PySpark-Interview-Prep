@@ -105,7 +105,7 @@ function nextQuestion() {
       particleCount: 80,
       spread: 70,
       origin: { y: 0.6 },
-      colors: ['#FF6B35', '#906BFF', '#34D399']
+      colors: ['#2563EB', '#60A5FA', '#34D399']
     })
   }
 }
@@ -203,7 +203,7 @@ function close() {
 
       <!-- Results Screen -->
       <div v-else class="quiz-results">
-        <svg class="trophy-svg" viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="#FF6B35" stroke-width="1.8">
+        <svg class="trophy-svg" viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="#2563EB" stroke-width="1.8">
           <path d="M6 9H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3m12 6h3a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-3M6 3h12v7a6 6 0 0 1-12 0V3z"></path>
           <path d="M9 21h6"></path>
           <path d="M12 17v4"></path>
@@ -230,9 +230,9 @@ function close() {
   position: fixed;
   inset: 0;
   z-index: 99999;
-  background: rgba(8, 9, 13, 0.85);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -242,13 +242,20 @@ function close() {
 .quiz-dialog {
   width: 100%;
   max-width: 720px;
-  background: #15161E;
-  border: 1px solid rgba(255, 107, 53, 0.4);
-  border-radius: 24px;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8);
+  background: #FAF7F0;
+  border: 1px solid #E2DAC9;
+  border-radius: 20px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  font-family: 'Jost', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+:global(.dark) .quiz-dialog {
+  background: #2D3238;
+  border-color: #4B535E;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
 }
 
 .quiz-header {
@@ -256,14 +263,19 @@ function close() {
   align-items: center;
   justify-content: space-between;
   padding: 20px 24px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid #E2DAC9;
+}
+
+:global(.dark) .quiz-header {
+  border-bottom-color: #4B535E;
 }
 
 .quiz-badge {
   font-size: 11px;
   font-weight: 700;
-  color: #FF6B35;
-  background: rgba(255, 107, 53, 0.14);
+  color: #1D4ED8;
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
   padding: 3px 10px;
   border-radius: 9999px;
   letter-spacing: 0.05em;
@@ -271,16 +283,26 @@ function close() {
   margin-bottom: 4px;
 }
 
+:global(.dark) .quiz-badge {
+  color: #93C5FD;
+  background: rgba(37, 99, 235, 0.2);
+  border-color: rgba(59, 130, 246, 0.4);
+}
+
 .quiz-title {
   margin: 0;
   font-size: 17px;
-  color: #FFFFFF;
+  color: #1E242B;
+}
+
+:global(.dark) .quiz-title {
+  color: #EEEEEE;
 }
 
 .close-btn {
   background: transparent;
   border: none;
-  color: #6E7387;
+  color: #6B7280;
   cursor: pointer;
   padding: 6px;
   display: flex;
@@ -289,6 +311,10 @@ function close() {
 }
 
 .close-btn:hover {
+  color: #1E242B;
+}
+
+:global(.dark) .close-btn:hover {
   color: #FFFFFF;
 }
 
@@ -300,23 +326,32 @@ function close() {
   display: flex;
   justify-content: space-between;
   font-size: 12.5px;
-  color: #9CA3AF;
+  color: #6B7280;
   margin-bottom: 14px;
 }
 
 .scenario-box {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 14px;
-  padding: 16px;
+  background: #FFFFFF;
+  border: 1px solid #E2DAC9;
+  border-radius: 12px;
+  padding: 18px;
   margin-bottom: 18px;
+}
+
+:global(.dark) .scenario-box {
+  background: #222831;
+  border-color: #4B535E;
 }
 
 .scenario-text {
   margin: 0;
-  color: #FFFFFF;
+  color: #1E242B;
   font-size: 14.5px;
   line-height: 1.5;
+}
+
+:global(.dark) .scenario-text {
+  color: #EEEEEE;
 }
 
 .options-grid {
@@ -330,44 +365,70 @@ function close() {
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #FFFFFF;
+  border: 1.5px solid #E2DAC9;
   border-radius: 12px;
   padding: 12px 16px;
   text-align: left;
   cursor: pointer;
-  color: #E2E8F0;
+  color: #393E46;
   transition: all 0.2s ease;
 }
 
+:global(.dark) .option-card {
+  background: #222831;
+  border-color: #4B535E;
+  color: #D1D5DB;
+}
+
 .option-card:hover:not(.correct):not(.wrong) {
-  background: rgba(255, 255, 255, 0.07);
-  border-color: rgba(255, 107, 53, 0.4);
+  background: #F8FAFC;
+  border-color: #2563EB;
+}
+
+:global(.dark) .option-card:hover:not(.correct):not(.wrong) {
+  background: #2A303A;
+  border-color: #3B82F6;
 }
 
 .option-card.selected {
-  background: rgba(255, 107, 53, 0.15);
-  border-color: #FF6B35;
+  background: #EFF6FF;
+  border-color: #2563EB;
+}
+
+:global(.dark) .option-card.selected {
+  background: rgba(37, 99, 235, 0.2);
+  border-color: #3B82F6;
 }
 
 .option-card.correct {
-  background: rgba(5, 150, 105, 0.2);
+  background: #ECFDF5;
   border-color: #10B981;
-  color: #A7F3D0;
+  color: #047857;
 }
 
 .option-card.wrong {
-  background: rgba(239, 68, 68, 0.18);
+  background: #FEF2F2;
   border-color: #EF4444;
-  color: #FECACA;
+  color: #B91C1C;
 }
 
 .option-letter {
   font-weight: 700;
   font-size: 12.5px;
-  background: rgba(255, 255, 255, 0.1);
+  background: #E2DAC9;
   padding: 2px 7px;
   border-radius: 6px;
+}
+
+:global(.dark) .option-letter {
+  background: #4B535E;
+  color: #EEEEEE;
+}
+
+.option-card.selected .option-letter {
+  background: #2563EB;
+  color: #FFFFFF;
 }
 
 .option-text {
@@ -376,16 +437,21 @@ function close() {
 }
 
 .explanation-box {
-  background: rgba(255, 107, 53, 0.1);
-  border: 1px solid rgba(255, 107, 53, 0.3);
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
   border-radius: 12px;
   padding: 14px;
   margin-bottom: 18px;
 }
 
+:global(.dark) .explanation-box {
+  background: rgba(37, 99, 235, 0.15);
+  border-color: rgba(59, 130, 246, 0.4);
+}
+
 .explanation-box.is-correct {
-  background: rgba(5, 150, 105, 0.12);
-  border-color: rgba(16, 185, 129, 0.35);
+  background: #ECFDF5;
+  border-color: #A7F3D0;
 }
 
 .explanation-title {
@@ -393,14 +459,22 @@ function close() {
   align-items: center;
   font-size: 13.5px;
   font-weight: 700;
-  color: #FFFFFF;
+  color: #1E40AF;
   margin-bottom: 4px;
+}
+
+:global(.dark) .explanation-title {
+  color: #93C5FD;
 }
 
 .explanation-text {
   font-size: 12.5px;
-  color: #D1D5DB;
+  color: #1E242B;
   line-height: 1.45;
+}
+
+:global(.dark) .explanation-text {
+  color: #D1D5DB;
 }
 
 .quiz-footer {
@@ -409,7 +483,7 @@ function close() {
 }
 
 .btn-submit, .btn-next {
-  background: linear-gradient(135deg, #FF6B35 0%, #EA580C 100%);
+  background: #2563EB;
   border: none;
   color: #FFFFFF;
   font-size: 13.5px;
@@ -417,8 +491,12 @@ function close() {
   padding: 10px 22px;
   border-radius: 10px;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(255, 107, 53, 0.35);
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
   transition: all 0.2s ease;
+}
+
+.btn-submit:hover:not(:disabled), .btn-next:hover:not(:disabled) {
+  background: #1D4ED8;
 }
 
 .btn-submit:disabled {
@@ -441,27 +519,39 @@ function close() {
 
 .result-title {
   font-size: 22px;
-  color: #FFFFFF;
+  color: #1E242B;
   margin: 0 0 10px 0;
+}
+
+:global(.dark) .result-title {
+  color: #EEEEEE;
 }
 
 .result-score {
   font-size: 16px;
-  color: #9CA3AF;
+  color: #6B7280;
   margin: 0 0 12px 0;
 }
 
 .highlight {
-  color: #FF6B35;
+  color: #2563EB;
   font-weight: bold;
+}
+
+:global(.dark) .highlight {
+  color: #60A5FA;
 }
 
 .result-msg {
   max-width: 520px;
   margin: 0 auto 28px auto;
   font-size: 14px;
-  color: #D1D5DB;
+  color: #393E46;
   line-height: 1.5;
+}
+
+:global(.dark) .result-msg {
+  color: #D1D5DB;
 }
 
 .result-actions {
@@ -471,21 +561,31 @@ function close() {
 }
 
 .btn-restart {
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #FFFFFF;
+  background: #FFFFFF;
+  border: 1px solid #E2DAC9;
+  color: #1E242B;
   padding: 10px 20px;
   border-radius: 10px;
   cursor: pointer;
 }
 
+:global(.dark) .btn-restart {
+  background: #222831;
+  border-color: #4B535E;
+  color: #EEEEEE;
+}
+
 .btn-done {
-  background: linear-gradient(135deg, #FF6B35 0%, #EA580C 100%);
+  background: #2563EB;
   border: none;
   color: #FFFFFF;
   padding: 10px 22px;
   border-radius: 10px;
   cursor: pointer;
   font-weight: 600;
+}
+
+.btn-done:hover {
+  background: #1D4ED8;
 }
 </style>

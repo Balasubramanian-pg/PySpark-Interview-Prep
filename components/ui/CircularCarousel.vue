@@ -271,14 +271,14 @@ const currentItem = computed(() => props.items[activeIndex.value] || props.items
 }
 
 .carousel-card:hover {
-  border-color: rgba(255, 107, 53, 0.4);
+  border-color: rgba(37, 99, 235, 0.4);
 }
 
 .carousel-card.active {
   background: linear-gradient(145deg, #202234 0%, #161726 100%);
-  border-color: #FF6B35;
-  box-shadow: 0 16px 48px -8px rgba(255, 107, 53, 0.35),
-              0 0 0 1px rgba(255, 107, 53, 0.3);
+  border-color: #2563EB;
+  box-shadow: 0 16px 48px -8px rgba(37, 99, 235, 0.35),
+              0 0 0 1px rgba(37, 99, 235, 0.3);
 }
 
 .card-inner {
@@ -300,11 +300,11 @@ const currentItem = computed(() => props.items[activeIndex.value] || props.items
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #FF6B35;
-  background: rgba(255, 107, 53, 0.12);
+  color: #2563EB;
+  background: rgba(37, 99, 235, 0.12);
   padding: 2px 8px;
   border-radius: 6px;
-  border: 1px solid rgba(255, 107, 53, 0.25);
+  border: 1px solid rgba(37, 99, 235, 0.25);
   white-space: nowrap;
 }
 
@@ -358,7 +358,7 @@ const currentItem = computed(() => props.items[activeIndex.value] || props.items
 }
 
 .card-action-text {
-  color: #FF6B35;
+  color: #2563EB;
 }
 
 .card-action-hint {
@@ -388,9 +388,9 @@ const currentItem = computed(() => props.items[activeIndex.value] || props.items
 }
 
 .control-btn:hover {
-  background: rgba(255, 107, 53, 0.2);
-  border-color: rgba(255, 107, 53, 0.5);
-  color: #FF6B35;
+  background: rgba(37, 99, 235, 0.2);
+  border-color: rgba(37, 99, 235, 0.5);
+  color: #2563EB;
   transform: scale(1.06);
 }
 
@@ -413,7 +413,7 @@ const currentItem = computed(() => props.items[activeIndex.value] || props.items
 
 .dot-indicator.active {
   width: 22px;
-  background: #FF6B35;
-  box-shadow: 0 0 8px rgba(255, 107, 53, 0.6);
+  background: #2563EB;
+  box-shadow: 0 0 8px rgba(37, 99, 235, 0.6);
 }
 </style>
