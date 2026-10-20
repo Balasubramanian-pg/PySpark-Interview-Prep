@@ -1,5 +1,8 @@
 # 1.1 Spark Architecture Basics
 
+<img width="640" height="480" alt="image" src="https://github.com/user-attachments/assets/479e51c8-5c7b-4df1-8fe2-2f779261f34e" />
+
+
 # 1. Fundamentals/1.1 Spark Architecture Basics
 
 Apache Spark is a distributed computing engine designed for fast, general-purpose data processing. Its architecture is built around a driver program, a cluster manager, and a set of executors running on worker nodes. Understanding these components and how they interact is essential for writing efficient Spark applications, debugging failures, and tuning performance.
