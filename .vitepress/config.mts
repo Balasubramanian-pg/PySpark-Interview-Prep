@@ -72,9 +72,20 @@ export default defineConfig({
     socialLinks: [
       { icon: 'github', link: 'https://github.com/Balasubramanian-pg/PySpark-Interview-Prep' }
     ],
+    outline: {
+      level: [2, 3],
+      label: 'On this page'
+    },
     footer: {
       message: 'Zero-backend, client-first interactive learning portal for PySpark engineers.',
       copyright: 'Maintained by Balasubramanian PG'
+    }
+  },
+
+  markdown: {
+    theme: {
+      light: 'github-light',
+      dark: 'github-dark'
     }
   },
 
