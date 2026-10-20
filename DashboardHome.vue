@@ -52,18 +52,6 @@ const activeView = ref<ViewType>('1. Fundamentals')
 const selectedSubtopic = ref<string>('all')
 const sidebarQuery = ref<string>('')
 
-// Collapsible Track sections in Sidebar
-const expandedTracks = ref<Record<string, boolean>>({
-  '1. Fundamentals': true,
-  '2. Intermediate': false,
-  '3. Advanced': false,
-  '4. Senior Dev': false
-})
-
-function toggleTrackExpand(track: string) {
-  expandedTracks.value[track] = !expandedTracks.value[track]
-}
-
 // Master tracks metadata
 const tracksMetadata = [
   {
@@ -71,36 +59,32 @@ const tracksMetadata = [
     name: 'Fundamentals',
     code: '01',
     count: 70,
-    desc: 'Core Spark Architecture, RDDs, DataFrames, SparkSession, Lazy Evaluation & Transformations.',
-    icon: 'book',
-    color: '#F97316'
+    subtitle: 'Core Spark Architecture, RDDs, DataFrames, SparkSession, Lazy Evaluation & Transformations.',
+    icon: 'book'
   },
   {
     id: '2. Intermediate',
     name: 'Intermediate',
     code: '02',
     count: 77,
-    desc: 'Joins, Window Functions, Complex Types, Regex, UDFs, Date/Time & File Formats.',
-    icon: 'zap',
-    color: '#0EA5E9'
+    subtitle: 'Joins, Window Functions, Complex Types, Regex, UDFs, Date/Time & File Formats.',
+    icon: 'zap'
   },
   {
     id: '3. Advanced',
     name: 'Advanced',
     code: '03',
     count: 68,
-    desc: 'Catalyst Optimizer, Shuffling, AQE, Join Strategies, Caching & Data Skew Remediation.',
-    icon: 'rocket',
-    color: '#8B5CF6'
+    subtitle: 'Catalyst Optimizer, Shuffling, AQE, Join Strategies, Caching & Data Skew Remediation.',
+    icon: 'rocket'
   },
   {
     id: '4. Senior Dev',
     name: 'Senior Dev',
     code: '04',
     count: 50,
-    desc: 'Memory Management, OOM Debugging, Spark UI Analysis, Structured Streaming & Lakehouse.',
-    icon: 'award',
-    color: '#10B981'
+    subtitle: 'Memory Management, OOM Debugging, Spark UI Analysis, Structured Streaming & Lakehouse.',
+    icon: 'award'
   }
 ]
 
@@ -192,9 +176,6 @@ const currentTrackMeta = computed(() => {
 function selectTrack(trackId: ViewType, subtopic = 'all') {
   activeView.value = trackId
   selectedSubtopic.value = subtopic
-  if (trackId.startsWith('1.') || trackId.startsWith('2.') || trackId.startsWith('3.') || trackId.startsWith('4.')) {
-    expandedTracks.value[trackId] = true
-  }
 }
 
 function selectSubtopic(subtopic: string) {
@@ -251,43 +232,46 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="wiki-portal-container">
-    <!-- Top Header Bar -->
-    <header class="portal-header">
-      <div class="header-left">
-        <div class="portal-logo" @click="selectTrack('overview')">
-          <svg class="spark-logo-icon" viewBox="0 0 24 24" width="22" height="22" fill="#F97316">
+  <div class="app-viewport-root">
+    <!-- ═════════════════════════════════════════════════════════════════
+         TOP NAVIGATION BAR (Dark charcoal Kirrivan style, full width)
+         ═════════════════════════════════════════════════════════════════ -->
+    <header class="app-top-header">
+      <div class="top-header-left">
+        <div class="app-brand" @click="selectTrack('overview')">
+          <svg class="brand-spark-icon" viewBox="0 0 24 24" width="22" height="22" fill="#F97316">
             <path d="M12 0c-.28 0-.5.22-.5.5 0 2.24-1.32 3.63-2.6 4.98C7.54 6.89 6 8.52 6 11.5c0 3.59 2.91 6.5 6.5 6.5s6.5-2.91 6.5-6.5c0-4.08-3.08-6.19-5.58-8.75C12.74 2.05 12.08 1.13 12 0zm0 15c-1.93 0-3.5-1.57-3.5-3.5 0-1.3.7-2.31 1.6-3.3.8-1 1.9-2.12 1.9-4.2 1.34 1.5 3.5 3.32 3.5 6 0 2.76-1.57 5-3.5 5z"/>
           </svg>
-          <span class="portal-title">PySpark Wiki</span>
-          <span class="portal-badge">265 Questions</span>
+          <span class="brand-name">PySpark Wiki</span>
         </div>
+        <div class="header-divider"></div>
+        <span class="header-module-label">Curriculum</span>
       </div>
 
-      <!-- Center Search Pill -->
-      <div class="header-center">
-        <button class="portal-search-trigger" @click="openSearch">
+      <!-- Center Search Bar -->
+      <div class="top-header-center">
+        <div class="search-input-pill" @click="openSearch">
           <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
-          <span class="search-hint">Search 260+ questions, concepts, code...</span>
-          <span class="search-kbd">Ctrl K</span>
-        </button>
+          <span class="search-text">Search 260+ questions, concepts, code...</span>
+          <span class="search-shortcut">Ctrl K</span>
+        </div>
       </div>
 
       <!-- Right Header Actions -->
-      <div class="header-right">
-        <!-- Streak counter -->
-        <div class="streak-pill" :title="`Streak: ${studyStreak.currentStreak} days`">
+      <div class="top-header-right">
+        <!-- Streak pill -->
+        <div class="streak-badge" :title="`Streak: ${studyStreak.currentStreak} days`">
           <svg viewBox="0 0 24 24" width="13" height="13" fill="#F97316">
             <path d="M12 0c-.28 0-.5.22-.5.5 0 2.24-1.32 3.63-2.6 4.98C7.54 6.89 6 8.52 6 11.5c0 3.59 2.91 6.5 6.5 6.5s6.5-2.91 6.5-6.5c0-4.08-3.08-6.19-5.58-8.75C12.74 2.05 12.08 1.13 12 0zm0 15c-1.93 0-3.5-1.57-3.5-3.5 0-1.3.7-2.31 1.6-3.3.8-1 1.9-2.12 1.9-4.2 1.34 1.5 3.5 3.32 3.5 6 0 2.76-1.57 5-3.5 5z"/>
           </svg>
           <span>{{ studyStreak.currentStreak > 0 ? `${studyStreak.currentStreak}d Streak` : 'Active' }}</span>
         </div>
 
-        <!-- 5-min Diagnostic button -->
-        <button class="tool-btn" @click="showDiagnosticModal = true" title="Test your level in 5 minutes">
+        <!-- 5-min Diagnostic -->
+        <button class="header-action-btn" @click="showDiagnosticModal = true">
           <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="10"></circle>
             <circle cx="12" cy="12" r="6"></circle>
@@ -295,20 +279,20 @@ onUnmounted(() => {
           <span>Diagnostic</span>
         </button>
 
-        <!-- Flashcards button -->
-        <button class="tool-btn" @click="showFlashcardModal = true" title="Spaced repetition recall deck">
+        <!-- Flashcards -->
+        <button class="header-action-btn" @click="showFlashcardModal = true">
           <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
             <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
           </svg>
           <span>Flashcards</span>
         </button>
 
-        <!-- GitHub link -->
+        <!-- GitHub -->
         <a
           href="https://github.com/Balasubramanian-pg/PySpark-Interview-Prep"
           target="_blank"
           rel="noopener"
-          class="icon-link-btn"
+          class="header-icon-circle"
           title="GitHub Repository"
         >
           <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
@@ -318,14 +302,95 @@ onUnmounted(() => {
       </div>
     </header>
 
-    <!-- Main Dual-Panel Workspace -->
-    <div class="portal-body">
-      <!-- ══════════════════════════════════════════════════════════════
-           LEFT SIDEBAR NAVIGATION (Allows user to choose where to go)
-           ══════════════════════════════════════════════════════════════ -->
-      <aside class="portal-sidebar">
-        <!-- Sidebar Search / Filter -->
-        <div class="sidebar-search-box">
+    <!-- ═════════════════════════════════════════════════════════════════
+         FULL 1920 CANVAS: Icon Rail + Secondary Panel + Main Workspace
+         ═════════════════════════════════════════════════════════════════ -->
+    <div class="app-workspace-body">
+      <!-- 1. Slim Left Icon Rail (Kirrivan far left strip, 60px) -->
+      <nav class="icon-rail">
+        <button
+          class="rail-btn"
+          :class="{ active: activeView.startsWith('1.') || activeView.startsWith('2.') || activeView.startsWith('3.') || activeView.startsWith('4.') || activeView === 'overview' }"
+          title="Curriculum Tracks"
+          @click="selectTrack('1. Fundamentals')"
+        >
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+          </svg>
+        </button>
+
+        <button
+          class="rail-btn"
+          :class="{ active: activeView === 'bookmarked' }"
+          title="Saved Bookmarks"
+          @click="selectTrack('bookmarked')"
+        >
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+          </svg>
+        </button>
+
+        <button
+          class="rail-btn"
+          title="5-Min Diagnostic Test"
+          @click="showDiagnosticModal = true"
+        >
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <circle cx="12" cy="12" r="6"></circle>
+          </svg>
+        </button>
+
+        <button
+          class="rail-btn"
+          title="Flashcards Spaced Repetition"
+          @click="showFlashcardModal = true"
+        >
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+          </svg>
+        </button>
+
+        <button
+          class="rail-btn"
+          title="Scenario Architecture Quiz"
+          @click="showQuizModal = true"
+        >
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+          </svg>
+        </button>
+
+        <div class="rail-spacer"></div>
+
+        <button
+          class="rail-btn"
+          title="Data Sync & Backup"
+          @click="showSyncModal = true"
+        >
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </button>
+      </nav>
+
+      <!-- 2. Secondary Left Panel (Kirrivan "Create Sequence" panel, 340px) -->
+      <aside class="sequence-nav-panel">
+        <div class="panel-header-top">
+          <button class="back-link-btn" @click="selectTrack('overview')">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+            <span>Back</span>
+          </button>
+          <h2 class="panel-main-heading">Choose Track</h2>
+        </div>
+
+        <!-- Search Input -->
+        <div class="panel-search-wrap">
           <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
@@ -333,418 +398,257 @@ onUnmounted(() => {
           <input
             v-model="sidebarQuery"
             type="text"
-            placeholder="Filter topics..."
-            class="sidebar-input"
+            placeholder="Search sequence or topic..."
+            class="panel-search-input"
           />
         </div>
 
-        <div class="sidebar-nav-scroll">
-          <!-- Overview Option -->
-          <div
-            class="nav-item-single"
-            :class="{ active: activeView === 'overview' }"
-            @click="selectTrack('overview')"
-          >
-            <div class="nav-item-icon">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="3" y="3" width="7" height="7"></rect>
-                <rect x="14" y="3" width="7" height="7"></rect>
-                <rect x="14" y="14" width="7" height="7"></rect>
-                <rect x="3" y="14" width="7" height="7"></rect>
-              </svg>
-            </div>
-            <div class="nav-item-info">
-              <span class="nav-item-title">Overview Dashboard</span>
-            </div>
-          </div>
+        <!-- Selectable Sequence Cards (Exact Kirrivan visual format) -->
+        <div class="sequence-list-scroll">
+          <div class="section-micro-heading">Core Learning Tracks</div>
 
-          <!-- Section Label: Learning Tracks -->
-          <div class="nav-section-title">LEARNING TRACKS</div>
-
-          <!-- 4 Tracks with Collapsible Subtopics -->
+          <!-- 4 Pre-made Track Cards -->
           <div
             v-for="track in tracksMetadata"
             :key="track.id"
-            class="track-group"
+            class="sequence-selector-card"
+            :class="{ selected: activeView === track.id }"
+            @click="selectTrack(track.id as ViewType)"
           >
-            <div
-              class="track-item-header"
-              :class="{
-                active: activeView === track.id,
-                expanded: expandedTracks[track.id]
-              }"
-              @click="selectTrack(track.id as ViewType)"
-            >
-              <div class="track-left">
-                <span class="track-code-badge">{{ track.code }}</span>
-                <span class="track-name">{{ track.name }}</span>
-              </div>
-              <div class="track-right">
-                <span class="track-count-pill">{{ getTrackProgress(track.id).completed }}/{{ track.count }}</span>
-                <button
-                  class="expand-caret-btn"
-                  @click.stop="toggleTrackExpand(track.id)"
-                  :aria-label="`Toggle ${track.name} subtopics`"
-                >
-                  <svg
-                    class="caret-icon"
-                    :class="{ rotated: expandedTracks[track.id] }"
-                    viewBox="0 0 24 24"
-                    width="14"
-                    height="14"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <polyline points="6 9 12 15 18 9"></polyline>
-                  </svg>
-                </button>
-              </div>
-            </div>
-
-            <!-- Subtopics List inside Track -->
-            <div v-if="expandedTracks[track.id]" class="subtopics-list">
-              <button
-                class="subtopic-item-btn"
-                :class="{ active: activeView === track.id && selectedSubtopic === 'all' }"
-                @click="selectTrack(track.id as ViewType, 'all')"
-              >
-                <span class="subtopic-dot"></span>
-                <span class="subtopic-title">All {{ track.name }}</span>
-                <span class="subtopic-badge">{{ track.count }}</span>
-              </button>
-
-              <button
-                v-for="sub in getSubtopicsForTrack(track.id)"
-                :key="sub.name"
-                class="subtopic-item-btn"
-                :class="{ active: activeView === track.id && selectedSubtopic === sub.name }"
-                @click="selectTrack(track.id as ViewType, sub.name)"
-              >
-                <span class="subtopic-dot"></span>
-                <span class="subtopic-title">{{ sub.name.replace(/^\d+\.\d+\s*/, '') }}</span>
-                <span class="subtopic-badge">{{ sub.count }}</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- Section Label: Interactive Practice -->
-          <div class="nav-section-title">INTERACTIVE PRACTICE</div>
-
-          <div class="nav-item-single" @click="showDiagnosticModal = true">
-            <div class="nav-item-icon">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"></circle>
-                <circle cx="12" cy="12" r="6"></circle>
+            <div class="seq-card-icon-box">
+              <svg v-if="track.code === '01'" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
               </svg>
-            </div>
-            <div class="nav-item-info">
-              <span class="nav-item-title">5-Min Diagnostic Test</span>
-            </div>
-          </div>
-
-          <div class="nav-item-single" @click="showFlashcardModal = true">
-            <div class="nav-item-icon">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <svg v-else-if="track.code === '02'" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
                 <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
               </svg>
+              <svg v-else-if="track.code === '03'" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path>
+                <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"></path>
+              </svg>
+              <svg v-else viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="8" r="7"></circle>
+                <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+              </svg>
             </div>
-            <div class="nav-item-info">
-              <span class="nav-item-title">Flashcards Active Recall</span>
+
+            <div class="seq-card-details">
+              <div class="seq-card-title-row">
+                <span class="seq-card-title">{{ track.id.replace(/^\d+\.\s*/, '') }}</span>
+                <span class="seq-card-count">{{ track.count }} topics</span>
+              </div>
+              <p class="seq-card-subtitle">{{ track.subtitle }}</p>
             </div>
           </div>
 
-          <div class="nav-item-single" @click="showQuizModal = true">
-            <div class="nav-item-icon">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                <polyline points="14 2 14 8 20 8"></polyline>
-                <line x1="16" y1="13" x2="8" y2="13"></line>
-                <line x1="16" y1="17" x2="8" y2="17"></line>
-              </svg>
-            </div>
-            <div class="nav-item-info">
-              <span class="nav-item-title">Scenario Architecture Quiz</span>
-            </div>
-          </div>
+          <!-- Subtopics Accordion under Active Track -->
+          <div v-if="currentSubtopics.length > 0" class="subtopics-tree-section">
+            <div class="section-micro-heading">Subtopic Modules</div>
+            <button
+              class="subtopic-link-row"
+              :class="{ active: selectedSubtopic === 'all' }"
+              @click="selectSubtopic('all')"
+            >
+              <span class="dot-indicator"></span>
+              <span class="subtopic-name">All {{ currentTrackMeta?.name }}</span>
+              <span class="subtopic-count">{{ currentTrackMeta?.count }}</span>
+            </button>
 
-          <!-- Section Label: My Library -->
-          <div class="nav-section-title">MY LIBRARY</div>
-
-          <div
-            class="nav-item-single"
-            :class="{ active: activeView === 'bookmarked' }"
-            @click="selectTrack('bookmarked')"
-          >
-            <div class="nav-item-icon">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-              </svg>
-            </div>
-            <div class="nav-item-info">
-              <span class="nav-item-title">Saved Questions</span>
-            </div>
-            <span class="nav-count-badge">{{ favorites.length }}</span>
-          </div>
-
-          <div
-            class="nav-item-single"
-            :class="{ active: activeView === 'completed' }"
-            @click="selectTrack('completed')"
-          >
-            <div class="nav-item-icon">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="20 6 9 17 4 12"></polyline>
-              </svg>
-            </div>
-            <div class="nav-item-info">
-              <span class="nav-item-title">Mastered Lessons</span>
-            </div>
-            <span class="nav-count-badge">{{ completedLessons.length }}</span>
+            <button
+              v-for="sub in currentSubtopics"
+              :key="sub.name"
+              class="subtopic-link-row"
+              :class="{ active: selectedSubtopic === sub.name }"
+              @click="selectSubtopic(sub.name)"
+            >
+              <span class="dot-indicator"></span>
+              <span class="subtopic-name">{{ sub.name.replace(/^\d+\.\d+\s*/, '') }}</span>
+              <span class="subtopic-count">{{ sub.count }}</span>
+            </button>
           </div>
         </div>
       </aside>
 
-      <!-- ══════════════════════════════════════════════════════════════
-           RIGHT MAIN ACTIVE WORKSPACE
-           ══════════════════════════════════════════════════════════════ -->
-      <main class="portal-main">
+      <!-- 3. Main Workspace Area (Fills 1920 Screen Canvas, Pure White #FFFFFF) -->
+      <main class="main-canvas-area">
         <!-- ─── CASE A: OVERVIEW DASHBOARD ─── -->
-        <div v-if="activeView === 'overview'" class="overview-view-container">
-          <div class="overview-hero-card">
-            <div class="hero-badge">PYSPARK CERTIFICATION &amp; INTERVIEW PREP</div>
-            <h1 class="hero-title">Master PySpark Architecture &amp; Production Engineering</h1>
-            <p class="hero-subtitle">
-              Choose your focus track on the left sidebar to navigate step-by-step through 265 production interview questions, architecture diagrams, and deep dives.
-            </p>
+        <div v-if="activeView === 'overview'" class="canvas-overview-wrap">
+          <div class="overview-header-row">
+            <div>
+              <h1 class="canvas-big-title">Platform Preview</h1>
+              <p class="canvas-big-subtitle">265 curated production questions, real-world failure scenarios, and interview playbooks.</p>
+            </div>
+          </div>
 
-            <div class="hero-stats-row">
-              <div class="stat-box">
-                <span class="stat-number">265</span>
-                <span class="stat-label">Total Questions</span>
-              </div>
-              <div class="stat-box">
-                <span class="stat-number">{{ completedLessons.length }}</span>
-                <span class="stat-label">Mastered</span>
-              </div>
-              <div class="stat-box">
-                <span class="stat-number">{{ overallReadiness }}%</span>
-                <span class="stat-label">Interview Readiness</span>
-              </div>
-              <div class="stat-box">
-                <span class="stat-number">{{ studyStreak.currentStreak }}d</span>
-                <span class="stat-label">Study Streak</span>
-              </div>
+          <div class="hero-stats-banner">
+            <div class="hero-stat-card">
+              <span class="hero-stat-val">265</span>
+              <span class="hero-stat-lbl">Total Questions</span>
+            </div>
+            <div class="hero-stat-card">
+              <span class="hero-stat-val">{{ completedLessons.length }}</span>
+              <span class="hero-stat-lbl">Lessons Mastered</span>
+            </div>
+            <div class="hero-stat-card">
+              <span class="hero-stat-val">{{ overallReadiness }}%</span>
+              <span class="hero-stat-lbl">Interview Readiness</span>
+            </div>
+            <div class="hero-stat-card">
+              <span class="hero-stat-val">{{ studyStreak.currentStreak }}d</span>
+              <span class="hero-stat-lbl">Study Streak</span>
             </div>
           </div>
 
           <!-- Spaced Repetition Due Banner -->
-          <div v-if="dueReviews.length > 0" class="srs-alert-card">
-            <div class="srs-alert-left">
-              <span class="srs-bell-icon">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                  <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                </svg>
-              </span>
+          <div v-if="dueReviews.length > 0" class="srs-due-card">
+            <div class="srs-card-left">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#F97316" stroke-width="2">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+              </svg>
               <div>
-                <div class="srs-title">{{ dueReviews.length }} Topic{{ dueReviews.length > 1 ? 's' : '' }} Due for Spaced Repetition</div>
-                <div class="srs-desc">Memory decay indicates these topics need recall practice today.</div>
+                <h4 class="srs-card-title">{{ dueReviews.length }} Topic{{ dueReviews.length > 1 ? 's' : '' }} Due for Review Today</h4>
+                <p class="srs-card-sub">Ebbinghaus spaced repetition indicates memory decay on these questions.</p>
               </div>
             </div>
-            <button class="srs-review-btn" @click="showFlashcardModal = true">
+            <button class="srs-card-btn" @click="showFlashcardModal = true">
               Review Due Cards &rarr;
             </button>
           </div>
 
-          <!-- Track Cards Grid -->
-          <div class="overview-tracks-section">
-            <div class="section-heading-row">
-              <h2 class="section-title">Core Learning Tracks</h2>
-              <span class="section-sub">Select any track to start reading</span>
-            </div>
-
-            <div class="tracks-cards-grid">
-              <div
-                v-for="track in tracksMetadata"
-                :key="track.id"
-                class="track-display-card"
-                @click="selectTrack(track.id as ViewType)"
-              >
-                <div class="track-card-top">
-                  <span class="card-track-code">TRACK {{ track.code }}</span>
-                  <span class="card-track-count">{{ track.count }} Questions</span>
+          <!-- Track Grid -->
+          <div class="canvas-section-header">Select a Master Track to begin</div>
+          <div class="tracks-full-grid">
+            <div
+              v-for="track in tracksMetadata"
+              :key="track.id"
+              class="track-hero-box"
+              @click="selectTrack(track.id as ViewType)"
+            >
+              <div class="hero-box-top">
+                <span class="hero-box-tag">TRACK {{ track.code }}</span>
+                <span class="hero-box-count">{{ track.count }} Questions</span>
+              </div>
+              <h3 class="hero-box-title">{{ track.name }}</h3>
+              <p class="hero-box-desc">{{ track.subtitle }}</p>
+              <div class="hero-box-bottom">
+                <div class="progress-bar-bg">
+                  <div
+                    class="progress-bar-val"
+                    :style="{ width: `${getTrackProgress(track.id).percent}%` }"
+                  ></div>
                 </div>
-
-                <h3 class="track-card-title">{{ track.name }}</h3>
-                <p class="track-card-desc">{{ track.desc }}</p>
-
-                <div class="track-card-bottom">
-                  <div class="progress-wrap">
-                    <div class="progress-bar-track">
-                      <div
-                        class="progress-bar-fill"
-                        :style="{ width: `${getTrackProgress(track.id).percent}%` }"
-                      ></div>
-                    </div>
-                    <span class="progress-text">{{ getTrackProgress(track.id).percent }}% complete</span>
-                  </div>
-                  <button class="track-open-btn">
-                    Explore &rarr;
-                  </button>
-                </div>
+                <span class="progress-status-lbl">{{ getTrackProgress(track.id).percent }}% complete</span>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- ─── CASE B: SPECIFIC TRACK OR FILTERED VIEW ─── -->
-        <div v-else class="track-view-container">
-          <!-- Active Track Header (Inspired by Kirrivan & Riddle UI) -->
-          <div class="workspace-header-card">
-            <div class="workspace-header-top">
-              <div class="breadcrumbs-row">
-                <span class="crumb-link" @click="selectTrack('overview')">Wiki</span>
-                <span class="crumb-sep">/</span>
-                <span class="crumb-active">{{ currentTrackMeta ? currentTrackMeta.name : (activeView === 'bookmarked' ? 'Bookmarked Questions' : 'Mastered Lessons') }}</span>
-                <template v-if="selectedSubtopic !== 'all'">
-                  <span class="crumb-sep">/</span>
-                  <span class="crumb-sub">{{ selectedSubtopic }}</span>
-                </template>
-              </div>
-
-              <!-- Quick Action button -->
-              <button
-                v-if="activeQuestions.length > 0"
-                class="open-wiki-btn"
-                @click="openFirstLessonInView"
-              >
-                <span>Open in Wiki Reader</span>
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
-                  <line x1="5" y1="12" x2="19" y2="12"></line>
-                  <polyline points="12 5 19 12 12 19"></polyline>
-                </svg>
-              </button>
-            </div>
-
-            <div class="workspace-title-row">
-              <h1 class="workspace-main-title">
+        <!-- ─── CASE B: SELECTED TRACK / TOPIC (Kirrivan Preview Flow) ─── -->
+        <div v-else class="canvas-sequence-wrap">
+          <!-- Canvas Header (Exact Kirrivan title + orange action button) -->
+          <div class="preview-header-bar">
+            <div class="preview-title-block">
+              <h1 class="preview-heading">
                 {{ selectedSubtopic !== 'all' ? selectedSubtopic : (currentTrackMeta ? currentTrackMeta.name : (activeView === 'bookmarked' ? 'Saved Questions' : 'Mastered Lessons')) }}
               </h1>
-              <span class="workspace-count-pill">{{ activeQuestions.length }} Questions</span>
+              <p class="preview-subtext">
+                {{ currentTrackMeta ? currentTrackMeta.subtitle : 'Personal collection of PySpark interview concepts and architectural patterns.' }}
+              </p>
+              <div class="preview-meta-row">
+                <span class="meta-item">{{ activeQuestions.length }} steps</span>
+                <span class="meta-dot">&bull;</span>
+                <span class="meta-item">{{ currentTrackMeta ? `${getTrackProgress(currentTrackMeta.id).completed} of ${currentTrackMeta.count} completed` : `${activeQuestions.length} questions` }}</span>
+              </div>
             </div>
 
-            <p class="workspace-desc">
-              {{ currentTrackMeta ? currentTrackMeta.desc : 'Personal collection of PySpark interview concepts and architectural patterns.' }}
-            </p>
-
-            <!-- Subtopic Filter Pills (if track selected) -->
-            <div v-if="currentSubtopics.length > 1" class="subtopic-pills-row">
-              <button
-                class="sub-pill"
-                :class="{ active: selectedSubtopic === 'all' }"
-                @click="selectSubtopic('all')"
-              >
-                All ({{ currentTrackMeta?.count }})
-              </button>
-              <button
-                v-for="sub in currentSubtopics"
-                :key="sub.name"
-                class="sub-pill"
-                :class="{ active: selectedSubtopic === sub.name }"
-                @click="selectSubtopic(sub.name)"
-              >
-                {{ sub.name.replace(/^\d+\.\d+\s*/, '') }} ({{ sub.count }})
-              </button>
-            </div>
+            <button
+              v-if="activeQuestions.length > 0"
+              class="open-builder-btn"
+              @click="openFirstLessonInView"
+            >
+              Open in Wiki Reader &rarr;
+            </button>
           </div>
 
-          <!-- Step Cards Flow (Inspired directly by Kirrivan Image 1) -->
-          <div class="sequence-step-flow">
-            <div v-if="activeQuestions.length === 0" class="empty-state-card">
-              <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="8" y1="12" x2="16" y2="12"></line>
-              </svg>
-              <h3>No questions found</h3>
-              <p>Try clearing your filter or selecting a different category from the sidebar.</p>
+          <!-- Connected Step Cards Flow (Kirrivan Timeline Layout) -->
+          <div class="connected-timeline-container">
+            <div v-if="activeQuestions.length === 0" class="empty-state-notice">
+              <p>No questions found matching your filter.</p>
             </div>
 
-            <!-- Connected Timeline & Step Cards -->
             <div
               v-for="(question, index) in activeQuestions"
               :key="question.path"
-              class="step-row-wrapper"
+              class="timeline-step-row"
             >
-              <!-- Timeline left indicator -->
-              <div class="step-timeline-indicator">
-                <div class="step-badge-pill">
-                  {{ String(index + 1).padStart(2, '0') }}
+              <!-- Step Pill & Vertical Connected Line -->
+              <div class="timeline-gutter">
+                <div class="step-counter-pill">
+                  Steep {{ index + 1 }}
                 </div>
-                <div v-if="index < activeQuestions.length - 1" class="timeline-vertical-line"></div>
+                <div v-if="index < activeQuestions.length - 1" class="connecting-line"></div>
               </div>
 
-              <!-- Question Card -->
+              <!-- Question Step Card (Stretches across wide canvas) -->
               <div
-                class="step-card"
+                class="kirrivan-step-card"
                 :class="{ completed: isLessonCompleted(question.path) }"
                 @click="navigateTo(question.path)"
               >
-                <div class="step-card-header">
-                  <div class="tags-group">
-                    <span class="subtopic-tag">{{ question.subtopic.replace(/^\d+\.\d+\s*/, '') }}</span>
-                    <span class="company-tag">Asked at {{ getCompanyTag(question.title) }}</span>
-                    <span v-if="isLessonCompleted(question.path)" class="completed-tag">
-                      <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3">
+                <div class="step-card-top-row">
+                  <div class="step-card-badges">
+                    <span class="badge-subtopic">{{ question.subtopic.replace(/^\d+\.\d+\s*/, '') }}</span>
+                    <span class="badge-company">Asked at {{ getCompanyTag(question.title) }}</span>
+                    <span v-if="isLessonCompleted(question.path)" class="badge-done">
+                      <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3">
                         <polyline points="20 6 9 17 4 12"></polyline>
                       </svg>
-                      Mastered
+                      Completed
                     </span>
                   </div>
 
-                  <div class="card-top-actions">
-                    <!-- Bookmark button -->
-                    <button
-                      class="card-action-icon-btn"
-                      :class="{ active: isFavorite(question.path) }"
-                      :title="isFavorite(question.path) ? 'Saved' : 'Bookmark'"
-                      @click="onToggleFavorite(question.path, $event)"
-                    >
-                      <svg v-if="isFavorite(question.path)" viewBox="0 0 24 24" width="15" height="15" fill="#FBBF24">
-                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                      </svg>
-                      <svg v-else viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
-                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                      </svg>
-                    </button>
-                  </div>
+                  <button
+                    class="bookmark-icon-btn"
+                    :class="{ active: isFavorite(question.path) }"
+                    :title="isFavorite(question.path) ? 'Saved' : 'Bookmark'"
+                    @click="onToggleFavorite(question.path, $event)"
+                  >
+                    <svg v-if="isFavorite(question.path)" viewBox="0 0 24 24" width="16" height="16" fill="#F59E0B">
+                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
+                    <svg v-else viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                    </svg>
+                  </button>
                 </div>
 
-                <h3 class="step-card-title">
+                <h3 class="step-card-question-title">
                   {{ question.title }}
                 </h3>
 
-                <p class="step-card-summary">
+                <p class="step-card-preview-text">
                   {{ question.summary }}
                 </p>
 
-                <div class="step-card-footer">
-                  <button class="read-btn" @click.stop="navigateTo(question.path)">
-                    <span>Read Full Answer</span>
-                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+                <div class="step-card-bottom-actions">
+                  <button class="step-read-action-btn" @click.stop="navigateTo(question.path)">
+                    <span>Read Answer</span>
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
                       <polyline points="9 18 15 12 9 6"></polyline>
                     </svg>
                   </button>
 
                   <button
-                    class="mark-complete-btn"
+                    class="step-complete-toggle-btn"
                     :class="{ done: isLessonCompleted(question.path) }"
                     @click="onToggleComplete(question.path, $event)"
                   >
                     <svg v-if="isLessonCompleted(question.path)" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5">
                       <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
-                    <span>{{ isLessonCompleted(question.path) ? 'Completed' : 'Mark as Done' }}</span>
+                    <span>{{ isLessonCompleted(question.path) ? 'Completed' : 'Mark as done' }}</span>
                   </button>
                 </div>
               </div>
@@ -766,1041 +670,938 @@ onUnmounted(() => {
 
 <style scoped>
 /* ==========================================================================
-   Wiki Portal Layout & Modern Styling (Easy on the eyes, active, minimal)
+   Full 1920x1080 Kirrivan Screen Layout | Pure White Background (#FFFFFF)
+   Font: Open Sans (Google Fonts) | Code: Cabin
    ========================================================================== */
 
-.wiki-portal-container {
+.app-viewport-root {
+  width: 100vw;
+  max-width: 100%;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: var(--canvas-bg);
-  color: var(--text-primary);
-  font-family: var(--vp-font-family-base);
+  background: #FFFFFF;
+  color: #111827;
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  overflow-x: hidden;
 }
 
-/* ─── Top Header ────────────────────────────────────────────────────────── */
-.portal-header {
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  height: 60px;
-  background: var(--surface-panel);
-  border-bottom: 1px solid var(--border-subtle);
+/* ─── Top Header (Dark Charcoal Kirrivan Style, Full Width) ─────────────── */
+.app-top-header {
+  width: 100%;
+  height: 56px;
+  background: #181920;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 24px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
-.header-left {
+.top-header-left {
   display: flex;
   align-items: center;
+  gap: 16px;
 }
 
-.portal-logo {
+.app-brand {
   display: flex;
   align-items: center;
   gap: 10px;
   cursor: pointer;
-  text-decoration: none;
 }
 
-.spark-logo-icon {
+.brand-spark-icon {
   flex-shrink: 0;
 }
 
-.portal-title {
-  font-size: 16px;
+.brand-name {
+  font-size: 17px;
   font-weight: 700;
-  color: var(--text-primary);
+  color: #FFFFFF;
   letter-spacing: -0.01em;
 }
 
-.portal-badge {
-  font-size: 11px;
-  font-weight: 600;
-  background: var(--accent-orange-soft);
-  color: var(--accent-orange-dark);
-  padding: 2px 7px;
-  border-radius: 9999px;
+.header-divider {
+  width: 1px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.15);
 }
 
-.header-center {
+.header-module-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #9CA3AF;
+}
+
+.top-header-center {
   flex: 1;
-  max-width: 480px;
-  margin: 0 20px;
+  max-width: 520px;
+  margin: 0 24px;
 }
 
-.portal-search-trigger {
+.search-input-pill {
   width: 100%;
   display: flex;
   align-items: center;
   gap: 10px;
-  background: var(--capsule-container);
-  border: 1px solid var(--border-subtle);
-  padding: 8px 14px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 7px 14px;
   border-radius: 8px;
-  color: var(--text-muted);
+  color: #9CA3AF;
   font-size: 13.5px;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
-.portal-search-trigger:hover {
-  background: var(--surface-panel);
-  border-color: var(--accent-orange);
-  color: var(--text-primary);
+.search-input-pill:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: #F97316;
+  color: #FFFFFF;
 }
 
-.search-hint {
+.search-text {
   flex: 1;
   text-align: left;
 }
 
-.search-kbd {
-  font-size: 10.5px;
-  font-family: var(--vp-font-family-mono);
-  background: var(--surface-panel);
-  border: 1px solid var(--border-subtle);
+.search-shortcut {
+  font-size: 11px;
+  font-family: 'Cabin', monospace;
+  background: rgba(255, 255, 255, 0.1);
   padding: 2px 6px;
   border-radius: 4px;
-  color: var(--text-secondary);
+  color: #D1D5DB;
 }
 
-.header-right {
+.top-header-right {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
-.streak-pill {
+.streak-badge {
   display: flex;
   align-items: center;
   gap: 6px;
-  background: var(--accent-orange-soft);
-  border: 1px solid rgba(249, 115, 22, 0.3);
+  background: rgba(249, 115, 22, 0.15);
+  border: 1px solid rgba(249, 115, 22, 0.35);
   padding: 5px 10px;
   border-radius: 6px;
   font-size: 12px;
   font-weight: 600;
-  color: var(--accent-orange-dark);
+  color: #F97316;
 }
 
-.tool-btn {
+.header-action-btn {
   display: flex;
   align-items: center;
   gap: 6px;
-  background: var(--capsule-container);
-  border: 1px solid var(--border-subtle);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   padding: 6px 12px;
   border-radius: 6px;
   font-size: 12.5px;
   font-weight: 600;
-  color: var(--text-secondary);
+  color: #D1D5DB;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
-.tool-btn:hover {
-  background: var(--card-hover);
-  border-color: var(--border-medium);
-  color: var(--text-primary);
+.header-action-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #FFFFFF;
 }
 
-.icon-link-btn {
+.header-icon-circle {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   border-radius: 6px;
-  background: var(--capsule-container);
-  border: 1px solid var(--border-subtle);
-  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.08);
+  color: #D1D5DB;
   text-decoration: none;
   transition: all 0.2s ease;
 }
 
-.icon-link-btn:hover {
-  background: var(--accent-orange-soft);
-  color: var(--accent-orange-dark);
-  border-color: var(--accent-orange);
+.header-icon-circle:hover {
+  background: rgba(249, 115, 22, 0.2);
+  color: #F97316;
 }
 
-/* ─── Body Layout: Left Sidebar + Main Active Workspace ────────────────── */
-.portal-body {
+/* ─── Body Layout: Icon Rail + Secondary Panel + Main Canvas ────────────── */
+.app-workspace-body {
   display: flex;
+  width: 100vw;
+  max-width: 100%;
+  flex: 1;
+  min-height: calc(100vh - 56px);
+  background: #FFFFFF;
+}
+
+/* 1. Slim Left Icon Rail (60px) */
+.icon-rail {
+  width: 60px;
+  min-width: 60px;
+  background: #FFFFFF;
+  border-right: 1px solid #E5E7EB;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 18px 0;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.rail-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background: transparent;
+  border: none;
+  color: #6B7280;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+}
+
+.rail-btn:hover {
+  background: #F3F4F6;
+  color: #111827;
+}
+
+.rail-btn.active {
+  background: #EFF6FF;
+  color: #2563EB;
+}
+
+.rail-btn.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 10px;
+  bottom: 10px;
+  width: 3px;
+  background: #F97316;
+  border-radius: 0 4px 4px 0;
+}
+
+.rail-spacer {
   flex: 1;
 }
 
-/* ─── Left Sidebar Navigation ───────────────────────────────────────────── */
-.portal-sidebar {
-  width: 310px;
-  flex-shrink: 0;
-  background: var(--surface-panel);
-  border-right: 1px solid var(--border-subtle);
+/* 2. Secondary Left Sequence Panel (340px) */
+.sequence-nav-panel {
+  width: 340px;
+  min-width: 340px;
+  background: #FFFFFF;
+  border-right: 1px solid #E5E7EB;
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 60px);
+  flex-shrink: 0;
+  height: calc(100vh - 56px);
   position: sticky;
-  top: 60px;
+  top: 56px;
 }
 
-.sidebar-search-box {
-  padding: 14px 16px;
-  border-bottom: 1px solid var(--border-subtle);
+.panel-header-top {
+  padding: 20px 20px 12px;
+}
+
+.back-link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  color: #6B7280;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 8px;
+}
+
+.back-link-btn:hover {
+  color: #111827;
+}
+
+.panel-main-heading {
+  font-size: 20px;
+  font-weight: 700;
+  color: #111827;
+  letter-spacing: -0.015em;
+}
+
+.panel-search-wrap {
+  margin: 0 20px 16px;
   display: flex;
   align-items: center;
   gap: 8px;
-  color: var(--text-muted);
+  background: #FFFFFF;
+  border: 1px solid #D1D5DB;
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: #9CA3AF;
 }
 
-.sidebar-input {
+.panel-search-input {
   flex: 1;
   background: transparent;
   border: none;
   outline: none;
   font-size: 13px;
-  color: var(--text-primary);
+  color: #111827;
 }
 
-.sidebar-input::placeholder {
-  color: var(--text-muted);
+.panel-search-input::placeholder {
+  color: #9CA3AF;
 }
 
-.sidebar-nav-scroll {
+.sequence-list-scroll {
   flex: 1;
   overflow-y: auto;
-  padding: 12px 10px;
+  padding: 0 16px 24px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 8px;
 }
 
-.nav-section-title {
+.section-micro-heading {
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--text-muted);
-  padding: 14px 12px 6px;
+  color: #6B7280;
+  padding: 10px 4px 6px;
 }
 
-.nav-item-single {
+/* Kirrivan Selectable Sequence Cards */
+.sequence-selector-card {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 9px 12px;
-  border-radius: 8px;
+  align-items: flex-start;
+  gap: 12px;
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 10px;
+  padding: 14px;
   cursor: pointer;
-  transition: all 0.15s ease;
-  color: var(--text-secondary);
+  transition: all 0.2s ease;
 }
 
-.nav-item-single:hover {
-  background: var(--capsule-container);
-  color: var(--text-primary);
+.sequence-selector-card:hover {
+  border-color: #CBD5E1;
+  background: #F9FAFB;
 }
 
-.nav-item-single.active {
-  background: var(--accent-orange-soft);
-  color: var(--accent-orange-dark);
-  font-weight: 600;
+.sequence-selector-card.selected {
+  border: 1.5px solid #2563EB;
+  background: #FFFFFF;
+  box-shadow: 0 0 0 1px #2563EB, 0 2px 6px rgba(37, 99, 235, 0.08);
 }
 
-.nav-item-icon {
+.seq-card-icon-box {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: #F3F4F6;
+  color: #4B5563;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 }
 
-.nav-item-info {
+.sequence-selector-card.selected .seq-card-icon-box {
+  background: #EFF6FF;
+  color: #2563EB;
+}
+
+.seq-card-details {
   flex: 1;
 }
 
-.nav-item-title {
-  font-size: 13.5px;
-}
-
-.nav-count-badge {
-  font-size: 11px;
-  font-weight: 600;
-  background: var(--capsule-container);
-  padding: 2px 7px;
-  border-radius: 9999px;
-  color: var(--text-muted);
-}
-
-/* Track Group in Sidebar */
-.track-group {
-  margin-bottom: 3px;
-}
-
-.track-item-header {
+.seq-card-title-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 9px 12px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  color: var(--text-secondary);
-}
-
-.track-item-header:hover {
-  background: var(--capsule-container);
-  color: var(--text-primary);
-}
-
-.track-item-header.active {
-  background: var(--accent-orange-soft);
-  color: var(--accent-orange-dark);
-  font-weight: 600;
-}
-
-.track-left {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.track-code-badge {
-  font-size: 10px;
-  font-family: var(--vp-font-family-mono);
-  font-weight: 700;
-  background: var(--capsule-container);
-  border: 1px solid var(--border-subtle);
-  padding: 1px 5px;
-  border-radius: 4px;
-}
-
-.track-name {
-  font-size: 13.5px;
-}
-
-.track-right {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.track-count-pill {
-  font-size: 11px;
-  color: var(--text-muted);
-}
-
-.expand-caret-btn {
-  background: none;
-  border: none;
-  padding: 2px;
-  cursor: pointer;
-  color: var(--text-muted);
-  display: flex;
-  align-items: center;
-}
-
-.caret-icon {
-  transition: transform 0.2s ease;
-}
-
-.caret-icon.rotated {
-  transform: rotate(180deg);
-}
-
-/* Subtopics List inside Track */
-.subtopics-list {
-  padding-left: 20px;
-  margin-top: 2px;
-  margin-bottom: 6px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.subtopic-item-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-  text-align: left;
-  background: none;
-  border: none;
-  padding: 6px 10px;
-  border-radius: 6px;
-  font-size: 12.5px;
-  color: var(--text-muted);
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.subtopic-item-btn:hover {
-  background: var(--capsule-container);
-  color: var(--text-primary);
-}
-
-.subtopic-item-btn.active {
-  background: var(--surface-panel);
-  border: 1px solid var(--border-subtle);
-  color: var(--accent-orange-dark);
-  font-weight: 600;
-}
-
-.subtopic-dot {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: var(--border-medium);
-  flex-shrink: 0;
-}
-
-.subtopic-item-btn.active .subtopic-dot {
-  background: var(--accent-orange);
-}
-
-.subtopic-title {
-  flex: 1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.subtopic-badge {
-  font-size: 10.5px;
-  color: var(--text-muted);
-}
-
-/* ─── Right Main Content ────────────────────────────────────────────────── */
-.portal-main {
-  flex: 1;
-  padding: 28px 36px 80px;
-  max-width: 980px;
-  margin: 0 auto;
-  overflow-y: auto;
-}
-
-/* Overview Layout */
-.overview-hero-card {
-  background: var(--surface-panel);
-  border: 1px solid var(--border-subtle);
-  border-radius: 14px;
-  padding: 32px 36px;
-  margin-bottom: 24px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-}
-
-.hero-badge {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  color: var(--accent-orange-dark);
-  margin-bottom: 10px;
-}
-
-.hero-title {
-  font-size: 26px;
-  font-weight: 800;
-  color: var(--text-primary);
-  line-height: 1.25;
-  margin-bottom: 12px;
-  letter-spacing: -0.02em;
-}
-
-.hero-subtitle {
-  font-size: 15px;
-  line-height: 1.6;
-  color: var(--text-secondary);
-  max-width: 720px;
-  margin-bottom: 24px;
-}
-
-.hero-stats-row {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  padding-top: 20px;
-  border-top: 1px solid var(--border-subtle);
-}
-
-.stat-box {
-  display: flex;
-  flex-direction: column;
-}
-
-.stat-number {
-  font-size: 24px;
-  font-weight: 800;
-  color: var(--text-primary);
-}
-
-.stat-label {
-  font-size: 12px;
-  color: var(--text-muted);
-  margin-top: 2px;
-}
-
-/* Spaced Repetition Due Alert */
-.srs-alert-card {
-  background: var(--accent-orange-soft);
-  border: 1px solid rgba(249, 115, 22, 0.3);
-  border-radius: 12px;
-  padding: 14px 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 28px;
-}
-
-.srs-alert-left {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.srs-bell-icon {
-  color: var(--accent-orange);
-}
-
-.srs-title {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--accent-orange-dark);
-}
-
-.srs-desc {
-  font-size: 12.5px;
-  color: var(--text-secondary);
-}
-
-.srs-review-btn {
-  background: var(--accent-orange);
-  color: #FFFFFF;
-  border: none;
-  padding: 7px 14px;
-  border-radius: 6px;
-  font-size: 12.5px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.srs-review-btn:hover {
-  background: var(--accent-orange-dark);
-}
-
-/* Tracks Grid in Overview */
-.overview-tracks-section {
-  margin-top: 16px;
-}
-
-.section-heading-row {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  margin-bottom: 16px;
-}
-
-.section-title {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-.section-sub {
-  font-size: 13px;
-  color: var(--text-muted);
-}
-
-.tracks-cards-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
-}
-
-.track-display-card {
-  background: var(--surface-panel);
-  border: 1px solid var(--border-subtle);
-  border-radius: 12px;
-  padding: 22px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  flex-direction: column;
-}
-
-.track-display-card:hover {
-  border-color: var(--accent-orange);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
-}
-
-.track-card-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 10px;
-}
-
-.card-track-code {
-  font-size: 11px;
-  font-family: var(--vp-font-family-mono);
-  font-weight: 700;
-  color: var(--accent-orange-dark);
-  background: var(--accent-orange-soft);
-  padding: 2px 7px;
-  border-radius: 4px;
-}
-
-.card-track-count {
-  font-size: 12px;
-  color: var(--text-muted);
-}
-
-.track-card-title {
-  font-size: 17px;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 8px;
-}
-
-.track-card-desc {
-  font-size: 13.5px;
-  line-height: 1.5;
-  color: var(--text-secondary);
-  flex: 1;
-  margin-bottom: 18px;
-}
-
-.track-card-bottom {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  padding-top: 14px;
-  border-top: 1px solid var(--border-subtle);
-}
-
-.progress-wrap {
-  flex: 1;
-}
-
-.progress-bar-track {
-  height: 6px;
-  background: var(--capsule-container);
-  border-radius: 9999px;
-  overflow: hidden;
   margin-bottom: 4px;
 }
 
-.progress-bar-fill {
-  height: 100%;
-  background: var(--accent-orange);
-  border-radius: 9999px;
-  transition: width 0.3s ease;
-}
-
-.progress-text {
-  font-size: 11px;
-  color: var(--text-muted);
-}
-
-.track-open-btn {
-  background: var(--capsule-container);
-  border: 1px solid var(--border-subtle);
-  color: var(--text-primary);
-  padding: 5px 12px;
-  border-radius: 6px;
-  font-size: 12.5px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.track-display-card:hover .track-open-btn {
-  background: var(--accent-orange);
-  border-color: var(--accent-orange);
-  color: #FFFFFF;
-}
-
-/* ─── Active Track / Subtopic View ──────────────────────────────────────── */
-.workspace-header-card {
-  background: var(--surface-panel);
-  border: 1px solid var(--border-subtle);
-  border-radius: 14px;
-  padding: 26px 30px;
-  margin-bottom: 28px;
-}
-
-.workspace-header-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 12px;
-}
-
-.breadcrumbs-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12.5px;
-  color: var(--text-muted);
-}
-
-.crumb-link {
-  cursor: pointer;
-  color: var(--text-secondary);
-}
-
-.crumb-link:hover {
-  color: var(--accent-orange-dark);
-}
-
-.crumb-sep {
-  color: var(--border-medium);
-}
-
-.crumb-active {
-  color: var(--text-primary);
-  font-weight: 600;
-}
-
-.crumb-sub {
-  color: var(--accent-orange-dark);
-  font-weight: 600;
-}
-
-.open-wiki-btn {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  background: var(--accent-orange);
-  border: none;
-  color: #FFFFFF;
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.25);
-  transition: all 0.2s ease;
-}
-
-.open-wiki-btn:hover {
-  background: var(--accent-orange-dark);
-  transform: translateY(-1px);
-}
-
-.workspace-title-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 8px;
-}
-
-.workspace-main-title {
-  font-size: 24px;
-  font-weight: 800;
-  color: var(--text-primary);
-  letter-spacing: -0.015em;
-}
-
-.workspace-count-pill {
-  font-size: 12px;
-  font-weight: 600;
-  background: var(--capsule-container);
-  border: 1px solid var(--border-subtle);
-  padding: 2px 8px;
-  border-radius: 9999px;
-  color: var(--text-secondary);
-}
-
-.workspace-desc {
+.seq-card-title {
   font-size: 14px;
-  line-height: 1.6;
-  color: var(--text-secondary);
-  margin-bottom: 18px;
-}
-
-.subtopic-pills-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  padding-top: 14px;
-  border-top: 1px solid var(--border-subtle);
-}
-
-.sub-pill {
-  background: var(--capsule-container);
-  border: 1px solid var(--border-subtle);
-  color: var(--text-secondary);
-  font-size: 12.5px;
-  padding: 5px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.sub-pill:hover {
-  background: var(--surface-panel);
-  color: var(--text-primary);
-  border-color: var(--border-medium);
-}
-
-.sub-pill.active {
-  background: var(--accent-orange-soft);
-  border-color: var(--accent-orange);
-  color: var(--accent-orange-dark);
-  font-weight: 600;
-}
-
-/* ─── Step Cards Sequence Flow (Kirrivan Style - Image 1) ───────────────── */
-.sequence-step-flow {
-  display: flex;
-  flex-direction: column;
-}
-
-.empty-state-card {
-  background: var(--surface-panel);
-  border: 1px dashed var(--border-medium);
-  border-radius: 12px;
-  padding: 40px;
-  text-align: center;
-  color: var(--text-muted);
-}
-
-.empty-state-card h3 {
-  font-size: 16px;
   font-weight: 700;
-  color: var(--text-primary);
-  margin: 12px 0 6px;
+  color: #111827;
 }
 
-.step-row-wrapper {
-  display: flex;
-  gap: 18px;
-  position: relative;
-}
-
-.step-timeline-indicator {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 36px;
-  flex-shrink: 0;
-}
-
-.step-badge-pill {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background: var(--surface-panel);
-  border: 2px solid var(--border-medium);
-  font-family: var(--vp-font-family-mono);
-  font-size: 12.5px;
-  font-weight: 700;
-  color: var(--text-muted);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
-}
-
-.step-row-wrapper:hover .step-badge-pill {
-  border-color: var(--accent-orange);
-  color: var(--accent-orange);
-}
-
-.timeline-vertical-line {
-  flex: 1;
-  width: 2px;
-  background: var(--border-subtle);
-  margin: 6px 0;
-}
-
-/* Step Card Body */
-.step-card {
-  flex: 1;
-  background: var(--surface-panel);
-  border: 1px solid var(--border-subtle);
-  border-radius: 12px;
-  padding: 18px 22px;
-  margin-bottom: 18px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
-}
-
-.step-card:hover {
-  border-color: var(--accent-orange);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
-}
-
-.step-card.completed {
-  border-left: 3px solid var(--accent-mint);
-}
-
-.step-card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 8px;
-}
-
-.tags-group {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.subtopic-tag {
+.seq-card-count {
   font-size: 11px;
-  font-weight: 600;
-  background: var(--capsule-container);
-  color: var(--text-secondary);
-  padding: 2px 7px;
-  border-radius: 4px;
+  color: #6B7280;
 }
 
-.company-tag {
-  font-size: 11px;
-  font-weight: 600;
-  background: rgba(14, 165, 233, 0.1);
-  color: #0284C7;
-  padding: 2px 7px;
-  border-radius: 4px;
-}
-
-.completed-tag {
-  font-size: 11px;
-  font-weight: 600;
-  background: var(--accent-mint-bg);
-  color: var(--accent-mint);
-  padding: 2px 7px;
-  border-radius: 4px;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.card-top-actions {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.card-action-icon-btn {
-  background: none;
-  border: 1px solid var(--border-subtle);
-  border-radius: 6px;
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: var(--text-muted);
-  transition: all 0.15s ease;
-}
-
-.card-action-icon-btn:hover {
-  background: var(--capsule-container);
-  color: var(--text-primary);
-  border-color: var(--border-medium);
-}
-
-.card-action-icon-btn.active {
-  background: rgba(245, 158, 11, 0.12);
-  border-color: rgba(245, 158, 11, 0.4);
-  color: #D97706;
-}
-
-.step-card-title {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--text-primary);
-  line-height: 1.4;
-  margin-bottom: 8px;
-}
-
-.step-card-summary {
-  font-size: 13.5px;
-  line-height: 1.6;
-  color: var(--text-secondary);
-  margin-bottom: 14px;
+.seq-card-subtitle {
+  font-size: 12px;
+  line-height: 1.45;
+  color: #4B5563;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
-.step-card-footer {
+/* Subtopics tree */
+.subtopics-tree-section {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid #E5E7EB;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.subtopic-link-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 7px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #4B5563;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.subtopic-link-row:hover {
+  background: #F3F4F6;
+  color: #111827;
+}
+
+.subtopic-link-row.active {
+  background: #EFF6FF;
+  color: #2563EB;
+  font-weight: 600;
+}
+
+.dot-indicator {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #D1D5DB;
+  flex-shrink: 0;
+}
+
+.subtopic-link-row.active .dot-indicator {
+  background: #2563EB;
+}
+
+.subtopic-name {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.subtopic-count {
+  font-size: 11px;
+  color: #6B7280;
+}
+
+/* 3. Main Workspace Canvas (Fills 1920 Screen Canvas, Pure White #FFFFFF) */
+.main-canvas-area {
+  flex: 1;
+  width: calc(100% - 400px);
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 36px 56px 80px;
+  background: #FFFFFF;
+  overflow-y: auto;
+}
+
+/* Overview inside canvas */
+.canvas-overview-wrap {
+  width: 100%;
+}
+
+.canvas-big-title {
+  font-size: 28px;
+  font-weight: 800;
+  color: #111827;
+  letter-spacing: -0.02em;
+  margin-bottom: 6px;
+}
+
+.canvas-big-subtitle {
+  font-size: 15px;
+  color: #4B5563;
+  margin-bottom: 24px;
+}
+
+.hero-stats-banner {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.hero-stat-card {
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.hero-stat-val {
+  display: block;
+  font-size: 26px;
+  font-weight: 800;
+  color: #111827;
+}
+
+.hero-stat-lbl {
+  font-size: 13px;
+  color: #6B7280;
+  margin-top: 4px;
+}
+
+.srs-due-card {
+  background: #FFF7ED;
+  border: 1px solid #FED7AA;
+  border-radius: 12px;
+  padding: 16px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-top: 12px;
-  border-top: 1px solid var(--border-subtle);
+  margin-bottom: 32px;
 }
 
-.read-btn {
+.srs-card-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.srs-card-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #EA580C;
+  margin-bottom: 2px;
+}
+
+.srs-card-sub {
+  font-size: 13px;
+  color: #4B5563;
+}
+
+.srs-card-btn {
+  background: #F97316;
+  border: none;
+  color: #FFFFFF;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.canvas-section-header {
+  font-size: 17px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 16px;
+}
+
+.tracks-full-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.track-hero-box {
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  padding: 24px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.track-hero-box:hover {
+  border-color: #2563EB;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08);
+}
+
+.hero-box-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.hero-box-tag {
+  font-size: 11px;
+  font-family: 'Cabin', monospace;
+  font-weight: 700;
+  color: #2563EB;
+  background: #EFF6FF;
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.hero-box-count {
+  font-size: 12px;
+  color: #6B7280;
+}
+
+.hero-box-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 8px;
+}
+
+.hero-box-desc {
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: #4B5563;
+  margin-bottom: 20px;
+}
+
+.hero-box-bottom {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.progress-bar-bg {
+  flex: 1;
+  height: 6px;
+  background: #F3F4F6;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.progress-bar-val {
+  height: 100%;
+  background: #F97316;
+  border-radius: 9999px;
+}
+
+.progress-status-lbl {
+  font-size: 12px;
+  color: #6B7280;
+}
+
+/* ─── Selected Track: Kirrivan Preview Flow ─────────────────────────────── */
+.canvas-sequence-wrap {
+  width: 100%;
+}
+
+.preview-header-bar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 32px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #E5E7EB;
+}
+
+.preview-title-block {
+  flex: 1;
+}
+
+.preview-heading {
+  font-size: 26px;
+  font-weight: 800;
+  color: #111827;
+  letter-spacing: -0.015em;
+  margin-bottom: 6px;
+}
+
+.preview-subtext {
+  font-size: 14.5px;
+  color: #4B5563;
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+
+.preview-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #6B7280;
+}
+
+.meta-dot {
+  color: #D1D5DB;
+}
+
+/* Kirrivan Orange Button "Open builder" */
+.open-builder-btn {
+  background: #F97316;
+  border: none;
+  color: #FFFFFF;
+  font-size: 13.5px;
+  font-weight: 600;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(249, 115, 22, 0.25);
+  transition: all 0.2s ease;
+}
+
+.open-builder-btn:hover {
+  background: #EA580C;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.35);
+}
+
+/* Connected Step Cards Flow (Kirrivan Timeline Layout) */
+.connected-timeline-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.empty-state-notice {
+  padding: 40px;
+  text-align: center;
+  color: #6B7280;
+  border: 1px dashed #D1D5DB;
+  border-radius: 12px;
+}
+
+.timeline-step-row {
+  display: flex;
+  gap: 24px;
+  width: 100%;
+}
+
+/* Left Gutter: Pill badge + Vertical Connecting Track */
+.timeline-gutter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 68px;
+  flex-shrink: 0;
+}
+
+.step-counter-pill {
+  width: 68px;
+  height: 28px;
+  background: #111827;
+  color: #FFFFFF;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0.02em;
+  z-index: 2;
+}
+
+.connecting-line {
+  flex: 1;
+  width: 2px;
+  background: #E5E7EB;
+  margin: 6px 0;
+}
+
+/* Kirrivan Step Card (Stretches across full wide canvas) */
+.kirrivan-step-card {
+  flex: 1;
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  padding: 22px 28px;
+  margin-bottom: 22px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.kirrivan-step-card:hover {
+  border-color: #2563EB;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.08);
+}
+
+.kirrivan-step-card.completed {
+  border-left: 4px solid #10B981;
+}
+
+.step-card-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.step-card-badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.badge-subtopic {
+  font-size: 11px;
+  font-weight: 600;
+  background: #F3F4F6;
+  color: #4B5563;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.badge-company {
+  font-size: 11px;
+  font-weight: 600;
+  background: #EFF6FF;
+  color: #2563EB;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.badge-done {
+  font-size: 11px;
+  font-weight: 600;
+  background: rgba(16, 185, 129, 0.12);
+  color: #10B981;
+  padding: 2px 8px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.bookmark-icon-btn {
+  background: none;
+  border: 1px solid #E5E7EB;
+  border-radius: 6px;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #6B7280;
+  transition: all 0.15s ease;
+}
+
+.bookmark-icon-btn:hover {
+  background: #F9FAFB;
+  border-color: #D1D5DB;
+  color: #111827;
+}
+
+.bookmark-icon-btn.active {
+  background: #FEF3C7;
+  border-color: #FCD34D;
+  color: #D97706;
+}
+
+.step-card-question-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: #111827;
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
+
+.step-card-preview-text {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #4B5563;
+  margin-bottom: 16px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.step-card-bottom-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 14px;
+  border-top: 1px solid #F3F4F6;
+}
+
+.step-read-action-btn {
   display: inline-flex;
   align-items: center;
   gap: 5px;
   background: none;
   border: none;
-  color: var(--accent-orange-dark);
-  font-size: 13px;
+  color: #2563EB;
+  font-size: 13.5px;
   font-weight: 600;
   cursor: pointer;
   padding: 0;
 }
 
-.read-btn:hover {
+.step-read-action-btn:hover {
   text-decoration: underline;
 }
 
-.mark-complete-btn {
+.step-complete-toggle-btn {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  background: var(--capsule-container);
-  border: 1px solid var(--border-subtle);
-  color: var(--text-secondary);
-  font-size: 12px;
+  gap: 6px;
+  background: #F3F4F6;
+  border: 1px solid #E5E7EB;
+  color: #4B5563;
+  font-size: 12.5px;
   font-weight: 500;
-  padding: 4px 10px;
+  padding: 5px 12px;
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
-.mark-complete-btn:hover {
-  background: var(--surface-panel);
-  color: var(--text-primary);
-  border-color: var(--border-medium);
+.step-complete-toggle-btn:hover {
+  background: #FFFFFF;
+  color: #111827;
+  border-color: #D1D5DB;
 }
 
-.mark-complete-btn.done {
-  background: var(--accent-mint-bg);
+.step-complete-toggle-btn.done {
+  background: rgba(16, 185, 129, 0.1);
   border-color: rgba(16, 185, 129, 0.3);
-  color: var(--accent-mint);
+  color: #059669;
   font-weight: 600;
 }
 
-/* ─── Responsive Media Queries ─────────────────────────────────────────── */
-@media (max-width: 900px) {
-  .portal-sidebar {
+@media (max-width: 1024px) {
+  .sequence-nav-panel {
     display: none;
   }
-  .portal-main {
-    padding: 20px;
+  .main-canvas-area {
+    width: calc(100% - 60px);
+    padding: 24px;
   }
-  .tracks-cards-grid {
+  .tracks-full-grid {
     grid-template-columns: 1fr;
   }
-  .hero-stats-row {
+  .hero-stats-banner {
     grid-template-columns: repeat(2, 1fr);
   }
 }
