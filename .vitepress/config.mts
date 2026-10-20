@@ -42,7 +42,7 @@ export default defineConfig({
   head: [
     ['link', { rel: 'preconnect', href: 'https://fonts.googleapis.com' }],
     ['link', { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' }],
-    ['link', { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Cabin:ital,wght@0,400..700;1,400..700&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap' }],
+    ['link', { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Cabin:ital,wght@0,400..700;1,400..700&family=Jost:ital,wght@0,300..900;1,300..900&display=swap' }],
     ['meta', { name: 'theme-color', content: '#ffffff' }],
     ['meta', { name: 'author', content: 'Balasubramanian PG' }],
     ['meta', { property: 'og:title', content: 'PySpark Interview Prep Wiki' }],

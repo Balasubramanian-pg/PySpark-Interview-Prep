@@ -682,7 +682,7 @@ onUnmounted(() => {
   flex-direction: column;
   background: #FFFFFF;
   color: #111827;
-  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Jost', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   overflow-x: hidden;
 }
 
