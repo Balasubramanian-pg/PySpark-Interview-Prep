@@ -63,7 +63,6 @@ export default defineConfig({
       { text: 'Senior Dev', link: '/4. Senior Dev/4.1 Memory Management And OOM Errors/4.1.1 How does PySpark manage JVM off-heap and on-heap memory' }
     ],
     sidebar: {
-      '/': unifiedSidebar,
       '/1. Fundamentals/': unifiedSidebar,
       '/2. Intermediate/': unifiedSidebar,
       '/3. Advanced/': unifiedSidebar,
@@ -86,6 +85,19 @@ export default defineConfig({
     theme: {
       light: 'github-light',
       dark: 'github-dark'
+    },
+    config: (md) => {
+      const defaultFence = md.renderer.rules.fence!
+      md.renderer.rules.fence = (tokens, idx, options, env, self) => {
+        const token = tokens[idx]
+        const info = token.info.trim()
+        if (info === 'mermaid') {
+          const rawCode = token.content
+          const encodedCode = encodeURIComponent(rawCode)
+          return `<MermaidViewer raw-code="${encodedCode}" />\n`
+        }
+        return defaultFence(tokens, idx, options, env, self)
+      }
     }
   },
 

@@ -528,3 +528,60 @@ div[class*='language-'] > button.copy {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(156, 163, 175, 0.6);
 }
+
+/* ==========================================================================
+   Home Page Layout Rules - Sidebar Strictly Hidden on Home
+   ========================================================================== */
+.home-page .VPSidebar,
+.VPHome .VPSidebar,
+body:has(.app-viewport-root) .VPSidebar,
+body:has(.app-workspace-body) .VPSidebar {
+  display: none !important;
+}
+
+body:has(.app-viewport-root) .VPContent {
+  padding-left: 0 !important;
+}
+
+body:has(.app-viewport-root) .VPDoc {
+  padding: 0 !important;
+}
+
+/* Single Top Bar Search Trigger */
+.reader-top-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: 14px;
+}
+
+.reader-search-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  padding: 6px 14px;
+  border-radius: 20px;
+  color: #64748B;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.reader-search-trigger:hover {
+  background: #F1F5F9;
+  border-color: #CBD5E1;
+  color: #0F172A;
+}
+
+.reader-search-trigger .kbd-shortcut {
+  font-size: 10.5px;
+  font-family: 'Cabin', monospace;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  padding: 1px 6px;
+  border-radius: 4px;
+  color: #94A3B8;
+}
+
