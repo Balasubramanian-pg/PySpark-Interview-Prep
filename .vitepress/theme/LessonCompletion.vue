@@ -46,7 +46,7 @@ function onToggleCompletion() {
       particleCount: 50,
       spread: 60,
       origin: { y: 0.85 },
-      colors: ['#FF6B35', '#906BFF', '#34D399', '#FBBF24']
+      colors: ['#2563EB', '#60A5FA', '#34D399', '#FBBF24']
     })
   }
 }
@@ -65,7 +65,7 @@ function handleSRSGrade(confidence: 'hard' | 'good' | 'mastered') {
       particleCount: 35,
       spread: 50,
       origin: { y: 0.85 },
-      colors: ['#FF6B35', '#10B981']
+      colors: ['#2563EB', '#10B981']
     })
   }
 }
@@ -244,7 +244,7 @@ function navigateTo(path: string) {
 .srs-retention-pill {
   width: 100%;
   max-width: 100%;
-  background: #FFFFFF;
+  background: var(--surface-panel);
   border: 1px solid var(--border-subtle);
   border-radius: 14px;
   padding: 24px 28px;
@@ -264,9 +264,9 @@ function navigateTo(path: string) {
 .pill-tag {
   font-size: 11px;
   font-weight: 700;
-  color: var(--accent-orange-dark);
+  color: var(--accent-brand-dark);
   letter-spacing: 0.06em;
-  background: var(--accent-orange-soft);
+  background: var(--accent-brand-soft);
   padding: 3px 8px;
   border-radius: 5px;
 }
@@ -275,7 +275,7 @@ function navigateTo(path: string) {
   font-size: 11px;
   font-weight: 600;
   color: var(--text-muted);
-  background: #F1F5F9;
+  background: var(--capsule-container);
   padding: 3px 8px;
   border-radius: 5px;
 }
@@ -414,7 +414,7 @@ function navigateTo(path: string) {
   gap: 16px;
   width: 100%;
   max-width: 100%;
-  background: #FFFFFF;
+  background: var(--surface-panel);
   border: 1px solid var(--border-subtle);
   border-radius: 12px;
   padding: 14px 24px;
@@ -431,7 +431,7 @@ function navigateTo(path: string) {
   display: flex;
   align-items: center;
   gap: 6px;
-  background: #FFFFFF;
+  background: var(--card-bg);
   border: 1px solid var(--border-subtle);
   color: var(--text-secondary);
   font-size: 13.5px;
@@ -445,8 +445,8 @@ function navigateTo(path: string) {
 
 .nav-btn:hover:not(.disabled) {
   color: var(--text-primary);
-  border-color: var(--accent-orange);
-  background: var(--accent-orange-soft);
+  border-color: var(--accent-brand);
+  background: var(--accent-brand-soft);
 }
 
 .nav-btn.disabled {
@@ -464,7 +464,7 @@ function navigateTo(path: string) {
   display: flex;
   align-items: center;
   gap: 7px;
-  background: #FFFFFF;
+  background: var(--card-bg);
   border: 1px solid var(--border-subtle);
   color: var(--text-secondary);
   font-size: 13.5px;
@@ -491,7 +491,7 @@ function navigateTo(path: string) {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: var(--accent-orange);
+  background: var(--accent-brand);
   border: none;
   color: #FFFFFF;
   font-size: 13.5px;
@@ -500,13 +500,13 @@ function navigateTo(path: string) {
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 1px 3px rgba(249, 115, 22, 0.3);
+  box-shadow: 0 1px 3px rgba(37, 99, 235, 0.3);
 }
 
 .complete-btn:hover {
-  background: var(--accent-orange-dark);
+  background: var(--accent-brand-dark);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.35);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
 }
 
 .complete-btn.completed {

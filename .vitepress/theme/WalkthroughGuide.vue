@@ -217,39 +217,59 @@ defineExpose({
 
 .walkthrough-popover {
   position: fixed;
-  background: #15161E;
-  border: 1px solid rgba(255, 107, 53, 0.4);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7), 0 0 30px rgba(255, 107, 53, 0.2);
+  background: #FAF7F0;
+  border: 1px solid #E2DAC9;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.18), 0 0 30px rgba(37, 99, 235, 0.12);
   border-radius: 20px;
   padding: 22px;
-  color: #FFFFFF;
+  color: #1F2937;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   z-index: 100000;
+}
+
+:global(.dark) .walkthrough-popover {
+  background: #2D3238;
+  border: 1px solid #4B535E;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7), 0 0 30px rgba(37, 99, 235, 0.2);
+  color: #EEEEEE;
 }
 
 .popover-badge {
   display: inline-block;
   font-size: 11px;
   font-weight: 700;
-  color: #FF6B35;
-  background: rgba(255, 107, 53, 0.14);
+  color: #2563EB;
+  background: rgba(37, 99, 235, 0.1);
   padding: 4px 10px;
   border-radius: 9999px;
   letter-spacing: 0.05em;
   margin-bottom: 10px;
 }
 
+:global(.dark) .popover-badge {
+  color: #60A5FA;
+  background: rgba(37, 99, 235, 0.25);
+}
+
 .popover-title {
   margin: 0 0 8px 0;
   font-size: 17px;
   font-weight: 700;
-  color: #FFFFFF;
+  color: #1F2937;
+}
+
+:global(.dark) .popover-title {
+  color: #EEEEEE;
 }
 
 .popover-desc {
   margin: 0 0 18px 0;
   font-size: 13.5px;
   line-height: 1.5;
+  color: #4B5563;
+}
+
+:global(.dark) .popover-desc {
   color: #9CA3AF;
 }
 
@@ -257,8 +277,12 @@ defineExpose({
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid #E2DAC9;
   padding-top: 14px;
+}
+
+:global(.dark) .popover-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .step-dots {
@@ -270,13 +294,17 @@ defineExpose({
   width: 7px;
   height: 7px;
   border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.15);
   transition: all 0.25s ease;
+}
+
+:global(.dark) .dot {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .dot.active {
   width: 20px;
-  background: #FF6B35;
+  background: #2563EB;
 }
 
 .popover-actions {
@@ -287,8 +315,8 @@ defineExpose({
 
 .btn-subtle {
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: #9CA3AF;
+  border: 1px solid #E2DAC9;
+  color: #6B7280;
   padding: 6px 12px;
   border-radius: 8px;
   font-size: 12.5px;
@@ -296,13 +324,23 @@ defineExpose({
   transition: all 0.2s;
 }
 
+:global(.dark) .btn-subtle {
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #9CA3AF;
+}
+
 .btn-subtle:hover {
+  color: #1F2937;
+  border-color: #CBD5E1;
+}
+
+:global(.dark) .btn-subtle:hover {
   color: #FFFFFF;
   border-color: rgba(255, 255, 255, 0.3);
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #FF6B35 0%, #EA580C 100%);
+  background: #2563EB;
   border: none;
   color: #FFFFFF;
   padding: 7px 16px;
@@ -310,25 +348,34 @@ defineExpose({
   font-size: 12.5px;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(255, 107, 53, 0.35);
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
   transition: all 0.2s;
 }
 
 .btn-primary:hover {
+  background: #1D4ED8;
   transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(255, 107, 53, 0.45);
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.45);
 }
 
 .btn-close {
   background: transparent;
   border: none;
-  color: #6E7387;
+  color: #6B7280;
   font-size: 14px;
   cursor: pointer;
   padding: 4px 8px;
 }
 
+:global(.dark) .btn-close {
+  color: #6E7387;
+}
+
 .btn-close:hover {
+  color: #1F2937;
+}
+
+:global(.dark) .btn-close:hover {
   color: #FFFFFF;
 }
 </style>

@@ -155,7 +155,7 @@ onMounted(() => {
 .gallery6-eyebrow {
   font-size: 11px;
   font-weight: 700;
-  color: #FF6B35;
+  color: #2563EB;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   margin-bottom: 4px;
@@ -196,9 +196,9 @@ onMounted(() => {
 }
 
 .gallery6-btn:hover:not(:disabled) {
-  background: rgba(255, 107, 53, 0.2);
-  border-color: rgba(255, 107, 53, 0.5);
-  color: #FF6B35;
+  background: rgba(37, 99, 235, 0.15);
+  border-color: rgba(37, 99, 235, 0.4);
+  color: #2563EB;
   transform: scale(1.06);
 }
 
@@ -236,7 +236,7 @@ onMounted(() => {
 
 .gallery6-item:hover {
   transform: translateY(-4px);
-  border-color: rgba(255, 107, 53, 0.4);
+  border-color: rgba(37, 99, 235, 0.4);
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
   background: #171827;
 }
@@ -273,7 +273,7 @@ onMounted(() => {
   background: rgba(13, 14, 20, 0.85);
   backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #FF6B35;
+  color: #2563EB;
   font-size: 10.5px;
   font-weight: 700;
   padding: 3px 10px;
@@ -333,7 +333,7 @@ onMounted(() => {
 
 .item-progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #FF6B35 0%, #EA580C 100%);
+  background: linear-gradient(90deg, #2563EB 0%, #1D4ED8 100%);
   border-radius: 9999px;
   transition: width 0.6s ease;
 }
@@ -358,7 +358,7 @@ onMounted(() => {
   gap: 6px;
   font-size: 12px;
   font-weight: 700;
-  color: #FF6B35;
+  color: #2563EB;
   transition: gap 0.2s;
 }
 

@@ -22,7 +22,7 @@ function onAccept() {
   <div v-if="visible" class="storage-consent-banner">
     <div class="consent-inner">
       <div class="consent-info">
-        <svg class="consent-lock-svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#FF6B35" stroke-width="2">
+        <svg class="consent-lock-svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#2563EB" stroke-width="2">
           <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
           <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
         </svg>
@@ -58,14 +58,18 @@ function onAccept() {
   gap: 20px;
   max-width: 860px;
   width: 100%;
-  background: rgba(18, 19, 26, 0.95);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  border: 1px solid rgba(255, 107, 53, 0.3);
+  background: #FAF7F0;
+  border: 1px solid #E2DAC9;
   border-radius: 18px;
   padding: 16px 24px;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
   animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:global(.dark) .consent-inner {
+  background: #2D3238;
+  border: 1px solid #4B535E;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
 }
 
 @keyframes slideUp {
@@ -98,17 +102,25 @@ function onAccept() {
 .consent-title {
   font-size: 14px;
   font-weight: 700;
-  color: #FFFFFF;
+  color: #1F2937;
+}
+
+:global(.dark) .consent-title {
+  color: #EEEEEE;
 }
 
 .consent-desc {
   font-size: 12.5px;
-  color: #9CA3AF;
+  color: #4B5563;
   line-height: 1.4;
 }
 
+:global(.dark) .consent-desc {
+  color: #9CA3AF;
+}
+
 .consent-accept-btn {
-  background: linear-gradient(135deg, #FF6B35 0%, #EA580C 100%);
+  background: #2563EB;
   border: none;
   color: #FFFFFF;
   padding: 8px 18px;
@@ -117,13 +129,14 @@ function onAccept() {
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
-  box-shadow: 0 4px 14px rgba(255, 107, 53, 0.3);
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
   transition: all 0.2s ease;
 }
 
 .consent-accept-btn:hover {
+  background: #1D4ED8;
   transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(255, 107, 53, 0.45);
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.45);
 }
 
 @media (max-width: 680px) {

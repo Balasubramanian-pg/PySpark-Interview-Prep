@@ -44,13 +44,13 @@ async function renderDiagram() {
       themeVariables: {
         fontFamily: 'Jost, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
         fontSize: '14px',
-        primaryColor: '#FFF7ED',
-        primaryTextColor: '#9A3412',
-        primaryBorderColor: '#F97316',
-        lineColor: '#EA580C',
-        secondaryColor: '#EFF6FF',
-        secondaryTextColor: '#1E40AF',
-        secondaryBorderColor: '#3B82F6',
+        primaryColor: '#EFF6FF',
+        primaryTextColor: '#1E40AF',
+        primaryBorderColor: '#2563EB',
+        lineColor: '#1D4ED8',
+        secondaryColor: '#F8FAFC',
+        secondaryTextColor: '#334155',
+        secondaryBorderColor: '#64748B',
         tertiaryColor: '#F0FDF4',
         tertiaryTextColor: '#166534',
         tertiaryBorderColor: '#22C55E',
@@ -222,7 +222,7 @@ function copyCode() {
 
 .mermaid-tab-btn.active {
   background: #FFFFFF;
-  color: #EA580C;
+  color: #2563EB;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
 }
 
@@ -301,7 +301,7 @@ function copyCode() {
   width: 22px;
   height: 22px;
   border: 2px solid #E2E8F0;
-  border-top-color: #F97316;
+  border-top-color: #2563EB;
   border-radius: 50%;
   animation: mermaid-spin 0.8s linear infinite;
 }
@@ -331,9 +331,9 @@ function copyCode() {
   margin-top: 10px;
   font-size: 12px;
   font-weight: 600;
-  color: #EA580C;
-  background: #FFF7ED;
-  border: 1px solid #FFEDD5;
+  color: #2563EB;
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
   padding: 5px 12px;
   border-radius: 6px;
   cursor: pointer;

@@ -241,7 +241,7 @@ onUnmounted(() => {
       <nav class="icon-rail">
         <!-- Streak Indicator in Rail -->
         <div class="rail-streak-badge" :title="`Study Streak: ${studyStreak.currentStreak} days active`">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="#F97316">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="#2563EB">
             <path d="M12 0c-.28 0-.5.22-.5.5 0 2.24-1.32 3.63-2.6 4.98C7.54 6.89 6 8.52 6 11.5c0 3.59 2.91 6.5 6.5 6.5s6.5-2.91 6.5-6.5c0-4.08-3.08-6.19-5.58-8.75C12.74 2.05 12.08 1.13 12 0zm0 15c-1.93 0-3.5-1.57-3.5-3.5 0-1.3.7-2.31 1.6-3.3.8-1 1.9-2.12 1.9-4.2 1.34 1.5 3.5 3.32 3.5 6 0 2.76-1.57 5-3.5 5z"/>
           </svg>
           <span class="rail-streak-num">{{ studyStreak.currentStreak > 0 ? `${studyStreak.currentStreak}d` : '1d' }}</span>
@@ -442,7 +442,7 @@ onUnmounted(() => {
           <!-- Spaced Repetition Due Banner -->
           <div v-if="dueReviews.length > 0" class="srs-due-card">
             <div class="srs-card-left">
-              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#F97316" stroke-width="2">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#2563EB" stroke-width="2">
                 <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
                 <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
               </svg>
@@ -619,8 +619,8 @@ onUnmounted(() => {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #FFFFFF;
-  color: #111827;
+  background: var(--canvas-bg);
+  color: var(--text-primary);
   font-family: 'Jost', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   overflow-x: hidden;
 }
@@ -635,8 +635,8 @@ onUnmounted(() => {
   width: 44px;
   height: 44px;
   border-radius: 8px;
-  background: rgba(249, 115, 22, 0.08);
-  border: 1px solid rgba(249, 115, 22, 0.25);
+  background: var(--accent-brand-soft);
+  border: 1px solid var(--accent-blue-border);
   margin-bottom: 8px;
   cursor: pointer;
 }
@@ -644,7 +644,7 @@ onUnmounted(() => {
 .rail-streak-num {
   font-size: 10px;
   font-weight: 700;
-  color: #EA580C;
+  color: var(--accent-brand-dark);
 }
 
 /* ─── Body Layout: Icon Rail + Secondary Panel + Main Canvas ────────────── */
@@ -654,15 +654,15 @@ onUnmounted(() => {
   max-width: 100%;
   flex: 1;
   min-height: calc(100vh - 56px);
-  background: #FFFFFF;
+  background: var(--canvas-bg);
 }
 
 /* 1. Slim Left Icon Rail (60px) */
 .icon-rail {
   width: 60px;
   min-width: 60px;
-  background: #FFFFFF;
-  border-right: 1px solid #E5E7EB;
+  background: var(--surface-panel);
+  border-right: 1px solid var(--border-subtle);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -677,7 +677,7 @@ onUnmounted(() => {
   border-radius: 8px;
   background: transparent;
   border: none;
-  color: #6B7280;
+  color: var(--text-muted);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -687,13 +687,13 @@ onUnmounted(() => {
 }
 
 .rail-btn:hover {
-  background: #F3F4F6;
-  color: #111827;
+  background: var(--card-hover);
+  color: var(--text-primary);
 }
 
 .rail-btn.active {
-  background: #EFF6FF;
-  color: #2563EB;
+  background: var(--accent-brand-soft);
+  color: var(--accent-brand);
 }
 
 .rail-btn.active::before {
@@ -703,7 +703,7 @@ onUnmounted(() => {
   top: 10px;
   bottom: 10px;
   width: 3px;
-  background: #F97316;
+  background: #2563EB;
   border-radius: 0 4px 4px 0;
 }
 
@@ -715,8 +715,8 @@ onUnmounted(() => {
 .sequence-nav-panel {
   width: 340px;
   min-width: 340px;
-  background: #FFFFFF;
-  border-right: 1px solid #E5E7EB;
+  background: var(--surface-panel);
+  border-right: 1px solid var(--border-subtle);
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
@@ -990,8 +990,8 @@ onUnmounted(() => {
 }
 
 .srs-due-card {
-  background: #FFF7ED;
-  border: 1px solid #FED7AA;
+  background: var(--accent-blue-soft);
+  border: 1px solid var(--accent-blue-border);
   border-radius: 12px;
   padding: 16px 24px;
   display: flex;
@@ -1009,17 +1009,17 @@ onUnmounted(() => {
 .srs-card-title {
   font-size: 15px;
   font-weight: 700;
-  color: #EA580C;
+  color: #1D4ED8;
   margin-bottom: 2px;
 }
 
 .srs-card-sub {
   font-size: 13px;
-  color: #4B5563;
+  color: var(--text-secondary);
 }
 
 .srs-card-btn {
-  background: #F97316;
+  background: #2563EB;
   border: none;
   color: #FFFFFF;
   font-size: 13px;
@@ -1027,12 +1027,17 @@ onUnmounted(() => {
   padding: 8px 16px;
   border-radius: 6px;
   cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.srs-card-btn:hover {
+  background: #1D4ED8;
 }
 
 .canvas-section-header {
   font-size: 17px;
   font-weight: 700;
-  color: #111827;
+  color: var(--text-primary);
   margin-bottom: 16px;
 }
 
@@ -1043,8 +1048,8 @@ onUnmounted(() => {
 }
 
 .track-hero-box {
-  background: #FFFFFF;
-  border: 1px solid #E5E7EB;
+  background: var(--card-bg);
+  border: 1px solid var(--border-subtle);
   border-radius: 12px;
   padding: 24px;
   cursor: pointer;
@@ -1069,27 +1074,27 @@ onUnmounted(() => {
   font-family: 'Cabin', monospace;
   font-weight: 700;
   color: #2563EB;
-  background: #EFF6FF;
+  background: var(--accent-blue-soft);
   padding: 2px 7px;
   border-radius: 4px;
 }
 
 .hero-box-count {
   font-size: 12px;
-  color: #6B7280;
+  color: var(--text-muted);
 }
 
 .hero-box-title {
   font-size: 18px;
   font-weight: 700;
-  color: #111827;
+  color: var(--text-primary);
   margin-bottom: 8px;
 }
 
 .hero-box-desc {
   font-size: 13.5px;
   line-height: 1.5;
-  color: #4B5563;
+  color: var(--text-secondary);
   margin-bottom: 20px;
 }
 
@@ -1102,20 +1107,20 @@ onUnmounted(() => {
 .progress-bar-bg {
   flex: 1;
   height: 6px;
-  background: #F3F4F6;
+  background: var(--capsule-container);
   border-radius: 9999px;
   overflow: hidden;
 }
 
 .progress-bar-val {
   height: 100%;
-  background: #F97316;
+  background: #2563EB;
   border-radius: 9999px;
 }
 
 .progress-status-lbl {
   font-size: 12px;
-  color: #6B7280;
+  color: var(--text-muted);
 }
 
 /* ─── Selected Track: Kirrivan Preview Flow ─────────────────────────────── */
@@ -1130,7 +1135,7 @@ onUnmounted(() => {
   gap: 24px;
   margin-bottom: 32px;
   padding-bottom: 24px;
-  border-bottom: 1px solid #E5E7EB;
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .preview-title-block {
@@ -1140,14 +1145,14 @@ onUnmounted(() => {
 .preview-heading {
   font-size: 26px;
   font-weight: 800;
-  color: #111827;
+  color: var(--text-primary);
   letter-spacing: -0.015em;
   margin-bottom: 6px;
 }
 
 .preview-subtext {
   font-size: 14.5px;
-  color: #4B5563;
+  color: var(--text-secondary);
   line-height: 1.5;
   margin-bottom: 10px;
 }
@@ -1157,16 +1162,16 @@ onUnmounted(() => {
   align-items: center;
   gap: 8px;
   font-size: 13px;
-  color: #6B7280;
+  color: var(--text-muted);
 }
 
 .meta-dot {
-  color: #D1D5DB;
+  color: var(--border-medium);
 }
 
-/* Kirrivan Orange Button "Open builder" */
+/* Kirrivan Blue Button "Open builder" */
 .open-builder-btn {
-  background: #F97316;
+  background: #2563EB;
   border: none;
   color: #FFFFFF;
   font-size: 13.5px;
@@ -1175,14 +1180,14 @@ onUnmounted(() => {
   border-radius: 8px;
   cursor: pointer;
   white-space: nowrap;
-  box-shadow: 0 2px 6px rgba(249, 115, 22, 0.25);
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
   transition: all 0.2s ease;
 }
 
 .open-builder-btn:hover {
-  background: #EA580C;
+  background: #1D4ED8;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.35);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
 }
 
 /* Connected Step Cards Flow (Kirrivan Timeline Layout) */
@@ -1195,8 +1200,8 @@ onUnmounted(() => {
 .empty-state-notice {
   padding: 40px;
   text-align: center;
-  color: #6B7280;
-  border: 1px dashed #D1D5DB;
+  color: var(--text-muted);
+  border: 1px dashed var(--border-medium);
   border-radius: 12px;
 }
 
@@ -1219,7 +1224,7 @@ onUnmounted(() => {
   min-width: 76px;
   height: 28px;
   padding: 0 10px;
-  background: #111827;
+  background: #1E242B;
   color: #FFFFFF;
   border-radius: 6px;
   font-size: 11.5px;
@@ -1235,15 +1240,15 @@ onUnmounted(() => {
 .connecting-line {
   flex: 1;
   width: 2px;
-  background: #E5E7EB;
+  background: var(--border-subtle);
   margin: 6px 0;
 }
 
 /* Kirrivan Step Card (Stretches across full wide canvas) */
 .kirrivan-step-card {
   flex: 1;
-  background: #FFFFFF;
-  border: 1px solid #E5E7EB;
+  background: var(--card-bg);
+  border: 1px solid var(--border-subtle);
   border-radius: 12px;
   padding: 22px 28px;
   margin-bottom: 22px;

@@ -153,9 +153,9 @@ function openFullNotes() {
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: rgba(8, 9, 13, 0.85);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -165,14 +165,21 @@ function openFullNotes() {
 .flashcard-dialog {
   width: 100%;
   max-width: 580px;
-  background: #141521;
-  border: 1px solid rgba(255, 107, 53, 0.35);
-  border-radius: 24px;
+  background: #FAF7F0;
+  border: 1px solid #E2DAC9;
+  border-radius: 20px;
   padding: 20px;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
   display: flex;
   flex-direction: column;
   gap: 16px;
+  font-family: 'Jost', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+:global(.dark) .flashcard-dialog {
+  background: #2D3238;
+  border-color: #4B535E;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
 }
 
 .flashcard-header {
@@ -188,27 +195,35 @@ function openFullNotes() {
 }
 
 .flashcard-badge {
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 700;
-  color: #FF6B35;
+  color: #2563EB;
   letter-spacing: 0.08em;
 }
 
+:global(.dark) .flashcard-badge {
+  color: #60A5FA;
+}
+
 .counter-text {
-  font-size: 11.5px;
-  color: #8C93A8;
+  font-size: 12px;
+  color: #6B7280;
 }
 
 .close-icon-btn {
   background: none;
   border: none;
-  color: #8C93A8;
+  color: #6B7280;
   font-size: 24px;
   cursor: pointer;
   line-height: 1;
 }
 
 .close-icon-btn:hover {
+  color: #1E242B;
+}
+
+:global(.dark) .close-icon-btn:hover {
   color: #FFFFFF;
 }
 
@@ -235,25 +250,35 @@ function openFullNotes() {
 .card-face {
   position: absolute;
   inset: 0;
-  border-radius: 20px;
+  border-radius: 16px;
   padding: 22px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
 }
 
 .card-front {
-  background: linear-gradient(145deg, #1A1C2C, #131420);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #FFFFFF;
+  border: 1px solid #E2DAC9;
+}
+
+:global(.dark) .card-front {
+  background: #222831;
+  border-color: #4B535E;
 }
 
 .card-back {
-  background: linear-gradient(145deg, #201D2C, #141521);
-  border: 1px solid rgba(255, 107, 53, 0.4);
+  background: #FAF7F0;
+  border: 1.5px solid #BFDBFE;
   transform: rotateY(180deg);
+}
+
+:global(.dark) .card-back {
+  background: #282E37;
+  border-color: #3B82F6;
 }
 
 .face-top {
@@ -263,26 +288,34 @@ function openFullNotes() {
 }
 
 .module-chip {
-  font-size: 10px;
+  font-size: 10.5px;
   font-weight: 700;
-  color: #FF6B35;
-  background: rgba(255, 107, 53, 0.12);
+  color: #1D4ED8;
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
   padding: 2px 8px;
   border-radius: 6px;
 }
 
+:global(.dark) .module-chip {
+  color: #93C5FD;
+  background: rgba(37, 99, 235, 0.2);
+  border-color: rgba(59, 130, 246, 0.4);
+}
+
 .answer-badge {
-  font-size: 10px;
+  font-size: 10.5px;
   font-weight: 700;
-  color: #10B981;
-  background: rgba(16, 185, 129, 0.12);
+  color: #047857;
+  background: #ECFDF5;
+  border: 1px solid #A7F3D0;
   padding: 2px 8px;
   border-radius: 6px;
 }
 
 .tap-hint {
-  font-size: 10.5px;
-  color: #6C7287;
+  font-size: 11px;
+  color: #6B7280;
 }
 
 .front-content {
@@ -292,9 +325,13 @@ function openFullNotes() {
 .flashcard-q {
   font-size: 18px;
   font-weight: 700;
-  color: #FFFFFF;
+  color: #1E242B;
   line-height: 1.4;
   margin: 0;
+}
+
+:global(.dark) .flashcard-q {
+  color: #EEEEEE;
 }
 
 .back-content {
@@ -302,10 +339,14 @@ function openFullNotes() {
 }
 
 .flashcard-summary {
-  font-size: 13.5px;
-  color: #D1D5DB;
-  line-height: 1.55;
+  font-size: 14px;
+  color: #393E46;
+  line-height: 1.6;
   margin: 0;
+}
+
+:global(.dark) .flashcard-summary {
+  color: #D1D5DB;
 }
 
 .face-bottom {
@@ -315,20 +356,20 @@ function openFullNotes() {
 }
 
 .subtopic-label {
-  font-size: 11.5px;
-  color: #8C93A8;
+  font-size: 12px;
+  color: #6B7280;
 }
 
 .flip-icon {
-  font-size: 11.5px;
-  color: #FF6B35;
+  font-size: 12px;
+  color: #2563EB;
   font-weight: 600;
 }
 
 .read-full-link {
   background: none;
   border: none;
-  color: #FF6B35;
+  color: #2563EB;
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
@@ -344,16 +385,21 @@ function openFullNotes() {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  background: #11121C;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 16px;
+  background: #FFFFFF;
+  border: 1px solid #E2DAC9;
+  border-radius: 14px;
   padding: 12px;
+}
+
+:global(.dark) .srs-grading-bar {
+  background: #222831;
+  border-color: #4B535E;
 }
 
 .grading-label {
   font-size: 11px;
   font-weight: 600;
-  color: #8C93A8;
+  color: #6B7280;
   text-align: center;
 }
 
@@ -369,25 +415,30 @@ function openFullNotes() {
   align-items: center;
   padding: 8px 6px;
   border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: #171827;
+  border: 1px solid #E2DAC9;
+  background: #FAF7F0;
   cursor: pointer;
   transition: all 0.2s;
 }
 
+:global(.dark) .grade-btn {
+  background: #2D3238;
+  border-color: #4B535E;
+}
+
 .grade-btn.hard:hover {
   border-color: #EF4444;
-  background: rgba(239, 68, 68, 0.12);
+  background: #FEF2F2;
 }
 
 .grade-btn.good:hover {
   border-color: #F59E0B;
-  background: rgba(245, 158, 11, 0.12);
+  background: #FFFBEB;
 }
 
 .grade-btn.mastered:hover {
   border-color: #10B981;
-  background: rgba(16, 185, 129, 0.12);
+  background: #ECFDF5;
 }
 
 .grade-icon {
@@ -402,14 +453,18 @@ function openFullNotes() {
 .grade-icon.mastered-icon { color: #10B981; }
 
 .grade-title {
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
-  color: #FFFFFF;
+  color: #1E242B;
+}
+
+:global(.dark) .grade-title {
+  color: #EEEEEE;
 }
 
 .grade-sub {
-  font-size: 9.5px;
-  color: #8C93A8;
+  font-size: 10px;
+  color: #6B7280;
 }
 
 /* Nav row */
@@ -420,20 +475,27 @@ function openFullNotes() {
 }
 
 .nav-arrow-btn {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #D1D5DB;
-  font-size: 12px;
+  background: #FFFFFF;
+  border: 1px solid #E2DAC9;
+  color: #393E46;
+  font-size: 12.5px;
   font-weight: 600;
-  padding: 8px 16px;
-  border-radius: 9999px;
+  padding: 8px 18px;
+  border-radius: 8px;
   cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+:global(.dark) .nav-arrow-btn {
+  background: #222831;
+  border-color: #4B535E;
+  color: #D1D5DB;
 }
 
 .nav-arrow-btn:hover:not(:disabled) {
-  background: rgba(255, 107, 53, 0.15);
-  border-color: rgba(255, 107, 53, 0.4);
-  color: #FF6B35;
+  background: #EFF6FF;
+  border-color: #2563EB;
+  color: #2563EB;
 }
 
 .nav-arrow-btn:disabled {
