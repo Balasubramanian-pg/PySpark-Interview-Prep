@@ -199,28 +199,29 @@ function navigateTo(path: string) {
 
 <style scoped>
 .completion-bar {
-  position: sticky;
-  bottom: 16px;
-  margin-top: 48px;
-  z-index: 40;
+  position: static !important;
+  margin-top: 64px;
+  margin-bottom: 48px;
+  width: 100%;
+  max-width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  padding: 0 16px;
+  align-items: stretch;
+  gap: 14px;
+  padding: 0;
 }
 
 .srs-retention-pill {
   width: 100%;
-  max-width: 860px;
+  max-width: 100%;
   background: var(--surface-panel);
   border: 1px solid var(--border-subtle);
   border-radius: 12px;
-  padding: 10px 16px;
+  padding: 12px 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .dark .srs-retention-pill {
@@ -244,7 +245,7 @@ function navigateTo(path: string) {
 }
 
 .pill-desc {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--text-muted);
 }
 
@@ -309,12 +310,12 @@ function navigateTo(path: string) {
   justify-content: space-between;
   gap: 16px;
   width: 100%;
-  max-width: 860px;
+  max-width: 100%;
   background: var(--surface-panel);
   border: 1px solid var(--border-subtle);
-  border-radius: 14px;
-  padding: 10px 18px;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  padding: 12px 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .dark .completion-inner {
